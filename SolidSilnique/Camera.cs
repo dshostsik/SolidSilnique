@@ -73,8 +73,7 @@ namespace SolidSilnique
             if (direction == directions.LEFT) Position -= Right * speed;
         }
 
-        public void mouseMovement(float xOffset, float yOffset, float deltaTime, bool constrainPitch = true,
-            bool constrainYaw = true)
+        public void mouseMovement(float xOffset, float yOffset, float deltaTime, bool constrainPitch = true)
         {
             xOffset *= MouseSensitivity;
             yOffset *= MouseSensitivity;
@@ -104,9 +103,9 @@ namespace SolidSilnique
         private void UpdateCameraVectors()
         {
             Vector3 front;
-            front.X = MathF.Cos(MathHelper.ToRadians(Yaw) * MathF.Cos(MathHelper.ToRadians(Pitch)));
+            front.X = MathF.Cos(MathHelper.ToRadians(Yaw)) * MathF.Cos(MathHelper.ToRadians(Pitch));
             front.Y = MathF.Sin(MathHelper.ToRadians(Pitch));
-            front.Z = MathF.Sin(MathHelper.ToRadians(Yaw) * MathF.Cos(MathHelper.ToRadians(Pitch)));
+            front.Z = MathF.Sin(MathHelper.ToRadians(Yaw)) * MathF.Cos(MathHelper.ToRadians(Pitch));
             Front = Vector3.Normalize(front);
 
             Right = Vector3.Normalize(Vector3.Cross(Front, WorldUp));
