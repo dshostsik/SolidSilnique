@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
@@ -13,6 +14,20 @@ namespace SolidSilnique
         private Matrix _world;
         private Matrix _view;
         private Matrix _projection;
+
+        private SpriteBatch _whatsAppIcon;
+        private Texture2D _whatsAppIconTexture;
+        private Vector2 _whatsAppIconPos;
+
+        private SpriteFont _font;
+        private SpriteBatch _text;
+        private Vector2 _textPos;
+
+
+        private SpriteBatch _rect;
+        private Texture2D _rectTexture;
+        private Vector2 _rectPos;
+        private Vector2 _rectOrigin;
 
         private Model _deimos;
 
@@ -53,9 +68,15 @@ namespace SolidSilnique
                 1000f
             );
 
-
-            lastX = Window.ClientBounds.Width / 2;
-            lastY = Window.ClientBounds.Height / 2;
+            _whatsAppIconPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.95f,
+                _graphics.PreferredBackBufferHeight * 0.01f);
+            _textPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.1f,
+                _graphics.PreferredBackBufferHeight * 0.05f);
+            _rectPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.85f,
+                _graphics.PreferredBackBufferHeight * 0.80f);
+            
+            lastX = _graphics.PreferredBackBufferWidth / 2;
+            lastY = _graphics.PreferredBackBufferHeight / 2;
             firstMouse = true;
 
             base.Initialize();
@@ -66,6 +87,34 @@ namespace SolidSilnique
             // TODO: use this.Content to load your game content here
             // Load the model
             _deimos = Content.Load<Model>("deimos");
+            _whatsAppIconTexture = Content.Load<Texture2D>("whatsapp_1384095");
+
+            _whatsAppIcon = new SpriteBatch(GraphicsDevice);
+
+            _font = Content.Load<SpriteFont>("Megafont");
+            _text = new SpriteBatch(GraphicsDevice);
+
+            _rectTexture = new Texture2D(GraphicsDevice, 100, 100);
+
+            var data = new Color[10000];
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    data[i] = Color.Chartreuse;
+                }
+                else
+                {
+                    data[i] = Color.Red;
+                }
+            }
+
+            _rectTexture.SetData(data);
+
+            _rect = new SpriteBatch(GraphicsDevice);
+            
+            _rectOrigin = new Vector2(_rectTexture.Width / 2, _rectTexture.Height / 2);
         }
 
         private void processMouse(GameTime gameTime)
@@ -123,6 +172,7 @@ namespace SolidSilnique
             _view = camera.getViewMatrix();
             // // Rotate object
             _world *= Matrix.CreateRotationY(MathHelper.ToRadians(gameTime.ElapsedGameTime.Milliseconds * 0.01f));
+
             camera.processScroll(Mouse.GetState().ScrollWheelValue);
             processKeyboard(gameTime);
             processMouse(gameTime);
@@ -133,9 +183,27 @@ namespace SolidSilnique
         protected override void Draw(GameTime gameTime)
         {
             // TODO: Add your drawing code here
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.Aqua);
 
             _deimos.Draw(_world, _view, _projection);
+
+            _whatsAppIcon.Begin();
+            _whatsAppIcon.Draw(_whatsAppIconTexture, _whatsAppIconPos, Color.White);
+            _whatsAppIcon.End();
+
+            Vector2 textCenter = _font.MeasureString(gameTime.ElapsedGameTime.Milliseconds.ToString()) / 2;
+
+            _text.Begin();
+            _text.DrawString(_font, gameTime.TotalGameTime.Milliseconds.ToString(), _textPos, Color.Black, 0,
+                textCenter, 2.5f, SpriteEffects.None, 0.5f);
+            _text.End();
+
+            _rect.Begin();
+            _rect.Draw(_rectTexture, _rectPos, null, Color.White,  (int)gameTime.TotalGameTime.TotalSeconds * 2, _rectOrigin,
+                1.0f, SpriteEffects.None, 0.5f);
+            
+            //_rect.Draw(_rectTexture, _rectPos, Color.White);
+            _rect.End();
 
             base.Draw(gameTime);
         }
