@@ -195,7 +195,7 @@ namespace SolidSilnique
 
             _text.Begin();
             _text.DrawString(_font, gameTime.TotalGameTime.Milliseconds.ToString(), _textPos, Color.Black, 0,
-                textCenter, 2.5f, SpriteEffects.None, 0.5f);
+                textCenter, 1.0f, SpriteEffects.None, 0.5f);
             _text.End();
 
             _rect.Begin();

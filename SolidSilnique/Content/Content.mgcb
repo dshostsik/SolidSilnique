@@ -33,7 +33,7 @@
 /processorParam:DefaultEffect=BasicEffect
 /processorParam:GenerateMipmaps=True
 /processorParam:GenerateTangentFrames=False
-/processorParam:PremultiplyTextureAlpha=True
+/processorParam:PremultiplyTextureAlpha=True    
 /processorParam:PremultiplyVertexColors=True
 /processorParam:ResizeTexturesToPowerOfTwo=False
 /processorParam:RotationX=0
