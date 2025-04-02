@@ -1,2 +1,2 @@
-﻿using var game = new SolidSilniqueProto.Game1();
+﻿using var game = new SolidSilnique.Game1();
 game.Run();

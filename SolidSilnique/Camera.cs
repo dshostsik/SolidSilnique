@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
-namespace SolidSilniqueProto
+namespace SolidSilnique
 {
     public class Camera
     {
@@ -82,15 +82,11 @@ namespace SolidSilniqueProto
             Yaw += xOffset * deltaTime;
             Pitch += yOffset * deltaTime;
 
-            if (constrainPitch)
-            {
-                if (Pitch > 89.0f)
-                {
+            if (constrainPitch) {
+                if (Pitch > 89.0f) {
                     Pitch = 89.0f;
                 }
-
-                if (Pitch < -89.0f)
-                {
+                if (Pitch < -89.0f) {
                     Pitch = -89.0f;
                 }
             }

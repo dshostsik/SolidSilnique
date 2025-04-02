@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
-namespace SolidSilniqueProto
+namespace SolidSilnique
 {
     public class Game1 : Game
     {
