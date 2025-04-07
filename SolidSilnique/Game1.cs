@@ -61,7 +61,7 @@ namespace SolidSilnique
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
             _graphics.ApplyChanges();
 
             // Create camera
@@ -142,8 +142,8 @@ namespace SolidSilnique
                 firstMouse = false;
             }
 
-            float xOffset = (lastX - mouseX);
-            float yOffset = (mouseY - lastY);
+            float xOffset = (mouseX - lastX);
+            float yOffset = (lastY - mouseY);
 
             lastX = mouseX;
             lastY = mouseY;

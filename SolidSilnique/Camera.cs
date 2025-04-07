@@ -9,7 +9,7 @@ namespace SolidSilnique
         private const float YAW = -90.0f;
         private const float PITCH = .0f;
         private const float ZOOM = 35.0f;
-        private const float SENSE = .005f;
+        private const float SENSE = .025f;
         private const float SPEED = .025f;
 
         public enum directions
@@ -78,8 +78,11 @@ namespace SolidSilnique
             xOffset *= MouseSensitivity;
             yOffset *= MouseSensitivity;
 
-            Yaw += xOffset * deltaTime;
-            Pitch += yOffset * deltaTime;
+            //Yaw += xOffset * deltaTime;
+            //Pitch += yOffset * deltaTime;
+            
+            Yaw += xOffset;
+            Pitch += yOffset;
 
             if (constrainPitch) {
                 if (Pitch > 89.0f) {
@@ -90,6 +93,9 @@ namespace SolidSilnique
                 }
             }
 
+            Console.WriteLine(Yaw);
+            Console.WriteLine(Pitch);
+            
             UpdateCameraVectors();
         }
 
