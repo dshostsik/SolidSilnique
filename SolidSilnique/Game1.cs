@@ -44,7 +44,7 @@ namespace SolidSilnique
             _graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
 
             IsFixedTimeStep = false;
             
@@ -59,9 +59,9 @@ namespace SolidSilnique
             Window.AllowUserResizing = true;
 
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            _graphics.PreferredBackBufferWidth = 1600;
-            _graphics.PreferredBackBufferHeight = 900;
-            
+            _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
+            _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
             // Create camera
@@ -148,10 +148,10 @@ namespace SolidSilnique
             lastX = mouseX;
             lastY = mouseY;
 
-            if (Mouse.GetState().MiddleButton == ButtonState.Pressed)
-            {
-                camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
-            }
+            // if (Mouse.GetState().MiddleButton == ButtonState.Pressed)
+            // {
+                 camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
+            // }
         }
 
         private void processKeyboard(GameTime gameTime)

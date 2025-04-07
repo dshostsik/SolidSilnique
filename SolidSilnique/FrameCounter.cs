@@ -15,7 +15,7 @@ namespace SolidSilnique
         public float avgFPS { get; private set; }
         public float currentFPS { get; private set; }
 
-        public const int MaximumSamples = 1000;
+        public const int MaximumSamples = 100;
 
         private Queue<float> samples = new();
 
