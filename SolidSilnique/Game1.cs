@@ -10,6 +10,10 @@ namespace SolidSilnique
     {
         private readonly GraphicsDeviceManager _graphics;
 
+        //FPS Counter
+        private readonly FrameCounter counter;
+        private Vector2 frameraterCounterPosition;
+
         // Model-View-Projection
         private Matrix _world;
         private Matrix _view;
@@ -41,6 +45,12 @@ namespace SolidSilnique
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+
+            IsFixedTimeStep = false;
+            
+            _graphics.SynchronizeWithVerticalRetrace = true;
+
+            counter = new FrameCounter();
         }
 
         protected override void Initialize()
@@ -51,6 +61,7 @@ namespace SolidSilnique
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
             _graphics.PreferredBackBufferWidth = 1600;
             _graphics.PreferredBackBufferHeight = 900;
+            
             _graphics.ApplyChanges();
 
             // Create camera
@@ -74,7 +85,9 @@ namespace SolidSilnique
                 _graphics.PreferredBackBufferHeight * 0.05f);
             _rectPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.85f,
                 _graphics.PreferredBackBufferHeight * 0.80f);
-            
+            frameraterCounterPosition = new Vector2(_graphics.PreferredBackBufferWidth * 0.025f,
+                _graphics.PreferredBackBufferHeight * 0.01f);
+
             lastX = _graphics.PreferredBackBufferWidth / 2;
             lastY = _graphics.PreferredBackBufferHeight / 2;
             firstMouse = true;
@@ -113,7 +126,7 @@ namespace SolidSilnique
             _rectTexture.SetData(data);
 
             _rect = new SpriteBatch(GraphicsDevice);
-            
+
             _rectOrigin = new Vector2(_rectTexture.Width / 2, _rectTexture.Height / 2);
         }
 
@@ -176,6 +189,7 @@ namespace SolidSilnique
             camera.processScroll(Mouse.GetState().ScrollWheelValue);
             processKeyboard(gameTime);
             processMouse(gameTime);
+            counter.Update(gameTime);
             // TODO: Add your update logic here
             base.Update(gameTime);
         }
@@ -198,10 +212,15 @@ namespace SolidSilnique
                 textCenter, 1.0f, SpriteEffects.None, 0.5f);
             _text.End();
 
+            _text.Begin();
+            _text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Black);
+            _text.End();
+
             _rect.Begin();
-            _rect.Draw(_rectTexture, _rectPos, null, Color.White,  (int)gameTime.TotalGameTime.TotalSeconds * 2, _rectOrigin,
+            _rect.Draw(_rectTexture, _rectPos, null, Color.White, (int)gameTime.TotalGameTime.TotalSeconds * 2,
+                _rectOrigin,
                 1.0f, SpriteEffects.None, 0.5f);
-            
+
             //_rect.Draw(_rectTexture, _rectPos, Color.White);
             _rect.End();
 
