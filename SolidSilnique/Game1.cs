@@ -47,7 +47,7 @@ namespace SolidSilnique
             IsMouseVisible = false;
 
             IsFixedTimeStep = false;
-            
+
             _graphics.SynchronizeWithVerticalRetrace = true;
 
             counter = new FrameCounter();
@@ -142,15 +142,15 @@ namespace SolidSilnique
                 firstMouse = false;
             }
 
-            float xOffset = (mouseX - lastX);
-            float yOffset = (lastY - mouseY);
+            float xOffset = (lastX - mouseX);
+            float yOffset = (mouseY - lastY);
 
             lastX = mouseX;
             lastY = mouseY;
 
             // if (Mouse.GetState().MiddleButton == ButtonState.Pressed)
             // {
-                 camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
+            camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
             // }
         }
 

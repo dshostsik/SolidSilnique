@@ -92,9 +92,6 @@ namespace SolidSilnique
                     Pitch = -89.0f;
                 }
             }
-
-            Console.WriteLine(Yaw);
-            Console.WriteLine(Pitch);
             
             UpdateCameraVectors();
         }
