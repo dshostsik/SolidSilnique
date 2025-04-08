@@ -26,7 +26,7 @@ namespace SolidSilnique
         private SpriteFont _font;
         private SpriteBatch _text;
         private Vector2 _textPos;
-
+        private Vector2 textCenter;
 
         private SpriteBatch _rect;
         private Texture2D _rectTexture;
@@ -41,6 +41,16 @@ namespace SolidSilnique
         private float lastX;
         private float lastY;
 
+        int scrollWheelValue;
+        int currentScrollWheelValue;
+
+
+        // create bg
+        private SpriteBatch background;
+        private Texture2D[] frames;
+        private int totalFrames;
+        private Rectangle screenBounds;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -50,6 +60,7 @@ namespace SolidSilnique
             IsFixedTimeStep = false;
             Mouse.SetCursor(MouseCursor.Crosshair);
             counter = new FrameCounter();
+            scrollWheelValue = 0;
         }
 
         protected override void Initialize()
@@ -65,7 +76,7 @@ namespace SolidSilnique
             _graphics.ApplyChanges();
 
             Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-            
+
             // Create camera
             camera = new Camera(new Vector3(0, 0, 5));
             // matrices initialisations
@@ -73,18 +84,7 @@ namespace SolidSilnique
             // Resize world matrix
             _world = Matrix.CreateScale(0.05f) * _world;
 
-            _projection = Matrix.CreatePerspectiveFieldOfView(
-                MathHelper.ToRadians(45f),
-                GraphicsDevice.Viewport.AspectRatio,
-                0.1f,
-                1000f
-            );
-            
-            // _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(camera.Zoom),
-            //     GraphicsDevice.Viewport.AspectRatio,
-            //     0.1f,
-            //     100f);
-
+            // Sprite settings
             _whatsAppIconPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.95f,
                 _graphics.PreferredBackBufferHeight * 0.01f);
             _textPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.1f,
@@ -94,6 +94,19 @@ namespace SolidSilnique
             frameraterCounterPosition = new Vector2(_graphics.PreferredBackBufferWidth * 0.025f,
                 _graphics.PreferredBackBufferHeight * 0.01f);
             firstMouse = true;
+
+            frames = new Texture2D[10];
+
+            for (int i = 0; i < 10; i++)
+            {
+                frames[i] = Content.Load<Texture2D>("Background/Frame" + (i + 1));
+            }
+
+            background = new SpriteBatch(GraphicsDevice);
+
+            totalFrames = frames.Length;
+
+            screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             
             base.Initialize();
         }
@@ -137,7 +150,7 @@ namespace SolidSilnique
         {
             int w = GraphicsDevice.Viewport.Width / 2;
             int h = GraphicsDevice.Viewport.Height / 2;
-            
+
             if (firstMouse)
             {
                 Mouse.SetPosition(w, h);
@@ -145,15 +158,15 @@ namespace SolidSilnique
                 _view = camera.resetCamera();
                 return;
             }
-            
+
             float mouseX = w - Mouse.GetState().X;
             float mouseY = Mouse.GetState().Y - h;
-            
+
             float xOffset = (mouseX);
             float yOffset = (mouseY);
-            
+
             Mouse.SetPosition(w, h);
-            
+
             camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
         }
 
@@ -182,18 +195,35 @@ namespace SolidSilnique
 
         protected override void Update(GameTime gameTime)
         {
+            // TODO: Add your update logic here
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            // Get current camera view
             _view = camera.getViewMatrix();
-            // // Rotate object
+
+            // Rotate object
             _world *= Matrix.CreateRotationY(MathHelper.ToRadians(gameTime.ElapsedGameTime.Milliseconds * 0.01f));
 
-            camera.processScroll(Mouse.GetState().ScrollWheelValue);
+            // Control FOV and perspective settings
+            currentScrollWheelValue = Mouse.GetState().ScrollWheelValue;
+            if (scrollWheelValue != currentScrollWheelValue)
+            {
+                if (scrollWheelValue - currentScrollWheelValue < 0.0f) camera.processScroll(1);
+                else camera.processScroll(-1);
+                scrollWheelValue = currentScrollWheelValue;
+            }
+
+            _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(camera.Zoom),
+                GraphicsDevice.Viewport.AspectRatio,
+                0.1f,
+                100f);
+
             processKeyboard(gameTime);
             processMouse(gameTime);
             counter.Update(gameTime);
-            // TODO: Add your update logic here
+
             base.Update(gameTime);
         }
 
@@ -201,30 +231,32 @@ namespace SolidSilnique
         {
             // TODO: Add your drawing code here
             GraphicsDevice.Clear(Color.Aqua);
+            background.Begin();
+            background.Draw(frames[(int)(gameTime.TotalGameTime.TotalMilliseconds / counter.avgFPS % totalFrames)], screenBounds, Color.White);
+            background.End();
+
 
             _deimos.Draw(_world, _view, _projection);
 
             _whatsAppIcon.Begin();
-            _whatsAppIcon.Draw(_whatsAppIconTexture, _whatsAppIconPos, Color.White);
+            _whatsAppIcon.Draw(_whatsAppIconTexture, _whatsAppIconPos, Color.Aquamarine);
             _whatsAppIcon.End();
 
-            Vector2 textCenter = _font.MeasureString(gameTime.ElapsedGameTime.Milliseconds.ToString()) / 2;
+            textCenter = _font.MeasureString(gameTime.ElapsedGameTime.Milliseconds.ToString()) / 2;
 
             _text.Begin();
-            _text.DrawString(_font, gameTime.TotalGameTime.Milliseconds.ToString(), _textPos, Color.Black, 0,
+            _text.DrawString(_font, gameTime.TotalGameTime.Milliseconds.ToString(), _textPos, Color.Aqua, 0,
                 textCenter, 1.0f, SpriteEffects.None, 0.5f);
             _text.End();
 
             _text.Begin();
-            _text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Black);
+            _text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Aqua);
             _text.End();
 
             _rect.Begin();
             _rect.Draw(_rectTexture, _rectPos, null, Color.White, (int)gameTime.TotalGameTime.TotalSeconds * 2,
                 _rectOrigin,
                 1.0f, SpriteEffects.None, 0.5f);
-
-            //_rect.Draw(_rectTexture, _rectPos, Color.White);
             _rect.End();
 
             base.Draw(gameTime);

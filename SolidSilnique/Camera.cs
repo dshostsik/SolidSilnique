@@ -26,7 +26,7 @@ namespace SolidSilnique
         Vector3 initialPosition;
         Vector3 initialFront;
         Vector3 initialUp;
-        
+
         Vector3 Position;
         Vector3 Front;
         Vector3 Up;
@@ -99,34 +99,35 @@ namespace SolidSilnique
             xOffset *= MouseSensitivity;
             yOffset *= MouseSensitivity;
 
-             Yaw += xOffset * (deltaTime / 1000.0f);
-             Pitch += yOffset * (deltaTime / 1000.0f);
-            
+            Yaw += xOffset * (deltaTime / 1000.0f);
+            Pitch += yOffset * (deltaTime / 1000.0f);
+
             //Yaw += xOffset;
             //Pitch += yOffset;
-            
+
             Console.WriteLine("Yaw: " + Yaw + " pitch: " + Pitch);
-            
-            if (constrainPitch) {
-                if (Pitch > 89.0f) {
+
+            if (constrainPitch)
+            {
+                if (Pitch > 89.0f)
+                {
                     Pitch = 89.0f;
                 }
-                if (Pitch < -89.0f) {
+
+                if (Pitch < -89.0f)
+                {
                     Pitch = -89.0f;
                 }
             }
-            
+
             UpdateCameraVectors();
         }
 
         public void processScroll(double yOffset)
         {
-            if (yOffset != 0.0f)
-            {
-                Zoom -= (float)yOffset / -(float)yOffset;
-                if (Zoom < 5.0f) Zoom = 5.0f;
-                if (Zoom > 60.0f) Zoom = 60.0f;    
-            }
+            Zoom -= (float)yOffset;
+            if (Zoom < 5.0f) Zoom = 5.0f;
+            if (Zoom > 60.0f) Zoom = 60.0f;
         }
 
         private void UpdateCameraVectors()
