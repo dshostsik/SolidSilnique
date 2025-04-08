@@ -4,12 +4,15 @@ using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace SolidSilnique
 {
+    /// <summary>
+    /// Class representing camera
+    /// </summary>
     public class Camera
     {
         private const float YAW = -90.0f;
         private const float PITCH = .0f;
         private const float ZOOM = 35.0f;
-        private const float SENSE = .025f;
+        private const float SENSE = 10.0f;
         private const float SPEED = .025f;
 
         public enum directions
@@ -20,6 +23,10 @@ namespace SolidSilnique
             RIGHT
         }
 
+        Vector3 initialPosition;
+        Vector3 initialFront;
+        Vector3 initialUp;
+        
         Vector3 Position;
         Vector3 Front;
         Vector3 Up;
@@ -31,12 +38,14 @@ namespace SolidSilnique
 
         float MovementSpeed;
         float MouseSensitivity;
-        float Zoom;
+        public float Zoom;
 
         public Camera(Vector3 position, float yaw = YAW, float pitch = PITCH)
         {
             Position = position;
+            initialPosition = Position;
             WorldUp = -Vector3.Up;
+            initialUp = Vector3.Up;
             Yaw = yaw;
             Pitch = pitch;
 
@@ -51,6 +60,7 @@ namespace SolidSilnique
             //     ) * 180 / MathHelper.Pi;
 
             Front = Vector3.Forward;
+            initialFront = Front;
             MovementSpeed = SPEED;
             MouseSensitivity = SENSE;
             Zoom = ZOOM;
@@ -59,6 +69,17 @@ namespace SolidSilnique
 
         public Matrix getViewMatrix()
         {
+            return Matrix.CreateLookAt(Position, Position + Front, Up);
+        }
+
+        public Matrix resetCamera()
+        {
+            Position = initialPosition;
+            Front = initialFront;
+            Up = initialUp;
+            Yaw = YAW;
+            Pitch = PITCH;
+            UpdateCameraVectors();
             return Matrix.CreateLookAt(Position, Position + Front, Up);
         }
 
@@ -78,12 +99,14 @@ namespace SolidSilnique
             xOffset *= MouseSensitivity;
             yOffset *= MouseSensitivity;
 
-            //Yaw += xOffset * deltaTime;
-            //Pitch += yOffset * deltaTime;
+             Yaw += xOffset * (deltaTime / 1000.0f);
+             Pitch += yOffset * (deltaTime / 1000.0f);
             
-            Yaw += xOffset;
-            Pitch += yOffset;
-
+            //Yaw += xOffset;
+            //Pitch += yOffset;
+            
+            Console.WriteLine("Yaw: " + Yaw + " pitch: " + Pitch);
+            
             if (constrainPitch) {
                 if (Pitch > 89.0f) {
                     Pitch = 89.0f;
@@ -98,9 +121,12 @@ namespace SolidSilnique
 
         public void processScroll(double yOffset)
         {
-            Zoom -= (float)yOffset;
-            if (Zoom < 5.0f) Zoom = 5.0f;
-            if (Zoom > 60.0f) Zoom = 60.0f;
+            if (yOffset != 0.0f)
+            {
+                Zoom -= (float)yOffset / -(float)yOffset;
+                if (Zoom < 5.0f) Zoom = 5.0f;
+                if (Zoom > 60.0f) Zoom = 60.0f;    
+            }
         }
 
         private void UpdateCameraVectors()

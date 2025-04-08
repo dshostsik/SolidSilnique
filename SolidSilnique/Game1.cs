@@ -36,34 +36,36 @@ namespace SolidSilnique
         private Model _deimos;
 
         private Camera camera;
-        private float lastX, lastY;
         private bool firstMouse;
+
+        private float lastX;
+        private float lastY;
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
-            IsMouseVisible = false;
-
+            IsMouseVisible = true;
             IsFixedTimeStep = false;
-
-            _graphics.SynchronizeWithVerticalRetrace = true;
-
+            Mouse.SetCursor(MouseCursor.Crosshair);
             counter = new FrameCounter();
         }
 
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            Window.AllowUserResizing = true;
+            //Window.AllowUserResizing = true;
 
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+            _graphics.SynchronizeWithVerticalRetrace = true;
             _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
 
+            Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            
             // Create camera
             camera = new Camera(new Vector3(0, 0, 5));
             // matrices initialisations
@@ -71,13 +73,17 @@ namespace SolidSilnique
             // Resize world matrix
             _world = Matrix.CreateScale(0.05f) * _world;
 
-            //_view = Matrix.CreateLookAt(new Vector3(0, 0, -5), Vector3.Zero, Vector3.Up);
             _projection = Matrix.CreatePerspectiveFieldOfView(
                 MathHelper.ToRadians(45f),
                 GraphicsDevice.Viewport.AspectRatio,
                 0.1f,
                 1000f
             );
+            
+            // _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(camera.Zoom),
+            //     GraphicsDevice.Viewport.AspectRatio,
+            //     0.1f,
+            //     100f);
 
             _whatsAppIconPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.95f,
                 _graphics.PreferredBackBufferHeight * 0.01f);
@@ -87,11 +93,8 @@ namespace SolidSilnique
                 _graphics.PreferredBackBufferHeight * 0.80f);
             frameraterCounterPosition = new Vector2(_graphics.PreferredBackBufferWidth * 0.025f,
                 _graphics.PreferredBackBufferHeight * 0.01f);
-
-            lastX = _graphics.PreferredBackBufferWidth / 2;
-            lastY = _graphics.PreferredBackBufferHeight / 2;
             firstMouse = true;
-
+            
             base.Initialize();
         }
 
@@ -132,26 +135,26 @@ namespace SolidSilnique
 
         private void processMouse(GameTime gameTime)
         {
-            float mouseX = Mouse.GetState().X;
-            float mouseY = Mouse.GetState().Y;
-
+            int w = GraphicsDevice.Viewport.Width / 2;
+            int h = GraphicsDevice.Viewport.Height / 2;
+            
             if (firstMouse)
             {
-                lastX = mouseX;
-                lastY = mouseY;
+                Mouse.SetPosition(w, h);
                 firstMouse = false;
+                _view = camera.resetCamera();
+                return;
             }
-
-            float xOffset = (lastX - mouseX);
-            float yOffset = (mouseY - lastY);
-
-            lastX = mouseX;
-            lastY = mouseY;
-
-            // if (Mouse.GetState().MiddleButton == ButtonState.Pressed)
-            // {
+            
+            float mouseX = w - Mouse.GetState().X;
+            float mouseY = Mouse.GetState().Y - h;
+            
+            float xOffset = (mouseX);
+            float yOffset = (mouseY);
+            
+            Mouse.SetPosition(w, h);
+            
             camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
-            // }
         }
 
         private void processKeyboard(GameTime gameTime)
