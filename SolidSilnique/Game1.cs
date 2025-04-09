@@ -69,16 +69,19 @@ namespace SolidSilnique
             //Window.AllowUserResizing = true;
 
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
+            _graphics.IsFullScreen = true;
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
             _graphics.SynchronizeWithVerticalRetrace = true;
-            _graphics.IsFullScreen = true;
             _graphics.ApplyChanges();
-
+            
             Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            Console.WriteLine("Initial mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
+            Console.WriteLine("Initial mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
 
             // Create camera
             camera = new Camera(new Vector3(0, 0, 5));
+            camera.mouseMovement(0,0,0);
             // matrices initialisations
             _world = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.Up);
             // Resize world matrix
@@ -93,8 +96,9 @@ namespace SolidSilnique
                 _graphics.PreferredBackBufferHeight * 0.80f);
             frameraterCounterPosition = new Vector2(_graphics.PreferredBackBufferWidth * 0.025f,
                 _graphics.PreferredBackBufferHeight * 0.01f);
-            firstMouse = true;
 
+            firstMouse = true;
+            
             frames = new Texture2D[10];
 
             for (int i = 0; i < 10; i++)
@@ -155,10 +159,10 @@ namespace SolidSilnique
             {
                 Mouse.SetPosition(w, h);
                 firstMouse = false;
-                _view = camera.resetCamera();
                 return;
             }
-
+            Console.WriteLine("Mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
+            Console.WriteLine("Mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
             float mouseX = w - Mouse.GetState().X;
             float mouseY = Mouse.GetState().Y - h;
 

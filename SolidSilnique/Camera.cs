@@ -23,10 +23,6 @@ namespace SolidSilnique
             RIGHT
         }
 
-        Vector3 initialPosition;
-        Vector3 initialFront;
-        Vector3 initialUp;
-
         Vector3 Position;
         Vector3 Front;
         Vector3 Up;
@@ -43,9 +39,7 @@ namespace SolidSilnique
         public Camera(Vector3 position, float yaw = YAW, float pitch = PITCH)
         {
             Position = position;
-            initialPosition = Position;
             WorldUp = -Vector3.Up;
-            initialUp = Vector3.Up;
             Yaw = yaw;
             Pitch = pitch;
 
@@ -60,7 +54,6 @@ namespace SolidSilnique
             //     ) * 180 / MathHelper.Pi;
 
             Front = Vector3.Forward;
-            initialFront = Front;
             MovementSpeed = SPEED;
             MouseSensitivity = SENSE;
             Zoom = ZOOM;
@@ -69,17 +62,6 @@ namespace SolidSilnique
 
         public Matrix getViewMatrix()
         {
-            return Matrix.CreateLookAt(Position, Position + Front, Up);
-        }
-
-        public Matrix resetCamera()
-        {
-            Position = initialPosition;
-            Front = initialFront;
-            Up = initialUp;
-            Yaw = YAW;
-            Pitch = PITCH;
-            UpdateCameraVectors();
             return Matrix.CreateLookAt(Position, Position + Front, Up);
         }
 
