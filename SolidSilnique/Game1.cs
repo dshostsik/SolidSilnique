@@ -51,6 +51,9 @@ namespace SolidSilnique
         private int totalFrames;
         private Rectangle screenBounds;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -63,9 +66,11 @@ namespace SolidSilnique
             scrollWheelValue = 0;
         }
 
+        /// <summary>
+        /// Add your initialization logic here
+        /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
             //Window.AllowUserResizing = true;
 
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
@@ -115,9 +120,11 @@ namespace SolidSilnique
             base.Initialize();
         }
 
+        /// <summary>
+        /// Use this.Content to load your game content here
+        /// </summary>
         protected override void LoadContent()
         {
-            // TODO: use this.Content to load your game content here
             // Load the model
             _deimos = Content.Load<Model>("deimos");
             _whatsAppIconTexture = Content.Load<Texture2D>("whatsapp_1384095");
@@ -150,6 +157,10 @@ namespace SolidSilnique
             _rectOrigin = new Vector2(_rectTexture.Width / 2, _rectTexture.Height / 2);
         }
 
+        /// <summary>
+        /// Function defining mouse behaviour
+        /// </summary>
+        /// <param name="gameTime">Object containing time values</param>
         private void processMouse(GameTime gameTime)
         {
             int w = GraphicsDevice.Viewport.Width / 2;
@@ -174,6 +185,10 @@ namespace SolidSilnique
             camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
         }
 
+        /// <summary>
+        /// Function for defining key bindings
+        /// </summary>
+        /// <param name="gameTime">Object containing time values</param>
         private void processKeyboard(GameTime gameTime)
         {
             if (Keyboard.GetState().IsKeyDown(Keys.W))
@@ -197,9 +212,12 @@ namespace SolidSilnique
             }
         }
 
+        /// <summary>
+        /// Add your update logic here
+        /// </summary>
+        /// <param name="gameTime">Object containing time values</param>
         protected override void Update(GameTime gameTime)
         {
-            // TODO: Add your update logic here
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
                 Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
