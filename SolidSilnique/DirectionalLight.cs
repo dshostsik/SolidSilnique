@@ -11,7 +11,7 @@ namespace SolidSilnique
             _direction = direction;
             AmbientColor = new Vector3(.2f, .2f, .2f);
             DiffuseColor = new Vector3(.8f, .8f, .8f);
-            ReflectiveColor = new Vector3(.8f, .8f, .8f);
+            SpecularColor = new Vector3(.8f, .8f, .8f);
         }
 
         public Vector3 Direction

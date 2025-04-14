@@ -26,7 +26,7 @@ public class Spotlight : PointLight
         set { outerCut = value; }
     }
 
-    public Spotlight(float linear, float quadratic, Vector3 direction, float innerCut, float outerCut) : base(linear, quadratic)
+    public Spotlight(float linear, float quadratic, float constant, Vector3 direction, float innerCut, float outerCut) : base(linear, quadratic, constant)
     {
         this.direction = direction;
         this.innerCut = innerCut;

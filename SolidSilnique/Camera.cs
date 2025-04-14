@@ -29,6 +29,8 @@ namespace SolidSilnique
         Vector3 Right;
         Vector3 WorldUp;
 
+        public Vector3 CameraPosition { get { return Position; } }
+        
         float Yaw;
         float Pitch;
 

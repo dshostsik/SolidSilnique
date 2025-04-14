@@ -51,6 +51,10 @@ namespace SolidSilnique
         private int totalFrames;
         private Rectangle screenBounds;
 
+        
+        // Custom shader
+        private Effect customEffect;
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -117,6 +121,8 @@ namespace SolidSilnique
 
             screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             
+            customEffect = new BasicEffect(GraphicsDevice);
+            
             base.Initialize();
         }
 
@@ -125,6 +131,10 @@ namespace SolidSilnique
         /// </summary>
         protected override void LoadContent()
         {
+            // Load shaders
+            customEffect = Content.Load<Effect>("Shaders/CustomShader");
+            
+            
             // Load the model
             _deimos = Content.Load<Model>("deimos");
             _whatsAppIconTexture = Content.Load<Texture2D>("whatsapp_1384095");
@@ -172,8 +182,8 @@ namespace SolidSilnique
                 firstMouse = false;
                 return;
             }
-            Console.WriteLine("Mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
-            Console.WriteLine("Mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
+            //Console.WriteLine("Mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
+            //Console.WriteLine("Mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
             float mouseX = w - Mouse.GetState().X;
             float mouseY = Mouse.GetState().Y - h;
 
@@ -252,34 +262,46 @@ namespace SolidSilnique
         protected override void Draw(GameTime gameTime)
         {
             // TODO: Add your drawing code here
-            GraphicsDevice.Clear(Color.Aqua);
-            background.Begin();
-            background.Draw(frames[(int)(gameTime.TotalGameTime.TotalMilliseconds / counter.avgFPS % totalFrames)], screenBounds, Color.White);
-            background.End();
+            GraphicsDevice.Clear(Color.Black);
+            
+            
+            // TODO: Disabled so far because it is irritating
+            // background.Begin();
+            // background.Draw(frames[(int)(gameTime.TotalGameTime.TotalMilliseconds / counter.avgFPS % totalFrames)], screenBounds, Color.White);
+            // background.End();
 
-
+            // customEffect.Parameters["World"].SetValue(_world);
+            // customEffect.Parameters["View"].SetValue(_view);
+            // customEffect.Parameters["Projection"].SetValue(_projection);
+            //
+            // customEffect.Parameters["viewPos"].SetValue(camera.CameraPosition);
+            // customEffect.Parameters["dirlightEnabled"].SetValue(false);
+            // customEffect.Parameters["pointlight1Enabled"].SetValue(false);
+            // customEffect.Parameters["spotlight1Enabled"].SetValue(false);
+            
             _deimos.Draw(_world, _view, _projection);
 
-            _whatsAppIcon.Begin();
-            _whatsAppIcon.Draw(_whatsAppIconTexture, _whatsAppIconPos, Color.Aquamarine);
-            _whatsAppIcon.End();
-
-            textCenter = _font.MeasureString(gameTime.ElapsedGameTime.Milliseconds.ToString()) / 2;
-
-            _text.Begin();
-            _text.DrawString(_font, gameTime.TotalGameTime.Milliseconds.ToString(), _textPos, Color.Aqua, 0,
-                textCenter, 1.0f, SpriteEffects.None, 0.5f);
-            _text.End();
+            // TODO: Disabled so far because it is irritating
+            // _whatsAppIcon.Begin();
+            // _whatsAppIcon.Draw(_whatsAppIconTexture, _whatsAppIconPos, Color.Aquamarine);
+            // _whatsAppIcon.End();
+            //
+            // textCenter = _font.MeasureString(gameTime.ElapsedGameTime.Milliseconds.ToString()) / 2;
+            //
+            // _text.Begin();
+            // _text.DrawString(_font, gameTime.TotalGameTime.Milliseconds.ToString(), _textPos, Color.Aqua, 0,
+            //     textCenter, 1.0f, SpriteEffects.None, 0.5f);
+            // _text.End();
 
             _text.Begin();
             _text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Aqua);
             _text.End();
 
-            _rect.Begin();
-            _rect.Draw(_rectTexture, _rectPos, null, Color.White, (int)gameTime.TotalGameTime.TotalSeconds * 2,
-                _rectOrigin,
-                1.0f, SpriteEffects.None, 0.5f);
-            _rect.End();
+            // _rect.Begin();
+            // _rect.Draw(_rectTexture, _rectPos, null, Color.White, (int)gameTime.TotalGameTime.TotalSeconds * 2,
+            //     _rectOrigin,
+            //     1.0f, SpriteEffects.None, 0.5f);
+            // _rect.End();
 
             base.Draw(gameTime);
         }
