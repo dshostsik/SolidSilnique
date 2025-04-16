@@ -218,6 +218,7 @@
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
+/processorParam:ShaderProfile=vs_5_0;ps_5_0
 /build:Shaders/CustomShader.fx
 
 #begin whatsapp_1384095.png
