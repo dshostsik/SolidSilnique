@@ -1,4 +1,5 @@
 ﻿using System;
+using GUIRESOURCES;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -10,6 +11,8 @@ namespace SolidSilnique
     {
         private readonly GraphicsDeviceManager _graphics;
 
+        private SpriteBatch _spriteBatch;
+        private GUI _gui;
         //FPS Counter
         private readonly FrameCounter counter;
         private Vector2 frameraterCounterPosition;
@@ -165,6 +168,9 @@ namespace SolidSilnique
             _rect = new SpriteBatch(GraphicsDevice);
 
             _rectOrigin = new Vector2(_rectTexture.Width / 2, _rectTexture.Height / 2);
+            
+            _gui = new GUI("GUI/resources/UI.xml",Content);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
         /// <summary>
@@ -302,7 +308,9 @@ namespace SolidSilnique
             //     _rectOrigin,
             //     1.0f, SpriteEffects.None, 0.5f);
             // _rect.End();
-
+            _spriteBatch.Begin();
+            _gui.Draw(_spriteBatch);
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
     }
