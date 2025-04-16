@@ -81,16 +81,19 @@ namespace SolidSilnique
             //Window.AllowUserResizing = true;
 
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            _graphics.IsFullScreen = true;
+            //_graphics.IsFullScreen = true;
+            _graphics.HardwareModeSwitch = true;
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
             _graphics.SynchronizeWithVerticalRetrace = true;
             _graphics.ApplyChanges();
             
-            Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+            //Mouse.SetPosition(Window.ClientBounds.Center.X, Window.ClientBounds.Center.Y);
             Console.WriteLine("Initial mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
             Console.WriteLine("Initial mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
 
+            Console.WriteLine("Client bounds: " + Window.ClientBounds.Width + "x" + Window.ClientBounds.Height);
+            
             // Create camera
             camera = new Camera(new Vector3(0, 0, 5));
             camera.mouseMovement(0,0,0);
@@ -179,26 +182,22 @@ namespace SolidSilnique
         /// <param name="gameTime">Object containing time values</param>
         private void processMouse(GameTime gameTime)
         {
-            int w = GraphicsDevice.Viewport.Width / 2;
-            int h = GraphicsDevice.Viewport.Height / 2;
-
-            if (firstMouse)
-            {
-                Mouse.SetPosition(w, h);
-                firstMouse = false;
-                return;
-            }
-            //Console.WriteLine("Mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
-            //Console.WriteLine("Mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
-            float mouseX = w - Mouse.GetState().X;
-            float mouseY = Mouse.GetState().Y - h;
+            int w = Window.ClientBounds.Center.X;
+            int h = Window.ClientBounds.Center.Y;
+            float mouseX, mouseY;
+            
+            
+            Console.WriteLine("Mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
+            Console.WriteLine("Mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
+            mouseX = w - Mouse.GetState().X;
+            mouseY = Mouse.GetState().Y - h;
 
             float xOffset = (mouseX);
             float yOffset = (mouseY);
 
+            camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
             Mouse.SetPosition(w, h);
 
-            camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
         }
 
         /// <summary>

@@ -88,9 +88,7 @@ namespace SolidSilnique
 
             //Yaw += xOffset;
             //Pitch += yOffset;
-
-            Console.WriteLine("Yaw: " + Yaw + " pitch: " + Pitch);
-
+            
             if (constrainPitch)
             {
                 if (Pitch > 89.0f)
@@ -103,7 +101,8 @@ namespace SolidSilnique
                     Pitch = -89.0f;
                 }
             }
-
+            
+            Console.WriteLine("Yaw: " + Yaw + " pitch: " + Pitch);
             UpdateCameraVectors();
         }
 
