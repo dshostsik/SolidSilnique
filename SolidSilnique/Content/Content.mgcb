@@ -214,12 +214,23 @@
 /processorParam:TextureFormat=Compressed
 /build:Megafont.spritefont
 
+#begin Shaders/BasicShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/BasicShader.fx
+
 #begin Shaders/CustomShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor
 /processorParam:DebugMode=Auto
-/processorParam:ShaderProfile=vs_5_0;ps_5_0
 /build:Shaders/CustomShader.fx
+
+#begin Shaders/demo.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/demo.fx
 
 #begin whatsapp_1384095.png
 /importer:TextureImporter

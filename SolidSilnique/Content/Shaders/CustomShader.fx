@@ -46,152 +46,9 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     output.Normal = float3(1.f, 1.f, 1.f);
     
 
-	output.Position = mul(float4(input.aPos, 1.0f), mul(World, mul(View, Projection)));
+	output.Position = mul(float4(input.aPos, 1.0f), mul(mul(World, View), Projection));
 	return output;
 }
-
-////-------------------------------------
-////           OTHER STRUCTURES            
-////-------------------------------------
-//struct DirectionalLight {
-//    float4 direction;
-//    float4 ambientColor;
-//    float4 diffuseColor;
-//    float4 specularColor;
-//};
-//
-//struct PointLight {
-//    float4 position;
-//    float linearAttenuation;
-//    float quadraticAttenuation;
-//    float constant;   
-//    float4 ambientColor;
-//    float4 diffuseColor;
-//    float4 specularColor;
-//};
-//
-//struct Spotlight {
-//    float4 position;
-//    float4 direction;
-//    float linearAttenuation;
-//    float quadraticAttenuation;
-//    float constant;
-//    float innerCut;
-//    float outerCut;
-//    float4 ambientColor;
-//    float4 diffuseColor;
-//    float4 specularColor;
-//};
-//
-////-------------------------------------
-////              UNIFORMS            
-////-------------------------------------
-//
-//DirectionalLight dirlight;
-//PointLight pointlight1;
-//Spotlight spotlight1;
-//
-//bool dirlightEnabled;
-//bool pointlight1Enabled;
-//bool spotlight1Enabled;
-//
-//sampler2D texture_diffuse1;
-//float3 viewPos;
-//
-////-------------------------------------
-////           PIXEL SHADER            
-////-------------------------------------
-//float4 MainPS(VertexShaderOutput input) : SV_TARGET
-//{
-//    // Zeroing output color in case something goes wrong;
-//    float4 OutFragColor = float4(0.1f, 0.1f, 0.1f, 0.1f);
-//
-//    float4 textureVector = tex2D(texture_diffuse1, input.TexCoords);
-//    float3 norm = normalize(input.Normal);
-//    float3 viewDir = normalize(viewPos - input.FragPos);
-//    
-//    float3 directionalLight = float3(0.f, 0.f, 0.f);
-//    
-//    // if (dirlightEnabled) because 'IF src0 must have replicate swizzle'
-//    if (dirlightEnabled == true)
-//    {
-//        float3 ambient = dirlight.ambientColor.rgb * textureVector.rgb;
-//        
-//        float3 lightDir = normalize(-dirlight.direction.xyz);
-//        float diff = max(dot(norm, lightDir), 0.0);
-//        float3 diffuse = dirlight.diffuseColor.rgb * diff * textureVector.rgb; 
-//        
-//        float3 reflectDir = reflect(-lightDir, norm);
-//        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-//        float3 specular = dirlight.specularColor.rgb * diffuse * textureVector.rgb;
-//        directionalLight = ambient + diffuse + specular;
-//    }
-//    
-//    float3 pointlight = float3(0.f, 0.f, 0.f);
-//    if (pointlight1Enabled == true) 
-//    {
-//        float3 pointAmbient = float3(1.f, 1.f, 1.f);
-//        float3 pointDiffuse = float3(1.f, 1.f, 1.f);
-//        float3 pointSpecular = float3(1.f, 1.f, 1.f);
-//        
-//        pointAmbient = pointlight1.ambientColor.rgb * textureVector.rgb;
-//        
-//        float3 lightDirPointLight = normalize(pointlight1.position.xyz - input.FragPos.xyz);
-//        float pointDiff = max(dot(norm, lightDirPointLight), 0.0);
-//        pointDiffuse = pointlight1.diffuseColor.rgb * pointDiff * textureVector.rgb;
-//        
-//        float3 reflectDirPoint = reflect(-lightDirPointLight, norm);
-//        float specPoint = pow(max(dot(viewDir, reflectDirPoint), 0.0), 32);
-//        pointSpecular = pointlight1.specularColor.rgb * specPoint * textureVector.rgb;
-//        
-//        float distance = length(pointlight1.position.xyz - input.FragPos);
-//        float attenuation = 1.0f / (pointlight1.constant + pointlight1.linearAttenuation * distance + pointlight1.quadraticAttenuation * (distance * distance));
-//        
-//        pointAmbient *= attenuation;
-//        pointDiffuse *= attenuation;
-//        pointSpecular *= attenuation;
-//        
-//        pointlight = pointAmbient + pointDiffuse + pointSpecular; 
-//    }
-//    
-//    float3 spotlight = float3(0.f, 0.f, 0.f);
-//    if (spotlight1Enabled == true) 
-//    {
-//        float3 spotAmbient = float3(1.f, 1.f, 1.f);
-//        float3 spotDiffuse = float3(1.f, 1.f, 1.f);
-//        float3 spotSpecular = float3(1.f, 1.f, 1.f);
-//        
-//        spotAmbient = spotlight1.ambientColor.rgb * textureVector.rgb;
-//        
-//        float3 lightDirSpot = normalize(spotlight1.position.xyz - input.FragPos);
-//        float spotDiff = max(dot(norm, lightDirSpot), 0.0);
-//        spotDiffuse = spotlight1.diffuseColor.rgb * spotDiff * textureVector.rgb;
-//        
-//        float3 reflectSpot = reflect(-lightDirSpot, norm);
-//        float specSpot = pow(max(dot(viewDir, reflectSpot), 0.0), 32);
-//        spotSpecular = spotlight1.specularColor.rgb * specSpot * textureVector.rgb;
-//        
-//        float theta = dot(lightDirSpot, normalize(-spotlight1.direction.xyz));
-//        float epsilon = spotlight1.innerCut - spotlight1.outerCut;
-//        float intensity = clamp((theta - spotlight1.outerCut) / epsilon, 0.f, 1.f);
-//        
-//        spotDiffuse *= intensity;
-//        spotSpecular *= intensity;
-//        
-//        float spotDistance = length(spotlight1.position.xyz - input.FragPos);
-//        float spotAttenuation = 1.0f / (spotlight1.constant + spotlight1.linearAttenuation * spotDistance + spotlight1.quadraticAttenuation * (spotDistance * spotDistance));
-//        
-//         spotAmbient *= spotAttenuation;
-//         spotDiffuse *= spotAttenuation;
-//         spotSpecular *= spotAttenuation;
-//         
-//         spotlight = spotAmbient + spotDiffuse + spotSpecular;
-//    }
-//    
-//    OutFragColor = float4(directionalLight + pointlight + spotlight, 1.0);
-//    
-//	return OutFragColor;
-//}
 
 //-------------------------------------
 //              UNIFORMS            
@@ -244,7 +101,8 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
     // Zeroing output color in case something goes wrong;
     float4 OutFragColor = float4(0.1f, 0.1f, 0.1f, 0.1f);
 
-    float4 textureVector = tex2D(texture_diffuse1, input.TexCoords);
+    float4 textureVector = float4(1,1,1,1); // Белый цвет по умолчанию
+    textureVector = tex2D(texture_diffuse1, input.TexCoords);
     float3 norm = normalize(input.Normal);
     float3 viewDir = normalize(viewPos - input.FragPos);
     
@@ -329,7 +187,7 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
 	return OutFragColor;
 }
 
-technique BasicColorDrawing
+technique BasicColorDrawingWithLights
 {
 	pass P0
 	{

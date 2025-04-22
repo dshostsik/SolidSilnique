@@ -39,6 +39,7 @@ namespace SolidSilnique
         private Vector2 _rectOrigin;
 
         private Model _deimos;
+        private Texture2D _deimosTexture;
 
         private Camera camera;
         private bool firstMouse;
@@ -64,6 +65,7 @@ namespace SolidSilnique
 
         // Custom shader
         private Effect customEffect;
+        private Effect testEffect;
 
         /// <summary>
         /// Constructor
@@ -138,11 +140,12 @@ namespace SolidSilnique
             screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
             customEffect = new BasicEffect(GraphicsDevice);
+            testEffect = new BasicEffect(GraphicsDevice);
 
             dirlight_ambient = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
             dirlight_diffuse = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
             dirlight_specular = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-            
+
             base.Initialize();
         }
 
@@ -153,10 +156,14 @@ namespace SolidSilnique
         {
             // Load shaders
             customEffect = Content.Load<Effect>("Shaders/CustomShader");
+            customEffect.CurrentTechnique = customEffect.Techniques["BasicColorDrawingWithLights"];
+            testEffect = Content.Load<Effect>("Shaders/demo");
+            testEffect.CurrentTechnique = testEffect.Techniques["BasicColorDrawing"];
 
 
             // Load the model
             _deimos = Content.Load<Model>("deimos");
+            _deimosTexture = Content.Load<Texture2D>("deimos_texture");
             _whatsAppIconTexture = Content.Load<Texture2D>("whatsapp_1384095");
 
             _whatsAppIcon = new SpriteBatch(GraphicsDevice);
@@ -290,24 +297,45 @@ namespace SolidSilnique
             // background.End();
             try
             {
-                customEffect.Parameters["World"].SetValue(_world);
-                customEffect.Parameters["View"].SetValue(_view);
-                customEffect.Parameters["Projection"].SetValue(_projection);
-                customEffect.Parameters["viewPos"].SetValue(camera.CameraPosition);
-                customEffect.Parameters["dirlightEnabled"].SetValue(true);
-                customEffect.Parameters["dirlight_direction"].SetValue(Vector4.Zero);
-                customEffect.Parameters["dirlight_ambientColor"].SetValue(dirlight_ambient);
-                customEffect.Parameters["dirlight_diffuseColor"].SetValue(dirlight_diffuse);
-                customEffect.Parameters["dirlight_specularColor"].SetValue(dirlight_specular);
-                customEffect.Parameters["pointlight1Enabled"].SetValue(false);
-                customEffect.Parameters["spotlight1Enabled"].SetValue(false);
+                foreach (ModelMesh mesh in _deimos.Meshes)
+                {
+                    foreach (ModelMeshPart part in mesh.MeshParts)
+                    {
+                        // BasicEffect effect = part.Effect as BasicEffect;
+                        // if (effect != null && effect.Texture != null)
+                        // {
+                        //     customEffect.Parameters["texture_diffuse1"].SetValue(effect.Texture);
+                        // }
+                        //
+                        // part.Effect = customEffect;
+                        // customEffect.Parameters["World"].SetValue(_world);
+                        // customEffect.Parameters["View"].SetValue(_view);
+                        // customEffect.Parameters["Projection"].SetValue(_projection);
+                        // customEffect.Parameters["viewPos"].SetValue(camera.CameraPosition);
+                        // customEffect.Parameters["dirlightEnabled"].SetValue(true);
+                        // customEffect.Parameters["dirlight_direction"].SetValue(Vector4.Zero);
+                        // customEffect.Parameters["dirlight_ambientColor"].SetValue(dirlight_ambient);
+                        // customEffect.Parameters["dirlight_diffuseColor"].SetValue(dirlight_diffuse);
+                        // customEffect.Parameters["dirlight_specularColor"].SetValue(dirlight_specular);
+                        // customEffect.Parameters["pointlight1Enabled"].SetValue(false);
+                        // customEffect.Parameters["spotlight1Enabled"].SetValue(false);
+                        part.Effect = testEffect;
+                        testEffect.Parameters["World"].SetValue(_world);
+                        testEffect.Parameters["View"].SetValue(_view);
+                        testEffect.Parameters["Projection"].SetValue(_projection);
+                    }
+
+                    mesh.Draw();
+                }
             }
-            catch (NullReferenceException)
+            catch (InvalidOperationException e)
             {
-                throw new NullReferenceException("uniform is null");
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
+                throw;
             }
-            
-            _deimos.Draw(_world, _view, _projection);
+
+            //_deimos.Draw(_world, _view, _projection);
 
             // TODO: Disabled so far because it is irritating
             // _whatsAppIcon.Begin();
