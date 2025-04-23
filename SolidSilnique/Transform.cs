@@ -1,6 +1,5 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using Vector3 = System.Numerics.Vector3;
+﻿using Microsoft.Xna.Framework;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace SolidSilnique
 {
@@ -9,23 +8,23 @@ namespace SolidSilnique
     /// </summary>
     public class Transform
     {
-        private Matrix _position;
-        private Matrix _rotation;
-        private Matrix _scale;
-
-        public Matrix Position
+        private Vector3 _position;
+        private Vector3 _rotation;
+        private Vector3 _scale;
+        
+        public Vector3 Position
         {
             get { return _position; }
             set { _position = value; }
         }
 
-        public Matrix Rotation
+        public Vector3 Rotation
         {
             get { return _rotation; }
             set { _rotation = value; }
         }
 
-        public Matrix Scale
+        public Vector3 Scale
         {
             get { return _scale; }
             set { _scale = value; }
@@ -33,28 +32,29 @@ namespace SolidSilnique
 
         public Matrix GetWorldMatrix()
         {
-            return _position * _rotation * _scale;
+            return Matrix.CreateScale(_scale) *
+                   Matrix.CreateRotationX(_rotation.X) *
+                   Matrix.CreateRotationY(_rotation.Y) *
+                   Matrix.CreateRotationZ(_rotation.Z) *
+                   Matrix.CreateTranslation(_position);
         }
 
-        // TODO: Implement those functions
         /// <summary>
         /// Function to move transform on a defined distance
         /// </summary>
-        /// <param name="velocity">Speed of movement or the distance object passes every frame</param>
+        /// <param name="velocity">Speed of movement or the distance the object passes every frame</param>
         public void Move(Vector3 velocity)
         {
-            //_position = Matrix.CreateTranslation(velocity, out _position);
-            throw new NotImplementedException("This function is not implemented");
+            _position += velocity;
         }
-        
+
         /// <summary>
         /// Function to move transform to the exact point in the world
         /// </summary>
-        /// <param name="position">Exact postion</param>
+        /// <param name="position">Exact position</param>
         public void SetPosition(Vector3 position)
         {
-            //_position = Matrix.CreateTranslation(position, Matrix.Identity);
-            throw new NotImplementedException("This function is not implemented");
+            _position = position;
         }
 
         /// <summary>
@@ -63,25 +63,25 @@ namespace SolidSilnique
         /// <param name="angle">Angle in degrees</param>
         public void RotateX(float angle)
         {
-            _rotation *= Matrix.CreateRotationX(MathHelper.ToRadians(angle));
+            _rotation.X += MathHelper.ToRadians(angle);
         }
-        
+
         /// <summary>
         /// Rotate transform around Y axis
         /// </summary>
         /// <param name="angle">Angle in degrees</param>
         public void RotateY(float angle)
         {
-            _rotation *= Matrix.CreateRotationY(MathHelper.ToRadians(angle));
+            _rotation.Y += MathHelper.ToRadians(angle);
         }
-        
+
         /// <summary>
         /// Rotate transform around Z axis
         /// </summary>
         /// <param name="angle">Angle in degrees</param>
         public void RotateZ(float angle)
         {
-            _rotation *= Matrix.CreateRotationZ(MathHelper.ToRadians(angle));
+            _rotation.Z += MathHelper.ToRadians(angle);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace SolidSilnique
         /// <param name="scale">Coefficient of scaling of the object</param>
         public void Rescale(Vector3 scale)
         {
-            _scale = Matrix.CreateScale(scale);
+            _scale = scale;
         }
 
         /// <summary>
@@ -99,25 +99,25 @@ namespace SolidSilnique
         /// <param name="factor">Coefficient of scaling of the object</param>
         public void RescaleX(float factor)
         {
-            _scale = Matrix.CreateScale(new Vector3(factor, .0f, .0f));
+            _scale = new Vector3(factor, _scale.Y, _scale.Z);
         }
-        
+
         /// <summary>
         /// Rescale the object by Y axis only
         /// </summary>
         /// <param name="factor">Coefficient of scaling of the object</param>
         public void RescaleY(float factor)
         {
-            _scale = Matrix.CreateScale(new Vector3(.0f, factor, .0f));
+            _scale = new Vector3(_scale.X, factor, _scale.Z);
         }
-        
+
         /// <summary>
         /// Rescale the object by Z axis only
         /// </summary>
         /// <param name="factor">Coefficient of scaling of the object</param>
         public void RescaleZ(float factor)
         {
-            _scale = Matrix.CreateScale(new Vector3(.0f, .0f, factor));
+            _scale = new Vector3(_scale.X, _scale.Y,  factor);
         }
     }
 }
