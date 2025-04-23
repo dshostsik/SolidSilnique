@@ -67,9 +67,11 @@ namespace SolidSilnique
         private Vector3 pointlight_position;
 
         // Custom shader
-        private Effect customEffect;
-        private Effect testEffect;
+        //private Effect customEffect;
 
+
+        private Shader shader;
+        
         /// <summary>
         /// Constructor
         /// </summary>
@@ -141,9 +143,14 @@ namespace SolidSilnique
             totalFrames = frames.Length;
 
             screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-
-            customEffect = new BasicEffect(GraphicsDevice);
-
+            
+            // Load shaders
+            shader = new Shader("Shaders/CustomShader",
+                GraphicsDevice,
+                this,
+                "BasicColorDrawingWithLights");
+            
+            
             dirlight_ambient = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
             dirlight_diffuse = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
             dirlight_specular = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -159,15 +166,6 @@ namespace SolidSilnique
         /// </summary>
         protected override void LoadContent()
         {
-            // Load shaders
-            customEffect = Content.Load<Effect>("Shaders/CustomShader");
-            customEffect.CurrentTechnique = customEffect.Techniques["BasicColorDrawingWithLights"];
-
-            foreach (var parameter in customEffect.Parameters)
-            {
-                Console.WriteLine($"Parameter: {parameter.Name}, Type: {parameter.ParameterType}");
-            }
-
             // Load the model
             _deimos = Content.Load<Model>("deimos");
             _deimosTexture = Content.Load<Texture2D>("deimos_texture");
@@ -308,50 +306,36 @@ namespace SolidSilnique
                 {
                     foreach (ModelMeshPart part in mesh.MeshParts)
                     {
-                        BasicEffect effect = part.Effect as BasicEffect;
-                        if (effect != null && effect.Texture != null)
-                        {
-                            customEffect.Parameters["texture_diffuse1"].SetValue(effect.Texture);
-                        }
-
-                        part.Effect = customEffect;
-                        customEffect.Parameters["World"].SetValue(_world);
-                        customEffect.Parameters["View"].SetValue(_view);
-                        customEffect.Parameters["Projection"].SetValue(_projection);
-                        customEffect.Parameters["viewPos"].SetValue(camera.CameraPosition);
-                        customEffect.Parameters["dirlightEnabled"].SetValue(false);
-                        customEffect.Parameters["dirlight_direction"].SetValue(Vector3.Zero);
-                        customEffect.Parameters["dirlight_ambientColor"].SetValue(dirlight_ambient);
-                        customEffect.Parameters["dirlight_diffuseColor"].SetValue(dirlight_diffuse);
-                        customEffect.Parameters["dirlight_specularColor"].SetValue(dirlight_specular);
-                        
-                        customEffect.Parameters["pointlight1Enabled"].SetValue(true);
-                        
-                        customEffect.Parameters["pointlight1_position"].SetValue(pointlight_position);
-                        
-                        customEffect.Parameters["pointlight1_ambientColor"].SetValue(dirlight_ambient);
-                        customEffect.Parameters["pointlight1_diffuseColor"].SetValue(dirlight_diffuse);
-                        customEffect.Parameters["pointlight1_specularColor"].SetValue(dirlight_specular);
-                        
-                        customEffect.Parameters["pointlight1_linearAttenuation"].SetValue(0.022f);
-                        customEffect.Parameters["pointlight1_quadraticAttenuation"].SetValue(0.0019f);
-                        customEffect.Parameters["pointlight1_constant"].SetValue(1);
-                        
-                        customEffect.Parameters["spotlight1Enabled"].SetValue(false);
-
-                        customEffect.Parameters["spotlight1_direction"].SetValue(Vector3.Zero);
-                        customEffect.Parameters["spotlight1_position"].SetValue(spotlight_position);
-
-                        customEffect.Parameters["spotlight1_innerCut"].SetValue(MathHelper.ToRadians(12.5f));
-                        customEffect.Parameters["spotlight1_outerCut"].SetValue(MathHelper.ToRadians(17.5f));
-
-                        customEffect.Parameters["spotlight1_linearAttenuation"].SetValue(0.045f);
-                        customEffect.Parameters["spotlight1_quadraticAttenuation"].SetValue(0.0075f);
-                        customEffect.Parameters["spotlight1_constant"].SetValue(1);
-
-                        customEffect.Parameters["spotlight1_ambientColor"].SetValue(dirlight_ambient);
-                        customEffect.Parameters["spotlight1_diffuseColor"].SetValue(dirlight_diffuse);
-                        customEffect.Parameters["spotlight1_specularColor"].SetValue(dirlight_specular);
+                        part.Effect = shader.Effect;
+                        shader.SetUniform("texture_diffuse1", _deimosTexture);
+                        shader.SetUniform("World", _world);
+                        shader.SetUniform("View", _view);
+                        shader.SetUniform("Projection", _projection);
+                        shader.SetUniform("viewPos", camera.CameraPosition);
+                        shader.SetUniform("dirlightEnabled", false);
+                        shader.SetUniform("dirlight_direction", Vector3.Zero);
+                        shader.SetUniform("dirlight_ambientColor", dirlight_ambient);
+                        shader.SetUniform("dirlight_diffuseColor", dirlight_diffuse);
+                        shader.SetUniform("dirlight_specularColor", dirlight_specular);
+                        shader.SetUniform("pointlight1Enabled", true);
+                        shader.SetUniform("pointlight1_position", pointlight_position);
+                        shader.SetUniform("pointlight1_ambientColor", dirlight_ambient);
+                        shader.SetUniform("pointlight1_diffuseColor", dirlight_diffuse);
+                        shader.SetUniform("pointlight1_specularColor", dirlight_specular);
+                        shader.SetUniform("pointlight1_linearAttenuation", 0.022f);
+                        shader.SetUniform("pointlight1_quadraticAttenuation", 0.0019f);
+                        shader.SetUniform("pointlight1_constant", 1);
+                        shader.SetUniform("spotlight1Enabled", false);
+                        shader.SetUniform("spotlight1_direction", Vector3.Zero);
+                        shader.SetUniform("spotlight1_position", spotlight_position);
+                        shader.SetUniform("spotlight1_innerCut", MathHelper.ToRadians(12.5f));
+                        shader.SetUniform("spotlight1_outerCut", MathHelper.ToRadians(17.5f));
+                        shader.SetUniform("spotlight1_linearAttenuation", 0.045f);
+                        shader.SetUniform("spotlight1_quadraticAttenuation", 0.0075f);
+                        shader.SetUniform("spotlight1_constant", 1);
+                        shader.SetUniform("spotlight1_ambientColor", dirlight_ambient);
+                        shader.SetUniform("spotlight1_diffuseColor", dirlight_diffuse);
+                        shader.SetUniform("spotlight1_specularColor", dirlight_specular);
                     }
 
                     mesh.Draw();
@@ -363,10 +347,9 @@ namespace SolidSilnique
                     "Check uniforms!\nIf you have missed any uniforms or they are not used in shader, this NullReferenceException is thrown");
                 throw;
             }
-            catch (InvalidOperationException e)
+            catch (UniformNotFoundException u)
             {
-                Console.WriteLine(
-                    "Check operations and input/output semantics.\nThis may have caused this InvalidOperationException!");
+                Console.WriteLine(u.Message);
                 throw;
             }
 
