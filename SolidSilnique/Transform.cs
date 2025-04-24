@@ -7,7 +7,7 @@ namespace SolidSilnique
     /// <summary>
     /// Container of transform matrices of an object allowing to operate on them
     /// </summary>
-    public class Transform
+    public class TransformOld
     {
         private Matrix _position;
         private Matrix _rotation;
