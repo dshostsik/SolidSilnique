@@ -92,16 +92,19 @@ namespace SolidSilnique
         /// </summary>
         protected override void Initialize()
         {
-            //Window.AllowUserResizing = true;
 
-            _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            // TODO
-            //_graphics.IsFullScreen = true;
-            _graphics.HardwareModeSwitch = true;
-            // TODO
+
+
+
+			//DISPLAY SETUP
+
+			//Window.AllowUserResizing = true;
+			_graphics.GraphicsProfile = GraphicsProfile.HiDef;
+			//_graphics.IsFullScreen = true;
+			_graphics.HardwareModeSwitch = true;
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
-            _graphics.SynchronizeWithVerticalRetrace = true;
+            _graphics.SynchronizeWithVerticalRetrace = true; //VSync
             _graphics.ApplyChanges();
 
             //Mouse.SetPosition(Window.ClientBounds.Center.X, Window.ClientBounds.Center.Y);

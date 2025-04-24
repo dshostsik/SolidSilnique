@@ -7,22 +7,23 @@ namespace SolidSilnique.Core
 {
 	class GameObject
     {
-        //Identifiers
-        string name = "GameObject";
-        int tag = 0;
-        int layer = 0;
 
-        //Scene Graph
-        GameObject parent = null;
-        Transform transform = null;
-        List<GameObject> children = [];
+		//Identifiers
+		public string name = "GameObject";
+		public int tag = 0;
+		public int layer = 0;
 
-        //Rendering
-        Model model = null;
-        Texture2D texture = null;
+		//Scene Graph
+		public GameObject parent = null;
+		public Transform transform = null;
+		public List<GameObject> children = [];
+
+		//Rendering
+		public Model model = null;
+		public Texture2D texture = null;
 
 		//Components
-		List<Component> components = [];
+		public List<Component> components = [];
 
 		public GameObject(string name)
         {
@@ -71,6 +72,7 @@ namespace SolidSilnique.Core
         /// </summary>
         public void Draw()
         {
+
 			foreach (var child in children)
 			{
 				child.Draw();
