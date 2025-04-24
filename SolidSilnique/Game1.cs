@@ -3,6 +3,7 @@ using GUIRESOURCES;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SolidSilnique.Core;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace SolidSilnique
@@ -105,25 +106,22 @@ namespace SolidSilnique
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
             _graphics.SynchronizeWithVerticalRetrace = true; //VSync
-            _graphics.ApplyChanges();
+			_graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
+			_graphics.ApplyChanges();
 
-            //Mouse.SetPosition(Window.ClientBounds.Center.X, Window.ClientBounds.Center.Y);
-            Console.WriteLine("Initial mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
-            Console.WriteLine("Initial mouse position (using Mouse.GetState().Position): " +
-                              Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
-
-            Console.WriteLine("Client bounds: " + Window.ClientBounds.Width + "x" + Window.ClientBounds.Height);
 
             // Create camera
-            camera = new Camera(new Vector3(0, 0, 25));
-            camera.mouseMovement(0, 0, 0);
+            camera = new Camera(new Vector3(0, 0, 25));                                     //TODO delete
+            camera.mouseMovement(0, 0, 0);                                                  //TODO delete
             // matrices initialisations
-            _world = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.Up);
+            _world = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.Up);           //TODO delete
+            
             // Resize world matrix
             _world = Matrix.CreateScale(1.0f) * _world;
 
-            // Sprite settings
-            _whatsAppIconPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.95f,
+			//TODO delete
+			// Sprite settings
+			_whatsAppIconPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.95f,
                 _graphics.PreferredBackBufferHeight * 0.01f);
             _textPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.1f,
                 _graphics.PreferredBackBufferHeight * 0.05f);
@@ -132,7 +130,8 @@ namespace SolidSilnique
             frameraterCounterPosition = new Vector2(_graphics.PreferredBackBufferWidth * 0.025f,
                 _graphics.PreferredBackBufferHeight * 0.01f);
 
-            firstMouse = true;
+			//TODO delete (shouldn't be here)
+			firstMouse = true;
 
             frames = new Texture2D[10];
 
@@ -160,6 +159,10 @@ namespace SolidSilnique
 
             spotlight_position = new Vector3(10.0f, 0.0f, 0.0f);
             pointlight_position = new Vector3(10.0f, 0.0f, 0.0f);
+
+
+
+
 
             base.Initialize();
         }
@@ -203,6 +206,24 @@ namespace SolidSilnique
 
             _gui = new GUI("GUI/resources/UI.xml", Content);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            /*foreach(var child in EngineManager.scene.gameObjects)
+            {
+                child.texture = _deimosTexture;
+                child.model = _deimos;
+				foreach (var che in child.children)
+				{
+					che.texture = _deimosTexture;
+					che.model = _deimos;
+					foreach (var c in che.children)
+					{
+						c.texture = _deimosTexture;
+						c.model = _deimos;
+					}
+				}
+			}*/
+            EngineManager.scene.LoadContent(Content);
+            EngineManager.scene.Setup();
         }
 
         /// <summary>
@@ -267,10 +288,7 @@ namespace SolidSilnique
                 Exit();
 
             // Get current camera view
-            _view = camera.getViewMatrix();
-
-            // Rotate object
-            //_world *= Matrix.CreateRotationY(MathHelper.ToRadians(gameTime.ElapsedGameTime.Milliseconds * 0.01f));
+            _view = camera.getViewMatrix(); //TODO Delete
 
             // Control FOV and perspective settings
             currentScrollWheelValue = Mouse.GetState().ScrollWheelValue;
@@ -295,66 +313,46 @@ namespace SolidSilnique
 
         protected override void Draw(GameTime gameTime)
         {
-            // TODO: Add your drawing code here
-            GraphicsDevice.Clear(Color.Black);
+			// TODO: Add your drawing code here
+			GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
+			GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+
+			// TODO: Disabled so far because it is irritating
+			// background.Begin();
+			// background.Draw(frames[(int)(gameTime.TotalGameTime.TotalMilliseconds / counter.avgFPS % totalFrames)], screenBounds, Color.White);
+			// background.End();
 
 
-            // TODO: Disabled so far because it is irritating
-            // background.Begin();
-            // background.Draw(frames[(int)(gameTime.TotalGameTime.TotalMilliseconds / counter.avgFPS % totalFrames)], screenBounds, Color.White);
-            // background.End();
-            try
-            {
-                foreach (ModelMesh mesh in _deimos.Meshes)
-                {
-                    foreach (ModelMeshPart part in mesh.MeshParts)
-                    {
-                        part.Effect = shader.Effect;
-                        shader.SetUniform("texture_diffuse1", _deimosTexture);
-                        shader.SetUniform("World", _world);
-                        shader.SetUniform("View", _view);
-                        shader.SetUniform("Projection", _projection);
-                        shader.SetUniform("viewPos", camera.CameraPosition);
-                        shader.SetUniform("dirlightEnabled", false);
-                        shader.SetUniform("dirlight_direction", Vector3.Zero);
-                        shader.SetUniform("dirlight_ambientColor", dirlight_ambient);
-                        shader.SetUniform("dirlight_diffuseColor", dirlight_diffuse);
-                        shader.SetUniform("dirlight_specularColor", dirlight_specular);
-                        shader.SetUniform("pointlight1Enabled", true);
-                        shader.SetUniform("pointlight1_position", pointlight_position);
-                        shader.SetUniform("pointlight1_ambientColor", dirlight_ambient);
-                        shader.SetUniform("pointlight1_diffuseColor", dirlight_diffuse);
-                        shader.SetUniform("pointlight1_specularColor", dirlight_specular);
-                        shader.SetUniform("pointlight1_linearAttenuation", 0.022f);
-                        shader.SetUniform("pointlight1_quadraticAttenuation", 0.0019f);
-                        shader.SetUniform("pointlight1_constant", 1);
-                        shader.SetUniform("spotlight1Enabled", false);
-                        shader.SetUniform("spotlight1_direction", Vector3.Zero);
-                        shader.SetUniform("spotlight1_position", spotlight_position);
-                        shader.SetUniform("spotlight1_innerCut", MathHelper.ToRadians(12.5f));
-                        shader.SetUniform("spotlight1_outerCut", MathHelper.ToRadians(17.5f));
-                        shader.SetUniform("spotlight1_linearAttenuation", 0.045f);
-                        shader.SetUniform("spotlight1_quadraticAttenuation", 0.0075f);
-                        shader.SetUniform("spotlight1_constant", 1);
-                        shader.SetUniform("spotlight1_ambientColor", dirlight_ambient);
-                        shader.SetUniform("spotlight1_diffuseColor", dirlight_diffuse);
-                        shader.SetUniform("spotlight1_specularColor", dirlight_specular);
-                    }
+			shader.SetUniform("View", _view);
+			shader.SetUniform("Projection", _projection);
+			shader.SetUniform("viewPos", camera.CameraPosition);
+			shader.SetUniform("dirlightEnabled", false);
+			shader.SetUniform("dirlight_direction", Vector3.Zero);
+			shader.SetUniform("dirlight_ambientColor", dirlight_ambient);
+			shader.SetUniform("dirlight_diffuseColor", dirlight_diffuse);
+			shader.SetUniform("dirlight_specularColor", dirlight_specular);
+			shader.SetUniform("pointlight1Enabled", true);
+			shader.SetUniform("pointlight1_position", pointlight_position);
+			shader.SetUniform("pointlight1_ambientColor", dirlight_ambient);
+			shader.SetUniform("pointlight1_diffuseColor", dirlight_diffuse);
+			shader.SetUniform("pointlight1_specularColor", dirlight_specular);
+			shader.SetUniform("pointlight1_linearAttenuation", 0.022f);
+			shader.SetUniform("pointlight1_quadraticAttenuation", 0.0019f);
+			shader.SetUniform("pointlight1_constant", 1);
+			shader.SetUniform("spotlight1Enabled", false);
+			shader.SetUniform("spotlight1_direction", Vector3.Zero);
+			shader.SetUniform("spotlight1_position", spotlight_position);
+			shader.SetUniform("spotlight1_innerCut", MathHelper.ToRadians(12.5f));
+			shader.SetUniform("spotlight1_outerCut", MathHelper.ToRadians(17.5f));
+			shader.SetUniform("spotlight1_linearAttenuation", 0.045f);
+			shader.SetUniform("spotlight1_quadraticAttenuation", 0.0075f);
+			shader.SetUniform("spotlight1_constant", 1);
+			shader.SetUniform("spotlight1_ambientColor", dirlight_ambient);
+			shader.SetUniform("spotlight1_diffuseColor", dirlight_diffuse);
+			shader.SetUniform("spotlight1_specularColor", dirlight_specular);
 
-                    mesh.Draw();
-                }
-            }
-            catch (NullReferenceException e)
-            {
-                Console.WriteLine(
-                    "Check uniforms!\nIf you have missed any uniforms or they are not used in shader, this NullReferenceException is thrown");
-                throw;
-            }
-            catch (UniformNotFoundException u)
-            {
-                Console.WriteLine(u.Message);
-                throw;
-            }
+
+			EngineManager.Draw(shader);
 
             //_deimos.Draw(_world, _view, _projection);
 

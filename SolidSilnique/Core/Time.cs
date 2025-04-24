@@ -8,7 +8,7 @@ namespace SolidSilnique.Core
 {
 	static class Time
 	{
-		static float deltaTime = 0;
-		static float deltaTimeMs = 0;
+		public static float deltaTime = 0;
+		public static float deltaTimeMs = 0;
 	}
 }

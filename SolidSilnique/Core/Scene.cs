@@ -1,4 +1,5 @@
-﻿using SolidSilnique.Core;
+﻿using Microsoft.Xna.Framework.Content;
+using SolidSilnique.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,16 @@ using System.Threading.Tasks;
 
 namespace SolidSilnique.Core
 {
-	class Scene
+	abstract class Scene
 	{
 		public string name = "scene";
-		public List<GameObject> gameObjects;
+		public List<GameObject> gameObjects = [];
 		public Camera mainCamera;
+
+
+		abstract public void Setup();
+		abstract public void LoadContent(ContentManager Content);
+
 
 		/// <summary>
 		/// Wykonywana na początku programu

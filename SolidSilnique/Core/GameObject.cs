@@ -72,6 +72,7 @@ namespace SolidSilnique.Core
         /// </summary>
         public void Draw()
         {
+            EngineManager.renderQueue.Enqueue(this);
 
 			foreach (var child in children)
 			{
@@ -96,6 +97,7 @@ namespace SolidSilnique.Core
 
         public void AddChild(GameObject child)
         {
+            child.parent = this;
             children.Add(child);
 
         }

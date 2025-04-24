@@ -54,8 +54,11 @@ namespace SolidSilnique.Core
 								Matrix.CreateRotationY(MathHelper.ToRadians(_rotation.Y)) *
 								Matrix.CreateRotationZ(MathHelper.ToRadians(_rotation.Z)) *
 								Matrix.CreateTranslation(_position);
-
-				modelMatrix = gameObject.parent.transform.getModelMatrix();
+				if(gameObject.parent != null)
+				{
+					modelMatrix = gameObject.parent.transform.getModelMatrix() * modelMatrix;
+				}
+				
 
 				_dirtyFlag = false;
 			}
