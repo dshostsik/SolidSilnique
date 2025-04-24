@@ -1,4 +1,5 @@
 ﻿using System;
+using GUIRESOURCES;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -9,6 +10,10 @@ namespace SolidSilnique
     public class Game1 : Game
     {
         private readonly GraphicsDeviceManager _graphics;
+
+        private SpriteBatch _spriteBatch;
+
+        private GUI _gui;
 
         //FPS Counter
         private readonly FrameCounter counter;
@@ -34,6 +39,7 @@ namespace SolidSilnique
         private Vector2 _rectOrigin;
 
         private Model _deimos;
+        private Texture2D _deimosTexture;
 
         private Camera camera;
         private bool firstMouse;
@@ -51,9 +57,20 @@ namespace SolidSilnique
         private int totalFrames;
         private Rectangle screenBounds;
 
-        
+        // TODO: Remove when unnecessary
+        // experimental colors;
+        private Vector4 dirlight_ambient;
+        private Vector4 dirlight_diffuse;
+        private Vector4 dirlight_specular;
+
+        private Vector3 spotlight_position;
+        private Vector3 pointlight_position;
+
         // Custom shader
-        private Effect customEffect;
+        //private Effect customEffect;
+
+
+        private Shader shader;
         
         /// <summary>
         /// Constructor
@@ -78,23 +95,29 @@ namespace SolidSilnique
             //Window.AllowUserResizing = true;
 
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            _graphics.IsFullScreen = true;
+            // TODO
+            //_graphics.IsFullScreen = true;
+            _graphics.HardwareModeSwitch = true;
+            // TODO
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
             _graphics.SynchronizeWithVerticalRetrace = true;
             _graphics.ApplyChanges();
-            
-            Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+
+            //Mouse.SetPosition(Window.ClientBounds.Center.X, Window.ClientBounds.Center.Y);
             Console.WriteLine("Initial mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
-            Console.WriteLine("Initial mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
+            Console.WriteLine("Initial mouse position (using Mouse.GetState().Position): " +
+                              Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
+
+            Console.WriteLine("Client bounds: " + Window.ClientBounds.Width + "x" + Window.ClientBounds.Height);
 
             // Create camera
-            camera = new Camera(new Vector3(0, 0, 5));
-            camera.mouseMovement(0,0,0);
+            camera = new Camera(new Vector3(0, 0, 25));
+            camera.mouseMovement(0, 0, 0);
             // matrices initialisations
             _world = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.Up);
             // Resize world matrix
-            _world = Matrix.CreateScale(0.05f) * _world;
+            _world = Matrix.CreateScale(1.0f) * _world;
 
             // Sprite settings
             _whatsAppIconPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.95f,
@@ -107,7 +130,7 @@ namespace SolidSilnique
                 _graphics.PreferredBackBufferHeight * 0.01f);
 
             firstMouse = true;
-            
+
             frames = new Texture2D[10];
 
             for (int i = 0; i < 10; i++)
@@ -121,8 +144,20 @@ namespace SolidSilnique
 
             screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
             
-            customEffect = new BasicEffect(GraphicsDevice);
+            // Load shaders
+            shader = new Shader("Shaders/CustomShader",
+                GraphicsDevice,
+                this,
+                "BasicColorDrawingWithLights");
             
+            
+            dirlight_ambient = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
+            dirlight_diffuse = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
+            dirlight_specular = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+
+            spotlight_position = new Vector3(10.0f, 0.0f, 0.0f);
+            pointlight_position = new Vector3(10.0f, 0.0f, 0.0f);
+
             base.Initialize();
         }
 
@@ -131,12 +166,9 @@ namespace SolidSilnique
         /// </summary>
         protected override void LoadContent()
         {
-            // Load shaders
-            customEffect = Content.Load<Effect>("Shaders/CustomShader");
-            
-            
             // Load the model
             _deimos = Content.Load<Model>("deimos");
+            _deimosTexture = Content.Load<Texture2D>("deimos_texture");
             _whatsAppIconTexture = Content.Load<Texture2D>("whatsapp_1384095");
 
             _whatsAppIcon = new SpriteBatch(GraphicsDevice);
@@ -165,6 +197,9 @@ namespace SolidSilnique
             _rect = new SpriteBatch(GraphicsDevice);
 
             _rectOrigin = new Vector2(_rectTexture.Width / 2, _rectTexture.Height / 2);
+
+            _gui = new GUI("GUI/resources/UI.xml", Content);
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
         /// <summary>
@@ -173,26 +208,22 @@ namespace SolidSilnique
         /// <param name="gameTime">Object containing time values</param>
         private void processMouse(GameTime gameTime)
         {
-            int w = GraphicsDevice.Viewport.Width / 2;
-            int h = GraphicsDevice.Viewport.Height / 2;
+            int w = Window.ClientBounds.Center.X;
+            int h = Window.ClientBounds.Center.Y;
+            float mouseX, mouseY;
 
-            if (firstMouse)
-            {
-                Mouse.SetPosition(w, h);
-                firstMouse = false;
-                return;
-            }
-            //Console.WriteLine("Mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
-            //Console.WriteLine("Mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
-            float mouseX = w - Mouse.GetState().X;
-            float mouseY = Mouse.GetState().Y - h;
+
+            Console.WriteLine("Mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
+            Console.WriteLine("Mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " +
+                              Mouse.GetState().Position.Y);
+            mouseX = w - Mouse.GetState().X;
+            mouseY = Mouse.GetState().Y - h;
 
             float xOffset = (mouseX);
             float yOffset = (mouseY);
 
-            Mouse.SetPosition(w, h);
-
             camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
+            Mouse.SetPosition(w, h);
         }
 
         /// <summary>
@@ -236,7 +267,7 @@ namespace SolidSilnique
             _view = camera.getViewMatrix();
 
             // Rotate object
-            _world *= Matrix.CreateRotationY(MathHelper.ToRadians(gameTime.ElapsedGameTime.Milliseconds * 0.01f));
+            //_world *= Matrix.CreateRotationY(MathHelper.ToRadians(gameTime.ElapsedGameTime.Milliseconds * 0.01f));
 
             // Control FOV and perspective settings
             currentScrollWheelValue = Mouse.GetState().ScrollWheelValue;
@@ -263,23 +294,66 @@ namespace SolidSilnique
         {
             // TODO: Add your drawing code here
             GraphicsDevice.Clear(Color.Black);
-            
-            
+
+
             // TODO: Disabled so far because it is irritating
             // background.Begin();
             // background.Draw(frames[(int)(gameTime.TotalGameTime.TotalMilliseconds / counter.avgFPS % totalFrames)], screenBounds, Color.White);
             // background.End();
+            try
+            {
+                foreach (ModelMesh mesh in _deimos.Meshes)
+                {
+                    foreach (ModelMeshPart part in mesh.MeshParts)
+                    {
+                        part.Effect = shader.Effect;
+                        shader.SetUniform("texture_diffuse1", _deimosTexture);
+                        shader.SetUniform("World", _world);
+                        shader.SetUniform("View", _view);
+                        shader.SetUniform("Projection", _projection);
+                        shader.SetUniform("viewPos", camera.CameraPosition);
+                        shader.SetUniform("dirlightEnabled", false);
+                        shader.SetUniform("dirlight_direction", Vector3.Zero);
+                        shader.SetUniform("dirlight_ambientColor", dirlight_ambient);
+                        shader.SetUniform("dirlight_diffuseColor", dirlight_diffuse);
+                        shader.SetUniform("dirlight_specularColor", dirlight_specular);
+                        shader.SetUniform("pointlight1Enabled", true);
+                        shader.SetUniform("pointlight1_position", pointlight_position);
+                        shader.SetUniform("pointlight1_ambientColor", dirlight_ambient);
+                        shader.SetUniform("pointlight1_diffuseColor", dirlight_diffuse);
+                        shader.SetUniform("pointlight1_specularColor", dirlight_specular);
+                        shader.SetUniform("pointlight1_linearAttenuation", 0.022f);
+                        shader.SetUniform("pointlight1_quadraticAttenuation", 0.0019f);
+                        shader.SetUniform("pointlight1_constant", 1);
+                        shader.SetUniform("spotlight1Enabled", false);
+                        shader.SetUniform("spotlight1_direction", Vector3.Zero);
+                        shader.SetUniform("spotlight1_position", spotlight_position);
+                        shader.SetUniform("spotlight1_innerCut", MathHelper.ToRadians(12.5f));
+                        shader.SetUniform("spotlight1_outerCut", MathHelper.ToRadians(17.5f));
+                        shader.SetUniform("spotlight1_linearAttenuation", 0.045f);
+                        shader.SetUniform("spotlight1_quadraticAttenuation", 0.0075f);
+                        shader.SetUniform("spotlight1_constant", 1);
+                        shader.SetUniform("spotlight1_ambientColor", dirlight_ambient);
+                        shader.SetUniform("spotlight1_diffuseColor", dirlight_diffuse);
+                        shader.SetUniform("spotlight1_specularColor", dirlight_specular);
+                    }
 
-            // customEffect.Parameters["World"].SetValue(_world);
-            // customEffect.Parameters["View"].SetValue(_view);
-            // customEffect.Parameters["Projection"].SetValue(_projection);
-            //
-            // customEffect.Parameters["viewPos"].SetValue(camera.CameraPosition);
-            // customEffect.Parameters["dirlightEnabled"].SetValue(false);
-            // customEffect.Parameters["pointlight1Enabled"].SetValue(false);
-            // customEffect.Parameters["spotlight1Enabled"].SetValue(false);
-            
-            _deimos.Draw(_world, _view, _projection);
+                    mesh.Draw();
+                }
+            }
+            catch (NullReferenceException e)
+            {
+                Console.WriteLine(
+                    "Check uniforms!\nIf you have missed any uniforms or they are not used in shader, this NullReferenceException is thrown");
+                throw;
+            }
+            catch (UniformNotFoundException u)
+            {
+                Console.WriteLine(u.Message);
+                throw;
+            }
+
+            //_deimos.Draw(_world, _view, _projection);
 
             // TODO: Disabled so far because it is irritating
             // _whatsAppIcon.Begin();
@@ -302,7 +376,9 @@ namespace SolidSilnique
             //     _rectOrigin,
             //     1.0f, SpriteEffects.None, 0.5f);
             // _rect.End();
-
+            _spriteBatch.Begin();
+            _gui.Draw(_spriteBatch);
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
     }
