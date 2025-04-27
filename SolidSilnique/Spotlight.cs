@@ -26,10 +26,32 @@ public class Spotlight : PointLight
         set { outerCut = value; }
     }
 
-    public Spotlight(float linear, float quadratic, float constant, Vector3 direction, float innerCut, float outerCut) : base(linear, quadratic, constant)
+    public Spotlight(float linear, float quadratic, float constant, Vector3 direction, float innerCut, float outerCut) :
+        base(linear, quadratic, constant)
     {
         this.direction = direction;
         this.innerCut = innerCut;
         this.outerCut = outerCut;
+    }
+
+    public override void SendToShader(Shader shader)
+    {
+        try
+        {
+            shader.SetUniform("spotlight1Enabled", Enabled);
+            shader.SetUniform("spotlight1_direction", Direction);
+            shader.SetUniform("spotlight1_innerCut", MathHelper.ToRadians(innerCut));
+            shader.SetUniform("spotlight1_outerCut", MathHelper.ToRadians(outerCut));
+            shader.SetUniform("spotlight1_linearAttenuation", 0.045f);
+            shader.SetUniform("spotlight1_quadraticAttenuation", 0.0075f);
+            shader.SetUniform("spotlight1_constant", 1);
+            shader.SetUniform("spotlight1_ambientColor", AmbientColor);
+            shader.SetUniform("spotlight1_diffuseColor", DiffuseColor);
+            shader.SetUniform("spotlight1_specularColor", SpecularColor);
+        }
+        catch (UniformNotFoundException e)
+        {
+            throw new UniformNotFoundException(e.Message, " error source: Spotlight.cs");
+        }
     }
 }

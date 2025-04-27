@@ -24,6 +24,11 @@ namespace SolidSilnique
         private Matrix _view;
         private Matrix _projection;
 
+        // For shadows
+        private Matrix _lightView;
+        private Matrix _lightProjection;
+        private RenderTarget2D shadowMapRenderTarget;
+
         private SpriteBatch _whatsAppIcon;
         private Texture2D _whatsAppIconTexture;
         private Vector2 _whatsAppIconPos;
@@ -66,12 +71,17 @@ namespace SolidSilnique
         private Vector3 spotlight_position;
         private Vector3 pointlight_position;
 
+        private DirectionalLight testDirectionalLight;
+        private PointLight testPointLight;
+        private Spotlight testSpotlight;
+
         // Custom shader
         //private Effect customEffect;
 
 
         private Shader shader;
-        
+        private Shader shadowShader;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -143,20 +153,43 @@ namespace SolidSilnique
             totalFrames = frames.Length;
 
             screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-            
+
             // Load shaders
             shader = new Shader("Shaders/CustomShader",
                 GraphicsDevice,
                 this,
                 "BasicColorDrawingWithLights");
+
+            shadowShader = new Shader("Shaders/ShadowMapShader",
+                GraphicsDevice,
+                this,
+                "ShadeTheSceneRightNow");
+            shadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, 1024, 1024, false, SurfaceFormat.Color,
+                DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
             
             
+
             dirlight_ambient = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
             dirlight_diffuse = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
             dirlight_specular = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
-            spotlight_position = new Vector3(10.0f, 0.0f, 0.0f);
+            spotlight_position = new Vector3(-5.0f, 0.0f, 0.0f);
             pointlight_position = new Vector3(10.0f, 0.0f, 0.0f);
+
+            testDirectionalLight = new DirectionalLight(Vector3.Zero);
+            testDirectionalLight.AmbientColor = dirlight_ambient;
+            testDirectionalLight.DiffuseColor = dirlight_diffuse;
+            testDirectionalLight.SpecularColor = dirlight_specular;
+
+            testPointLight = new PointLight(1, 0.022f, 0.0019f);
+            testPointLight.AmbientColor = dirlight_ambient;
+            testPointLight.DiffuseColor = dirlight_diffuse;
+            testPointLight.SpecularColor = dirlight_specular;
+
+            testSpotlight = new Spotlight(1, 0.022f, 0.0019f, Vector3.Zero, 12.5f, 17.5f);
+
+            testDirectionalLight.Enabled = false;
+            //testSpotlight.Enabled = false;
 
             base.Initialize();
         }
@@ -312,30 +345,13 @@ namespace SolidSilnique
                         shader.SetUniform("View", _view);
                         shader.SetUniform("Projection", _projection);
                         shader.SetUniform("viewPos", camera.CameraPosition);
-                        shader.SetUniform("dirlightEnabled", false);
-                        shader.SetUniform("dirlight_direction", Vector3.Zero);
-                        shader.SetUniform("dirlight_ambientColor", dirlight_ambient);
-                        shader.SetUniform("dirlight_diffuseColor", dirlight_diffuse);
-                        shader.SetUniform("dirlight_specularColor", dirlight_specular);
-                        shader.SetUniform("pointlight1Enabled", true);
+                        testDirectionalLight.SendToShader(shader);
+                        // TODO: Integrate light objects inheritance from GameObject class
                         shader.SetUniform("pointlight1_position", pointlight_position);
-                        shader.SetUniform("pointlight1_ambientColor", dirlight_ambient);
-                        shader.SetUniform("pointlight1_diffuseColor", dirlight_diffuse);
-                        shader.SetUniform("pointlight1_specularColor", dirlight_specular);
-                        shader.SetUniform("pointlight1_linearAttenuation", 0.022f);
-                        shader.SetUniform("pointlight1_quadraticAttenuation", 0.0019f);
-                        shader.SetUniform("pointlight1_constant", 1);
-                        shader.SetUniform("spotlight1Enabled", false);
-                        shader.SetUniform("spotlight1_direction", Vector3.Zero);
+                        testPointLight.SendToShader(shader);
+                        // TODO: Integrate light objects inheritance from GameObject class
                         shader.SetUniform("spotlight1_position", spotlight_position);
-                        shader.SetUniform("spotlight1_innerCut", MathHelper.ToRadians(12.5f));
-                        shader.SetUniform("spotlight1_outerCut", MathHelper.ToRadians(17.5f));
-                        shader.SetUniform("spotlight1_linearAttenuation", 0.045f);
-                        shader.SetUniform("spotlight1_quadraticAttenuation", 0.0075f);
-                        shader.SetUniform("spotlight1_constant", 1);
-                        shader.SetUniform("spotlight1_ambientColor", dirlight_ambient);
-                        shader.SetUniform("spotlight1_diffuseColor", dirlight_diffuse);
-                        shader.SetUniform("spotlight1_specularColor", dirlight_specular);
+                        testSpotlight.SendToShader(shader);
                     }
 
                     mesh.Draw();
