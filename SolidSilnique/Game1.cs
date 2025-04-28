@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core;
+using SolidSilnique.GameContent;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace SolidSilnique
@@ -162,9 +163,9 @@ namespace SolidSilnique
 
 
 
+            EngineManager.scene = new TestScene();
 
-
-            base.Initialize();
+			base.Initialize();
         }
 
         /// <summary>
@@ -224,7 +225,8 @@ namespace SolidSilnique
 			}*/
             EngineManager.scene.LoadContent(Content);
             EngineManager.scene.Setup();
-        }
+			EngineManager.Start();
+		}
 
         /// <summary>
         /// Function defining mouse behaviour
@@ -307,6 +309,8 @@ namespace SolidSilnique
             processKeyboard(gameTime);
             processMouse(gameTime);
             counter.Update(gameTime);
+
+            EngineManager.Update(gameTime);
 
             base.Update(gameTime);
         }

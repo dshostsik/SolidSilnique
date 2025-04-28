@@ -12,18 +12,21 @@ namespace SolidSilnique.Core
 {
 	static class EngineManager
 	{
-		public static Scene scene = new TestScene();
+		public static Scene scene = null;
 		public static Queue<GameObject> renderQueue = [];
 
-		static void Start()
+		public static void Start()
 		{
 
+			scene.Start();
 		}
 
-		static void Update(GameTime gameTime) 
+		public static void Update(GameTime gameTime) 
 		{
 			Time.deltaTimeMs = gameTime.ElapsedGameTime.Milliseconds;
 			Time.deltaTime = Time.deltaTimeMs/1000.0f;
+
+			scene.Update();
 		}
 
 		public static void Draw(Shader shader)

@@ -17,17 +17,17 @@ namespace SolidSilnique.Core
 		public Vector3 position
 		{
 			get { return _position; }
-			set { _position = value; _dirtyFlag = true; }
+			set { _position = value; dirtyFlag = true; }
 		}
 		public Vector3 rotation
 		{
 			get { return _rotation; }
-			set { _rotation = value; _dirtyFlag = true; }
+			set { _rotation = value; dirtyFlag = true; }
 		}
 		public Vector3 scale
 		{
 			get { return _scale; }
-			set { _scale = value; _dirtyFlag = true; }
+			set { _scale = value; dirtyFlag = true; }
 		}
 
 		//Model Matrix
@@ -35,6 +35,17 @@ namespace SolidSilnique.Core
 
 		//Flags
 		bool _dirtyFlag = true;
+
+		public bool dirtyFlag
+		{
+			get { return _dirtyFlag; }
+			set {
+				_dirtyFlag = value;
+				foreach (var child in gameObject.children) { 
+					child.transform.dirtyFlag = value;
+				}
+			}
+		}
 
 		//gameObject
 		public GameObject gameObject = null;
@@ -49,7 +60,7 @@ namespace SolidSilnique.Core
 		public Matrix getModelMatrix() {
 			if (_dirtyFlag) {
 
-				modelMatrix =	Matrix.CreateScale(_scale) *
+				modelMatrix =
 								Matrix.CreateRotationX(MathHelper.ToRadians(_rotation.X)) *
 								Matrix.CreateRotationY(MathHelper.ToRadians(_rotation.Y)) *
 								Matrix.CreateRotationZ(MathHelper.ToRadians(_rotation.Z)) *
@@ -58,7 +69,7 @@ namespace SolidSilnique.Core
 				{
 					modelMatrix = gameObject.parent.transform.getModelMatrix() * modelMatrix;
 				}
-				
+				modelMatrix = Matrix.CreateScale(_scale) * modelMatrix;
 
 				_dirtyFlag = false;
 			}

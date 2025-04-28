@@ -23,7 +23,7 @@ namespace SolidSilnique.Core
 		public Texture2D texture = null;
 
 		//Components
-		public List<Component> components = [];
+		List<Component> components = [];
 
 		public GameObject(string name)
         {
@@ -107,6 +107,17 @@ namespace SolidSilnique.Core
 			children.Remove(child);
 
 		}
+
+        //COMPONENTS
+        /// <summary>
+        /// COMPONENTY DODAWAĆ TYLKO TĄ METODĄ
+        /// </summary>
+        /// <param name="component"></param>
+        public void AddComponent(Component component)
+        {
+            component.gameObject = this;
+            components.Add(component);
+        }
 
 
 		////Searching

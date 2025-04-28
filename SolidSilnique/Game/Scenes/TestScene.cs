@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SolidSilnique.Core;
+using SolidSilnique.Core.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,6 +64,7 @@ namespace SolidSilnique.GameContent
 			go.transform.position = new Vector3(10, 0, -10);
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];
+			go.AddComponent(new DebugMoveComponent()); //<-- Dodawanie componentów
 			this.AddChild(go);
 
 			GameObject go2 = new GameObject("Square4");
