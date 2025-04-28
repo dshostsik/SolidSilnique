@@ -42,9 +42,9 @@ public class Spotlight : PointLight
             shader.SetUniform("spotlight1_direction", Direction);
             shader.SetUniform("spotlight1_innerCut", MathHelper.ToRadians(innerCut));
             shader.SetUniform("spotlight1_outerCut", MathHelper.ToRadians(outerCut));
-            shader.SetUniform("spotlight1_linearAttenuation", 0.045f);
-            shader.SetUniform("spotlight1_quadraticAttenuation", 0.0075f);
-            shader.SetUniform("spotlight1_constant", 1);
+            shader.SetUniform("spotlight1_linearAttenuation", Linear);
+            shader.SetUniform("spotlight1_quadraticAttenuation", Quadratic);
+            shader.SetUniform("spotlight1_constant", Constant);
             shader.SetUniform("spotlight1_ambientColor", AmbientColor);
             shader.SetUniform("spotlight1_diffuseColor", DiffuseColor);
             shader.SetUniform("spotlight1_specularColor", SpecularColor);
