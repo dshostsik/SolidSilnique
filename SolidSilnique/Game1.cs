@@ -27,21 +27,11 @@ namespace SolidSilnique
         // For shadows
         private Matrix _lightView;
         private Matrix _lightProjection;
+        private Matrix _lightViewProjection;
         private RenderTarget2D shadowMapRenderTarget;
-
-        private SpriteBatch _whatsAppIcon;
-        private Texture2D _whatsAppIconTexture;
-        private Vector2 _whatsAppIconPos;
 
         private SpriteFont _font;
         private SpriteBatch _text;
-        private Vector2 _textPos;
-        private Vector2 textCenter;
-
-        private SpriteBatch _rect;
-        private Texture2D _rectTexture;
-        private Vector2 _rectPos;
-        private Vector2 _rectOrigin;
 
         private Model _deimos;
         private Texture2D _deimosTexture;
@@ -57,9 +47,6 @@ namespace SolidSilnique
 
 
         // create bg
-        private SpriteBatch background;
-        private Texture2D[] frames;
-        private int totalFrames;
         private Rectangle screenBounds;
 
         // TODO: Remove when unnecessary
@@ -72,6 +59,8 @@ namespace SolidSilnique
         private Vector3 pointlight_position;
 
         private DirectionalLight testDirectionalLight;
+        private Vector3 sunPosition;
+
         private PointLight testPointLight;
         private Spotlight testSpotlight;
 
@@ -129,28 +118,7 @@ namespace SolidSilnique
             // Resize world matrix
             _world = Matrix.CreateScale(1.0f) * _world;
 
-            // Sprite settings
-            _whatsAppIconPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.95f,
-                _graphics.PreferredBackBufferHeight * 0.01f);
-            _textPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.1f,
-                _graphics.PreferredBackBufferHeight * 0.05f);
-            _rectPos = new Vector2(_graphics.PreferredBackBufferWidth * 0.85f,
-                _graphics.PreferredBackBufferHeight * 0.80f);
-            frameraterCounterPosition = new Vector2(_graphics.PreferredBackBufferWidth * 0.025f,
-                _graphics.PreferredBackBufferHeight * 0.01f);
-
             firstMouse = true;
-
-            frames = new Texture2D[10];
-
-            for (int i = 0; i < 10; i++)
-            {
-                frames[i] = Content.Load<Texture2D>("Background/Frame" + (i + 1));
-            }
-
-            background = new SpriteBatch(GraphicsDevice);
-
-            totalFrames = frames.Length;
 
             screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
 
@@ -166,8 +134,7 @@ namespace SolidSilnique
                 "ShadeTheSceneRightNow");
             shadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, 1024, 1024, false, SurfaceFormat.Color,
                 DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
-            
-            
+
 
             dirlight_ambient = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
             dirlight_diffuse = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
@@ -189,6 +156,10 @@ namespace SolidSilnique
             testSpotlight = new Spotlight(1, 0.022f, 0.0019f, Vector3.Zero, 12.5f, 17.5f);
 
             testDirectionalLight.Enabled = false;
+            testPointLight.Enabled = true;
+            testSpotlight.Enabled = false;
+            
+            sunPosition = new Vector3(50.0f, 50.0f, 0.0f);
             //testSpotlight.Enabled = false;
 
             base.Initialize();
@@ -202,34 +173,9 @@ namespace SolidSilnique
             // Load the model
             _deimos = Content.Load<Model>("deimos");
             _deimosTexture = Content.Load<Texture2D>("deimos_texture");
-            _whatsAppIconTexture = Content.Load<Texture2D>("whatsapp_1384095");
-
-            _whatsAppIcon = new SpriteBatch(GraphicsDevice);
 
             _font = Content.Load<SpriteFont>("Megafont");
             _text = new SpriteBatch(GraphicsDevice);
-
-            _rectTexture = new Texture2D(GraphicsDevice, 100, 100);
-
-            var data = new Color[10000];
-
-            for (int i = 0; i < data.Length; i++)
-            {
-                if (i % 2 == 0)
-                {
-                    data[i] = Color.Chartreuse;
-                }
-                else
-                {
-                    data[i] = Color.Red;
-                }
-            }
-
-            _rectTexture.SetData(data);
-
-            _rect = new SpriteBatch(GraphicsDevice);
-
-            _rectOrigin = new Vector2(_rectTexture.Width / 2, _rectTexture.Height / 2);
 
             _gui = new GUI("GUI/resources/UI.xml", Content);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -299,6 +245,10 @@ namespace SolidSilnique
             // Get current camera view
             _view = camera.getViewMatrix();
 
+            _lightView = Matrix.CreateLookAt(sunPosition, sunPosition + testDirectionalLight.Direction, Vector3.Up);
+            _lightProjection = Matrix.CreateOrthographic(200, 200, 0.1f, 100f);
+            _lightViewProjection = _lightView * _lightProjection;
+
             // Rotate object
             //_world *= Matrix.CreateRotationY(MathHelper.ToRadians(gameTime.ElapsedGameTime.Milliseconds * 0.01f));
 
@@ -327,14 +277,9 @@ namespace SolidSilnique
         {
             // TODO: Add your drawing code here
             GraphicsDevice.Clear(Color.Black);
-
-
-            // TODO: Disabled so far because it is irritating
-            // background.Begin();
-            // background.Draw(frames[(int)(gameTime.TotalGameTime.TotalMilliseconds / counter.avgFPS % totalFrames)], screenBounds, Color.White);
-            // background.End();
             try
             {
+                //GraphicsDevice.SetRenderTarget(shadowMapRenderTarget);
                 foreach (ModelMesh mesh in _deimos.Meshes)
                 {
                     foreach (ModelMeshPart part in mesh.MeshParts)
@@ -355,6 +300,22 @@ namespace SolidSilnique
                     }
 
                     mesh.Draw();
+
+                    // src: https://community.monogame.net/t/shadow-mapping-on-monogame/8212/2
+                    foreach (ModelMeshPart part in mesh.MeshParts)
+                    {
+                        shadowShader.SetUniform("LightViewProj", _world * _lightViewProjection);
+
+                        shadowShader.Effect.CurrentTechnique.Passes[0].Apply();
+
+                        GraphicsDevice.SetVertexBuffer(part.VertexBuffer);
+                        GraphicsDevice.Indices = part.IndexBuffer;
+                        int primitiveCount = part.PrimitiveCount;
+                        int vertexOffset = part.VertexOffset;
+                        int startIndex = part.StartIndex;
+
+                        GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, vertexOffset, startIndex, primitiveCount);
+                    }
                 }
             }
             catch (NullReferenceException e)
@@ -369,29 +330,10 @@ namespace SolidSilnique
                 throw;
             }
 
-            //_deimos.Draw(_world, _view, _projection);
-
-            // TODO: Disabled so far because it is irritating
-            // _whatsAppIcon.Begin();
-            // _whatsAppIcon.Draw(_whatsAppIconTexture, _whatsAppIconPos, Color.Aquamarine);
-            // _whatsAppIcon.End();
-            //
-            // textCenter = _font.MeasureString(gameTime.ElapsedGameTime.Milliseconds.ToString()) / 2;
-            //
-            // _text.Begin();
-            // _text.DrawString(_font, gameTime.TotalGameTime.Milliseconds.ToString(), _textPos, Color.Aqua, 0,
-            //     textCenter, 1.0f, SpriteEffects.None, 0.5f);
-            // _text.End();
-
             _text.Begin();
             _text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Aqua);
             _text.End();
 
-            // _rect.Begin();
-            // _rect.Draw(_rectTexture, _rectPos, null, Color.White, (int)gameTime.TotalGameTime.TotalSeconds * 2,
-            //     _rectOrigin,
-            //     1.0f, SpriteEffects.None, 0.5f);
-            // _rect.End();
             _spriteBatch.Begin();
             _gui.Draw(_spriteBatch);
             _spriteBatch.End();
