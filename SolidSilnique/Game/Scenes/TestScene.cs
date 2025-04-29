@@ -30,7 +30,16 @@ namespace SolidSilnique.GameContent
 
 		public override void Setup()
 		{
-			GameObject go = new GameObject("Square1");
+			GameObject go = new GameObject("Camera");
+			go.transform.position = new Vector3(0, 0, 0);
+			go.model = loadedModels["deimos"];
+			go.texture = loadedTextures["deimos"];
+			CameraComponent cam = new CameraComponent();
+			cam.SetMain();
+			go.AddComponent(cam);
+			this.AddChild(go);
+
+			go = new GameObject("Square1");
 			go.transform.position = new Vector3(10, 0, 10);
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];

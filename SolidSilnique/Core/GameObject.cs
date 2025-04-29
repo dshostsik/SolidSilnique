@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SolidSilnique.Core
 {
-	class GameObject
+	public class GameObject
     {
 
 		//Identifiers

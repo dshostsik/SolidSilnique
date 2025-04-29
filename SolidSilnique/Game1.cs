@@ -43,7 +43,7 @@ namespace SolidSilnique
         private Model _deimos;
         private Texture2D _deimosTexture;
 
-        private Camera camera;
+        
         private bool firstMouse;
 
         private float lastX;
@@ -112,8 +112,8 @@ namespace SolidSilnique
 
 
             // Create camera
-            camera = new Camera(new Vector3(0, 0, 25));                                     //TODO delete
-            camera.mouseMovement(0, 0, 0);                                                  //TODO delete
+                                          //TODO delete
+                                                          //TODO delete
             // matrices initialisations
             _world = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.Up);           //TODO delete
             
@@ -225,6 +225,9 @@ namespace SolidSilnique
 			}*/
             EngineManager.scene.LoadContent(Content);
             EngineManager.scene.Setup();
+
+			EngineManager.scene.mainCamera.mouseMovement(0, 0, 0);
+
 			EngineManager.Start();
 		}
 
@@ -248,7 +251,7 @@ namespace SolidSilnique
             float xOffset = (mouseX);
             float yOffset = (mouseY);
 
-            camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
+			EngineManager.scene.mainCamera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
             Mouse.SetPosition(w, h);
         }
 
@@ -258,26 +261,38 @@ namespace SolidSilnique
         /// <param name="gameTime">Object containing time values</param>
         private void processKeyboard(GameTime gameTime)
         {
+
+            Camera cam = EngineManager.scene.mainCamera;
             if (Keyboard.GetState().IsKeyDown(Keys.W))
             {
-                camera.move(Camera.directions.FORWARD, gameTime.ElapsedGameTime.Milliseconds);
+				cam.move(Camera.directions.FORWARD, Time.deltaTime);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.S))
             {
-                camera.move(Camera.directions.BACKWARD, gameTime.ElapsedGameTime.Milliseconds);
+				cam.move(Camera.directions.BACKWARD, Time.deltaTime);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
-                camera.move(Camera.directions.LEFT, gameTime.ElapsedGameTime.Milliseconds);
+				cam.move(Camera.directions.LEFT, Time.deltaTime);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.D))
             {
-                camera.move(Camera.directions.RIGHT, gameTime.ElapsedGameTime.Milliseconds);
+				cam.move(Camera.directions.RIGHT, Time.deltaTime);
             }
-        }
+
+			if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
+			{
+				cam.move(Camera.directions.DOWN, Time.deltaTime);
+			}
+
+			if (Keyboard.GetState().IsKeyDown(Keys.Space))
+			{
+				cam.move(Camera.directions.UP, Time.deltaTime);
+			}
+		}
 
         /// <summary>
         /// Add your update logic here
@@ -290,18 +305,18 @@ namespace SolidSilnique
                 Exit();
 
             // Get current camera view
-            _view = camera.getViewMatrix(); //TODO Delete
+            _view = EngineManager.scene.mainCamera.getViewMatrix(); //TODO Delete
 
             // Control FOV and perspective settings
             currentScrollWheelValue = Mouse.GetState().ScrollWheelValue;
             if (scrollWheelValue != currentScrollWheelValue)
             {
-                if (scrollWheelValue - currentScrollWheelValue < 0.0f) camera.processScroll(1);
-                else camera.processScroll(-1);
-                scrollWheelValue = currentScrollWheelValue;
+                //if (scrollWheelValue - currentScrollWheelValue < 0.0f) camera.processScroll(1);
+                //else camera.processScroll(-1);
+                //scrollWheelValue = currentScrollWheelValue;
             }
 
-            _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(camera.Zoom),
+            _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(EngineManager.scene.mainCamera.Zoom),
                 GraphicsDevice.Viewport.AspectRatio,
                 0.1f,
                 100f);
@@ -329,7 +344,7 @@ namespace SolidSilnique
 
 			shader.SetUniform("View", _view);
 			shader.SetUniform("Projection", _projection);
-			shader.SetUniform("viewPos", camera.CameraPosition);
+			shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
 			shader.SetUniform("dirlightEnabled", false);
 			shader.SetUniform("dirlight_direction", Vector3.Zero);
 			shader.SetUniform("dirlight_ambientColor", dirlight_ambient);

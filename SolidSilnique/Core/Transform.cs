@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SolidSilnique.Core
 {
-	class Transform
+	public class Transform
 	{
 		//Locals (Globals in future maybe?)
 		Vector3 _position = new Vector3(0);

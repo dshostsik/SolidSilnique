@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SolidSilnique.Core
 {
-	abstract class Component
+	public abstract class Component
 	{
 		//gameObject
 		public GameObject gameObject;
