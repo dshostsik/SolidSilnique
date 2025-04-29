@@ -119,6 +119,23 @@ namespace SolidSilnique.Core
             components.Add(component);
         }
 
+		
+		/// <summary>
+		/// SZUKA COMPONENTU PO TYPIE
+		/// </summary>
+		/// <param name="component"></param>
+		public T GetComponent<T>() where T : Component
+		{
+			foreach (var component in components)
+			{
+                if (component is T) { 
+                    return (T)component;
+                }
+			}
+            return null;
+
+		}
+
 
 		////Searching
 		//By Name
