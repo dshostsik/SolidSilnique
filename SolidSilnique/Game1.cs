@@ -334,11 +334,10 @@ namespace SolidSilnique
 			GraphicsDevice.DepthStencilState = DepthStencilState.Default;
 			GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
-            shader.SetUniform("texture_diffuse1", _deimosTexture);
-            shader.SetUniform("World", _world);
+            
             shader.SetUniform("View", _view);
             shader.SetUniform("Projection", _projection);
-            shader.SetUniform("viewPos", camera.CameraPosition);
+            shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
             testDirectionalLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
             shader.SetUniform("pointlight1_position", pointlight_position);
