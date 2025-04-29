@@ -14,7 +14,7 @@ namespace SolidSilnique.Core
 	{
 		public static Scene scene = null;
 		public static Queue<GameObject> renderQueue = [];
-
+		public static bool celShadingEnabled = false;
 		public static void Start()
 		{
 
@@ -39,14 +39,25 @@ namespace SolidSilnique.Core
 				GameObject go = renderQueue.Dequeue(); 
 				try
 				{
+					Matrix model = go.transform.getModelMatrix();
 					shader.SetUniform("texture_diffuse1", go.texture);
-					shader.SetUniform("World", go.transform.getModelMatrix());
+					shader.SetUniform("World", model);
+					Matrix modelTransInv = Matrix.Transpose(Matrix.Invert(go.transform.getModelMatrix()));
+					shader.SetUniform("WorldTransInv", modelTransInv);
 
 					foreach (ModelMesh mesh in go.model.Meshes)
 					{
 						foreach (ModelMeshPart part in mesh.MeshParts)
 						{
 							part.Effect = shader.Effect;
+							if (celShadingEnabled)
+							{
+								part.Effect.CurrentTechnique = shader.Effect.Techniques["CelShading"];
+							}
+							else {
+								part.Effect.CurrentTechnique = shader.Effect.Techniques["BasicColorDrawingWithLights"];
+							}
+							
 
 						}
 
