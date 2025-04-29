@@ -40,8 +40,7 @@ namespace SolidSilnique
         private Vector2 _rectPos;
         private Vector2 _rectOrigin;
 
-        private Model _deimos;
-        private Texture2D _deimosTexture;
+        private Skybox _skybox;
 
         
         private bool firstMouse;
@@ -161,9 +160,15 @@ namespace SolidSilnique
             spotlight_position = new Vector3(10.0f, 0.0f, 0.0f);
             pointlight_position = new Vector3(10.0f, 0.0f, 0.0f);
 
+			_projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
+				GraphicsDevice.Viewport.AspectRatio,
+				0.1f,
+				100f);
 
+			EngineManager.scene = new TestScene();
 
-            EngineManager.scene = new TestScene();
+            _skybox = new Skybox();
+            _skybox.Setup(Content,_graphics,GraphicsDevice,_projection);
 
 			base.Initialize();
         }
@@ -174,8 +179,7 @@ namespace SolidSilnique
         protected override void LoadContent()
         {
             // Load the model
-            _deimos = Content.Load<Model>("deimos");
-            _deimosTexture = Content.Load<Texture2D>("deimos_texture");
+            
             _whatsAppIconTexture = Content.Load<Texture2D>("whatsapp_1384095");
 
             _whatsAppIcon = new SpriteBatch(GraphicsDevice);
@@ -316,10 +320,7 @@ namespace SolidSilnique
                 //scrollWheelValue = currentScrollWheelValue;
             }
 
-            _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(EngineManager.scene.mainCamera.Zoom),
-                GraphicsDevice.Viewport.AspectRatio,
-                0.1f,
-                100f);
+            
 
             processKeyboard(gameTime);
             processMouse(gameTime);
@@ -334,7 +335,14 @@ namespace SolidSilnique
         {
 			// TODO: Add your drawing code here
 			GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
+
+			GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+			GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+
+			_skybox.Draw(_graphics,_view);
+
 			GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+			GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
 			// TODO: Disabled so far because it is irritating
 			// background.Begin();

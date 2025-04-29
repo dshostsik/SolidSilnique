@@ -43,7 +43,7 @@ namespace SolidSilnique.GameContent
 			go.transform.position = new Vector3(10, 0, 10);
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];
-			go.AddComponent(new SphereColliderComponent(6));
+			go.AddComponent(new SphereColliderComponent(7));
 			this.AddChild(go);
 
 			go = new GameObject("Square2");
@@ -76,7 +76,7 @@ namespace SolidSilnique.GameContent
 			go.texture = loadedTextures["deimos"];
 			
 			go.AddComponent(new DebugMoveComponent()); //<-- Dodawanie componentów
-			go.AddComponent(new SphereColliderComponent(6));
+			go.AddComponent(new SphereColliderComponent(7));
 
 			this.AddChild(go);
 
