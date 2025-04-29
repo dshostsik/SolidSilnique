@@ -298,6 +298,12 @@
 /processorParam:DebugMode=Auto
 /build:SkyBoxShader.fx
 
+#begin Shaders/ShadowMapShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/ShadowMapShader.fx
+
 #begin whatsapp_1384095.png
 /importer:TextureImporter
 /processor:TextureProcessor

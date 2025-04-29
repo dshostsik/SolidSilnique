@@ -4,25 +4,30 @@ namespace SolidSilnique
 {
     public abstract class Light
     {
-        private Vector3 ambientColor;
-        private Vector3 diffuseColor;
-        private Vector3 specularColor;
+        private Vector4 ambientColor;
+        private Vector4 diffuseColor;
+        private Vector4 specularColor;
 
         private bool enabled;
 
-        public Vector3 AmbientColor
+        protected Light()
+        {
+            enabled = true;
+        }
+
+        public Vector4 AmbientColor
         {
             get { return ambientColor; }
             set { ambientColor = value; }
         }
 
-        public Vector3 DiffuseColor
+        public Vector4 DiffuseColor
         {
             get { return diffuseColor; }
             set { diffuseColor = value; }
         }
 
-        public Vector3 SpecularColor
+        public Vector4 SpecularColor
         {
             get { return specularColor; }
             set { specularColor = value; }
@@ -33,5 +38,12 @@ namespace SolidSilnique
             get { return enabled; }
             set { enabled = value; }
         }
+        
+        /// <summary>
+        /// Send all light's data to shader.
+        /// </summary>
+        /// <param name="shader">Shader object that accepts uniforms</param>
+        /// <throws cref="UniformNotFoundException">if uniform was not found in shader</throws>
+        public abstract void SendToShader(Shader shader);
     }
 }

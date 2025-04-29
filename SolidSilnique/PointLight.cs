@@ -31,9 +31,29 @@ namespace SolidSilnique
             this.linear = linear;
             this.quadratic = quadratic;
             this.constant = constant;
-            AmbientColor = new Vector3(.2f, .2f, .2f);
-            DiffuseColor = new Vector3(.8f, .8f, .8f);
-            SpecularColor = new Vector3(.8f, .8f, .8f);
+            AmbientColor = new Vector4(.2f, .2f, .2f, .0f);
+            DiffuseColor = new Vector4(.8f, .8f, .8f, .0f);
+            SpecularColor = new Vector4(.8f, .8f, .8f, .0f);
+        }
+
+        public override void SendToShader(Shader shader)
+        {
+            try
+            {
+                shader.SetUniform("pointlight1Enabled", Enabled);
+                // TODO: Integrate light objects inheritance from GameObject class
+                // shader.SetUniform("pointlight1_position", pointlight_position);
+                shader.SetUniform("pointlight1_ambientColor", AmbientColor);
+                shader.SetUniform("pointlight1_diffuseColor", DiffuseColor);
+                shader.SetUniform("pointlight1_specularColor", SpecularColor);
+                shader.SetUniform("pointlight1_linearAttenuation", Linear);
+                shader.SetUniform("pointlight1_quadraticAttenuation", Quadratic);
+                shader.SetUniform("pointlight1_constant", Constant);
+            }
+            catch (UniformNotFoundException e)
+            {
+                throw new UniformNotFoundException(e.Message, " error source: PointLight.cs");
+            }
         }
     }
 }
