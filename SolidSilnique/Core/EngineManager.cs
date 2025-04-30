@@ -29,14 +29,17 @@ namespace SolidSilnique.Core
 			scene.Update();
 		}
 
-		public static void Draw(Shader shader)
+		public static void Draw(Shader shader, GraphicsDevice graphics)
 		{
 			scene.Draw();
 
 			while (renderQueue.Count > 0)
 			{
 
-				GameObject go = renderQueue.Dequeue(); 
+				GameObject go = renderQueue.Dequeue();
+				if (go.model == null) {
+					continue;
+				}
 				try
 				{
 					Matrix model = go.transform.getModelMatrix();
@@ -52,16 +55,25 @@ namespace SolidSilnique.Core
 							part.Effect = shader.Effect;
 							if (celShadingEnabled)
 							{
-								part.Effect.CurrentTechnique = shader.Effect.Techniques["CelShading"];
-							}
+                                part.Effect.CurrentTechnique = shader.Effect.Techniques["CelShadingOutline"];
+                                graphics.RasterizerState = RasterizerState.CullClockwise;
+                                mesh.Draw();
+
+                                part.Effect.CurrentTechnique = shader.Effect.Techniques["CelShading"];
+                                graphics.RasterizerState = RasterizerState.CullCounterClockwise;
+                                mesh.Draw();
+
+                                
+                            }
 							else {
 								part.Effect.CurrentTechnique = shader.Effect.Techniques["BasicColorDrawingWithLights"];
-							}
+                                mesh.Draw();
+                            }
 							
 
 						}
 
-						mesh.Draw();
+						
 					}
 				}
 				catch (NullReferenceException e)

@@ -287,7 +287,11 @@ namespace SolidSilnique
 			{
 				EngineManager.celShadingEnabled = true;
 			}
-		}
+            if (Keyboard.GetState().IsKeyDown(Keys.G))
+            {
+                Keyboard.GetState().IsKeyDown(Keys.G);
+            }
+        }
 
         /// <summary>
         /// Add your update logic here
@@ -363,7 +367,7 @@ namespace SolidSilnique
 			
 
 
-			EngineManager.Draw(shader);
+			EngineManager.Draw(shader, GraphicsDevice);
 
             /*
             foreach (ModelMeshPart part in mesh.MeshParts)

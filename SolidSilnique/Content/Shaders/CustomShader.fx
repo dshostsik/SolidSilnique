@@ -226,6 +226,32 @@ float4 CelShader(VertexShaderOutput input) : SV_TARGET
     return float4(directionalLight, 1.0) * textureVector;
 }
 
+VertexShaderOutput OutlineVS(in VertexShaderInput input){
+
+    VertexShaderOutput output = (VertexShaderOutput)0;
+
+
+    float inflate = -0.05f;
+
+    float4 posInflated = input.aPos + input.aNormal * inflate;
+
+    output.Position = mul(posInflated, mul(mul(World, View), Projection));
+    output.TexCoords = input.aTexCoords;
+
+    output.Normal = mul(transpose(WorldTransInv), input.aNormal);
+    output.FragPos = mul(input.aPos, World).xyz;
+
+    return output;
+
+
+}
+
+float4 OutlinePS(VertexShaderOutput input) : SV_TARGET
+{
+    
+    return float4(0.0, 0.0, 0.0, 1.0);
+}
+
 technique BasicColorDrawingWithLights
 {
 	pass P0
@@ -234,6 +260,15 @@ technique BasicColorDrawingWithLights
 		PixelShader = compile PS_SHADERMODEL MainPS();
 	}
 }
+
+technique CelShadingOutline
+{
+    pass P0
+    {
+        VertexShader = compile VS_SHADERMODEL OutlineVS();
+        PixelShader = compile PS_SHADERMODEL OutlinePS();
+    }
+    };
 
 technique CelShading
 {

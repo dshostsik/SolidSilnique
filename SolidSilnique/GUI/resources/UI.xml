@@ -3,7 +3,7 @@
     <GuiElement positionX="50" positionY="-10" scale="1">
         <Bar name="hpbar" orientation="vertical" inverse="false" width="50"/>
     </GuiElement>
-    <GuiElement positionX="0" positionY="200" scale="0,1">
+    <GuiElement positionX="0" positionY="200" scale="0">
         <Image name="D"/>
     </GuiElement>
     <GuiElement positionX="1920" positionY="200" scale="0,1">

@@ -36,12 +36,10 @@ namespace SolidSilnique.GameContent
 		{
 			GameObject go = new GameObject("Camera");
 			go.transform.position = new Vector3(0, 3, 0);
-			go.model = loadedModels["deimos"];
-			go.texture = loadedTextures["deimos"];
 			CameraComponent cam = new CameraComponent();
 			cam.SetMain();
 			go.AddComponent(cam);
-			go.AddComponent(new SphereColliderComponent(0.5f));
+			//go.AddComponent(new SphereColliderComponent(0.5f));
 			this.AddChild(go);
 
 			go = new GameObject("ground");
