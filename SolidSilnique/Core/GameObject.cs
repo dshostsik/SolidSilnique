@@ -25,6 +25,8 @@ namespace SolidSilnique.Core
 		//Components
 		List<Component> components = [];
 
+        public Texture2D normalMap = null;
+
         // Level of Detail (LOD)
         /// <summary>
         /// List of LOD models, sorted by increasing distance threshold.

@@ -25,13 +25,14 @@ namespace SolidSilnique.GameContent
 
 		public override void LoadContent(ContentManager Content)
 		{
+
 			loadedModels.Add("deimos", Content.Load<Model>("deimos"));
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 
             loadedModels.Add("gun_high", Content.Load<Model>("gun_high"));
             loadedModels.Add("gun_mid", Content.Load<Model>("gun_mid"));
             loadedModels.Add("gun_low", Content.Load<Model>("gun_low"));
-            loadedTextures.Add("gun", Content.Load<Texture2D>("gun_texture"));
+            loadedTextures.Add("gun", Content.Load<Texture2D>("deimos_texture"));
         }
 
 		public override void Setup()
@@ -103,6 +104,7 @@ namespace SolidSilnique.GameContent
                        // Register LOD variants with distance thresholds
             gun.AddLOD(loadedModels["gun_mid"], 20f);
             gun.AddLOD(loadedModels["gun_low"], 50f);
+
 
             this.AddChild(gun);
         }
