@@ -37,7 +37,7 @@ namespace SolidSilnique
 
         private Skybox _skybox;
 
-        
+
         private bool firstMouse;
 
         private float lastX;
@@ -65,12 +65,21 @@ namespace SolidSilnique
         private PointLight testPointLight;
         private Spotlight testSpotlight;
 
+        bool wasPDownLastFrame = false;
+
         // Custom shader
         //private Effect customEffect;
 
 
         private Shader shader;
         private Shader shadowShader;
+
+        public bool useCulling = true;
+
+        private BasicEffect _debugEffect;
+
+        private bool useDebugWireframe = false;
+        private bool wasBDownLastFrame = false;
 
         /// <summary>
         /// Constructor
@@ -96,25 +105,26 @@ namespace SolidSilnique
 
 
 
-			//DISPLAY SETUP
+            //DISPLAY SETUP
 
-			//Window.AllowUserResizing = true;
-			_graphics.GraphicsProfile = GraphicsProfile.HiDef;
-			//_graphics.IsFullScreen = true;
-			_graphics.HardwareModeSwitch = true;
+            //Window.AllowUserResizing = true;
+            _graphics.GraphicsProfile = GraphicsProfile.HiDef;
+            //_graphics.IsFullScreen = true;
+            _graphics.HardwareModeSwitch = true;
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
             _graphics.SynchronizeWithVerticalRetrace = true; //VSync
-			_graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
-			_graphics.ApplyChanges();
+            //_graphics.SynchronizeWithVerticalRetrace = false; // disabled VSync for uncapped FPS
+            _graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
+            _graphics.ApplyChanges();
 
 
             // Create camera
-                                          //TODO delete
-                                                          //TODO delete
+            //TODO delete
+            //TODO delete
             // matrices initialisations
             _world = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.Up);           //TODO delete
-            
+
             // Resize world matrix
             _world = Matrix.CreateScale(1.0f) * _world;
 
@@ -143,37 +153,37 @@ namespace SolidSilnique
             spotlight_position = new Vector3(-15.0f, 0.0f, 0.0f);
             pointlight_position = new Vector3(10.0f, 0.0f, 0.0f);
 
-			_projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
-				GraphicsDevice.Viewport.AspectRatio,
-				0.1f,
-				100f);
+            _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
+                GraphicsDevice.Viewport.AspectRatio,
+                0.1f,
+                100f);
 
-			
 
-			
+
+
             testDirectionalLight = new DirectionalLight(Vector3.Zero);
             testDirectionalLight.AmbientColor = dirlight_ambient;
             testDirectionalLight.DiffuseColor = dirlight_diffuse;
             testDirectionalLight.SpecularColor = dirlight_specular;
 
-            testPointLight = new PointLight( 0.022f, 0.0019f, 1);
+            testPointLight = new PointLight(0.022f, 0.0019f, 1);
             testPointLight.AmbientColor = dirlight_ambient;
             testPointLight.DiffuseColor = dirlight_diffuse;
             testPointLight.SpecularColor = dirlight_specular;
 
-            testSpotlight = new Spotlight( 0.007f, 0.0002f, 1, new Vector3(-10, 0, 0), 5.5f, 7.5f);
+            testSpotlight = new Spotlight(0.007f, 0.0002f, 1, new Vector3(-10, 0, 0), 5.5f, 7.5f);
 
             testDirectionalLight.Enabled = false;
             testPointLight.Enabled = false;
             testSpotlight.Enabled = true;
-            
+
             sunPosition = new Vector3(50.0f, 50.0f, 0.0f);
             //testSpotlight.Enabled = false;
 
             EngineManager.scene = new TestScene();
 
             _skybox = new Skybox();
-            _skybox.Setup(Content,_graphics,GraphicsDevice,_projection);
+            _skybox.Setup(Content, _graphics, GraphicsDevice, _projection);
 
 
             base.Initialize();
@@ -185,8 +195,8 @@ namespace SolidSilnique
         protected override void LoadContent()
         {
             // Load the model
-            
-            
+
+
 
             _font = Content.Load<SpriteFont>("Megafont");
             _text = new SpriteBatch(GraphicsDevice);
@@ -194,6 +204,7 @@ namespace SolidSilnique
             _gui = new GUI("GUI/resources/UI.xml", Content);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
+            _debugEffect = new BasicEffect(GraphicsDevice) { VertexColorEnabled = true };
             /*foreach(var child in EngineManager.scene.gameObjects)
             {
                 child.texture = _deimosTexture;
@@ -212,10 +223,10 @@ namespace SolidSilnique
             EngineManager.scene.LoadContent(Content);
             EngineManager.scene.Setup();
 
-			EngineManager.scene.mainCamera.mouseMovement(0, 0, 0);
+            EngineManager.scene.mainCamera.mouseMovement(0, 0, 0);
 
-			EngineManager.Start();
-		}
+            EngineManager.Start();
+        }
 
         /// <summary>
         /// Function defining mouse behaviour
@@ -237,7 +248,7 @@ namespace SolidSilnique
             float xOffset = (mouseX);
             float yOffset = (mouseY);
 
-			EngineManager.scene.mainCamera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
+            EngineManager.scene.mainCamera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
             Mouse.SetPosition(w, h);
         }
 
@@ -251,34 +262,47 @@ namespace SolidSilnique
             Camera cam = EngineManager.scene.mainCamera;
             if (Keyboard.GetState().IsKeyDown(Keys.W))
             {
-				cam.move(Camera.directions.FORWARD, Time.deltaTime);
+                cam.move(Camera.directions.FORWARD, Time.deltaTime);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.S))
             {
-				cam.move(Camera.directions.BACKWARD, Time.deltaTime);
+                cam.move(Camera.directions.BACKWARD, Time.deltaTime);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
-				cam.move(Camera.directions.LEFT, Time.deltaTime);
+                cam.move(Camera.directions.LEFT, Time.deltaTime);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.D))
             {
-				cam.move(Camera.directions.RIGHT, Time.deltaTime);
+                cam.move(Camera.directions.RIGHT, Time.deltaTime);
             }
 
-			if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
-			{
-				cam.move(Camera.directions.DOWN, Time.deltaTime);
-			}
+            if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
+            {
+                cam.move(Camera.directions.DOWN, Time.deltaTime);
+            }
 
-			if (Keyboard.GetState().IsKeyDown(Keys.Space))
-			{
-				cam.move(Camera.directions.UP, Time.deltaTime);
-			}
-		}
+            if (Keyboard.GetState().IsKeyDown(Keys.Space))
+            {
+                cam.move(Camera.directions.UP, Time.deltaTime);
+            }
+
+            var kb = Keyboard.GetState();
+            bool isPDown = kb.IsKeyDown(Keys.P);
+
+            if (isPDown && !wasPDownLastFrame)
+                useCulling = !useCulling;
+
+            wasPDownLastFrame = isPDown;
+
+            bool isBDown = kb.IsKeyDown(Keys.B);
+            if (isBDown && !wasBDownLastFrame)
+                useDebugWireframe = !useDebugWireframe;
+            wasBDownLastFrame = isBDown;
+        }
 
         /// <summary>
         /// Add your update logic here
@@ -292,7 +316,7 @@ namespace SolidSilnique
 
             // Get current camera view
             _view = EngineManager.scene.mainCamera.getViewMatrix(); //TODO Delete
-            
+
 
             _lightView = Matrix.CreateLookAt(sunPosition, sunPosition + testDirectionalLight.Direction, Vector3.Up);
             _lightProjection = Matrix.CreateOrthographic(200, 200, 0.1f, 100f);
@@ -310,7 +334,7 @@ namespace SolidSilnique
                 //scrollWheelValue = currentScrollWheelValue;
             }
 
-            
+
 
             processKeyboard(gameTime);
             processMouse(gameTime);
@@ -323,18 +347,18 @@ namespace SolidSilnique
 
         protected override void Draw(GameTime gameTime)
         {
-			// TODO: Add your drawing code here
-			GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
+            // TODO: Add your drawing code here
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
 
-			GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
-			GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-			_skybox.Draw(_graphics,_view);
+            _skybox.Draw(_graphics, _view);
 
-			GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-			GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
-            
+
             shader.SetUniform("View", _view);
             shader.SetUniform("Projection", _projection);
             shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
@@ -345,10 +369,15 @@ namespace SolidSilnique
             // TODO: Integrate light objects inheritance from GameObject class
             shader.SetUniform("spotlight1_position", spotlight_position);
             testSpotlight.SendToShader(shader);
-			
 
 
-			EngineManager.Draw(shader);
+            if (useCulling)
+                PerformCulledDraw();
+            else
+                EngineManager.Draw(shader);
+            //PerformCulledDraw();
+            //EngineManager.Draw(shader);
+            //Frustum Culling Setup
 
             /*
             foreach (ModelMeshPart part in mesh.MeshParts)
@@ -375,6 +404,82 @@ namespace SolidSilnique
             _gui.Draw(_spriteBatch);
             _spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        private void PerformCulledDraw()
+        {
+            //Build view-projection frustum
+            var viewProjection = _view * _projection;
+            var frustum = new BoundingFrustum(viewProjection);
+            var prevRasterizer = GraphicsDevice.RasterizerState;
+            if (useDebugWireframe)
+            {
+                _debugEffect.View = _view;
+                _debugEffect.Projection = _projection;
+                _debugEffect.World = Matrix.Identity;
+                GraphicsDevice.RasterizerState = new RasterizerState { FillMode = FillMode.WireFrame };
+            }
+
+            //Iterate through each GameObject in the scene
+            foreach (var go in EngineManager.scene.gameObjects)
+            {
+                if (go.model == null) continue;
+                var world = go.transform.getModelMatrix();
+                //Cull and draw each mesh
+                foreach (var mesh in go.model.Meshes)
+                {
+                    //Transform bounding sphere to world space
+                    var sphere = mesh.BoundingSphere.Transform(world);
+                    bool visible = frustum.Intersects(sphere);
+                    //Debug
+                    if (useDebugWireframe)
+                    {
+                        var box = BoundingBox.CreateFromSphere(sphere);
+                        var corners = box.GetCorners();
+                        var lines = new VertexPositionColor[24];
+                        Color wireColor = visible ? Color.Green : Color.Red;
+                        int idx = 0;
+                        int[,] edges = {
+                    {0,1},{1,2},{2,3},{3,0},
+                    {4,5},{5,6},{6,7},{7,4},
+                    {0,4},{1,5},{2,6},{3,7}
+                };
+                        for (int e = 0; e < edges.GetLength(0); e++)
+                        {
+                            var a = corners[edges[e, 0]];
+                            var b = corners[edges[e, 1]];
+                            lines[idx++] = new VertexPositionColor(a, wireColor);
+                            lines[idx++] = new VertexPositionColor(b, wireColor);
+                        }
+                        foreach (var pass in _debugEffect.CurrentTechnique.Passes)
+                        {
+                            pass.Apply();
+                            GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, lines, 0, edges.GetLength(0));
+                        }
+                    }
+                    //Skip drawing if mesh is outside the frustum
+                    if (!visible) continue;
+                    foreach (var effect in mesh.Effects)
+                    {
+                        if (effect is BasicEffect basic)
+                        {
+                            basic.World = world;
+                            basic.View = _view;
+                            basic.Projection = _projection;
+                            basic.EnableDefaultLighting();
+                            basic.TextureEnabled = true;
+                            basic.Texture = go.texture;
+                        }
+                        else
+                        {
+                            shader.SetUniform("World", world);
+                        }
+                    }
+                    mesh.Draw();
+                }
+            }
+            // Restore original rasterizer state
+            GraphicsDevice.RasterizerState = prevRasterizer;
         }
     }
 }
