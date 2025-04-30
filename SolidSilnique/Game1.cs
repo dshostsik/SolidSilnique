@@ -408,9 +408,11 @@ namespace SolidSilnique
 
         private void PerformCulledDraw()
         {
-            //Build view-projection frustum
+            // Build view-projection frustum
             var viewProjection = _view * _projection;
             var frustum = new BoundingFrustum(viewProjection);
+
+            // Debug wireframe setup if enabled
             var prevRasterizer = GraphicsDevice.RasterizerState;
             if (useDebugWireframe)
             {
@@ -420,18 +422,46 @@ namespace SolidSilnique
                 GraphicsDevice.RasterizerState = new RasterizerState { FillMode = FillMode.WireFrame };
             }
 
-            //Iterate through each GameObject in the scene
+            // Iterate through each GameObject in the scene
             foreach (var go in EngineManager.scene.gameObjects)
             {
                 if (go.model == null) continue;
+
+                // Compute world transform and object position
                 var world = go.transform.getModelMatrix();
-                //Cull and draw each mesh
-                foreach (var mesh in go.model.Meshes)
+                var position = go.transform.position;
+
+                // Determine distance from camera to object
+                var distance = Vector3.Distance(
+                    EngineManager.scene.mainCamera.CameraPosition,
+                    position);
+
+                // Select appropriate LOD model based on distance
+                Model modelToDraw = go.model;
+                if (go.LODModels != null && go.LODModels.Count > 0)
                 {
-                    //Transform bounding sphere to world space
+                    // LODRanges should correspond to LODModels entries and be sorted ascending
+                    for (int i = 0; i < go.LODRanges.Count; i++)
+                    {
+                        if (distance < go.LODRanges[i])
+                        {
+                            modelToDraw = go.LODModels[i];
+                            break;
+                        }
+                    }
+                    // If beyond all ranges, use the last LOD
+                    if (modelToDraw == go.model)
+                        modelToDraw = go.LODModels[go.LODModels.Count - 1];
+                }
+
+                // Cull and draw each mesh of the selected model
+                foreach (var mesh in modelToDraw.Meshes)
+                {
+                    // Transform bounding sphere to world space
                     var sphere = mesh.BoundingSphere.Transform(world);
                     bool visible = frustum.Intersects(sphere);
-                    //Debug
+
+                    // Draw debug bounding box if enabled
                     if (useDebugWireframe)
                     {
                         var box = BoundingBox.CreateFromSphere(sphere);
@@ -454,11 +484,19 @@ namespace SolidSilnique
                         foreach (var pass in _debugEffect.CurrentTechnique.Passes)
                         {
                             pass.Apply();
-                            GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, lines, 0, edges.GetLength(0));
+                            GraphicsDevice.DrawUserPrimitives(
+                                PrimitiveType.LineList,
+                                lines,
+                                0,
+                                edges.GetLength(0));
                         }
                     }
-                    //Skip drawing if mesh is outside the frustum
-                    if (!visible) continue;
+
+                    // Skip drawing if mesh is outside the frustum
+                    if (!visible)
+                        continue;
+
+                    // Configure effects and draw mesh
                     foreach (var effect in mesh.Effects)
                     {
                         if (effect is BasicEffect basic)
@@ -478,6 +516,7 @@ namespace SolidSilnique
                     mesh.Draw();
                 }
             }
+
             // Restore original rasterizer state
             GraphicsDevice.RasterizerState = prevRasterizer;
         }

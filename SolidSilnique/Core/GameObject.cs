@@ -25,12 +25,45 @@ namespace SolidSilnique.Core
 		//Components
 		List<Component> components = [];
 
-		public GameObject(string name)
+        // Level of Detail (LOD)
+        /// <summary>
+        /// List of LOD models, sorted by increasing distance threshold.
+        /// </summary>
+        public List<Model> LODModels { get; private set; } = new List<Model>();
+        /// <summary>
+        /// Distance thresholds corresponding to each LODModel entry.
+        /// </summary>
+        public List<float> LODRanges { get; private set; } = new List<float>();
+
+        public GameObject(string name)
         {
             this.name = name;
             this.transform = new Transform(this);
         }
 
+
+        public void AddLOD(Model lodModel, float maxDistance)
+        {
+            LODModels.Add(lodModel);
+            LODRanges.Add(maxDistance);
+        }
+
+        /// <summary>
+        /// Gets the appropriate Model for the given camera distance.
+        /// </summary>
+        internal Model GetLODModel(float distance)
+        {
+            if (LODModels.Count == 0)
+                return model;
+
+            for (int i = 0; i < LODRanges.Count; i++)
+            {
+                if (distance < LODRanges[i])
+                    return LODModels[i];
+            }
+            // Beyond all thresholds, return last LOD
+            return LODModels[LODModels.Count - 1];
+        }
 
         /// <summary>
         /// Wykonywana na początku programu

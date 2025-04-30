@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using GUIRESOURCES;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SolidSilnique.Core;
@@ -26,7 +27,12 @@ namespace SolidSilnique.GameContent
 		{
 			loadedModels.Add("deimos", Content.Load<Model>("deimos"));
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
-		}
+
+            loadedModels.Add("gun_high", Content.Load<Model>("gun_high"));
+            loadedModels.Add("gun_mid", Content.Load<Model>("gun_mid"));
+            loadedModels.Add("gun_low", Content.Load<Model>("gun_low"));
+            loadedTextures.Add("gun", Content.Load<Texture2D>("gun_texture"));
+        }
 
 		public override void Setup()
 		{
@@ -87,6 +93,18 @@ namespace SolidSilnique.GameContent
 			go2.model = loadedModels["deimos"];
 			go2.texture = loadedTextures["deimos"];
 			go.AddChild(go2);
-		}
+
+            //--------------------
+            var gun = new GameObject("Gun");
+            gun.transform.position = new Vector3(70, 0, -5);
+                       // Assign the highest-detail model by default
+            gun.model = loadedModels["gun_high"];
+            gun.texture = loadedTextures["deimos"];
+                       // Register LOD variants with distance thresholds
+            gun.AddLOD(loadedModels["gun_mid"], 20f);
+            gun.AddLOD(loadedModels["gun_low"], 50f);
+
+            this.AddChild(gun);
+        }
 	}
 }
