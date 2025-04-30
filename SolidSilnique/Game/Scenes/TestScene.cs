@@ -39,13 +39,14 @@ namespace SolidSilnique.GameContent
 			CameraComponent cam = new CameraComponent();
 			cam.SetMain();
 			go.AddComponent(cam);
-			//go.AddComponent(new SphereColliderComponent(0.5f));
+			go.AddComponent(new SphereColliderComponent(0.5f));
 			this.AddChild(go);
 
 			go = new GameObject("ground");
 			go.transform.scale = new Vector3(500, 1, 500);
 			go.model = loadedModels["plane"];
 			go.texture = loadedTextures["simpleGreen"];
+			go.AddComponent(new PlaneColliderComponent(new Vector3(0,1,0), true));
 			this.AddChild(go);
 
 			for(int i= 0; i < 150;i++)
@@ -61,7 +62,7 @@ namespace SolidSilnique.GameContent
 			}
 
 			go = new GameObject("Testak");
-			go.transform.position = new Vector3(5, 5, -5);
+			go.transform.position = new Vector3(5, 2.5f, -5);
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];
 			
@@ -110,10 +111,10 @@ namespace SolidSilnique.GameContent
 			}
 
 
-			go.transform.position = new Vector3(randX, 5, randZ);
+			go.transform.position = new Vector3(randX, 2.5f, randZ);
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];
-			go.AddComponent(new SphereColliderComponent(3.5f));
+			go.AddComponent(new SphereColliderComponent(3.5f,true));
 
 
 			this.AddChild(go);
