@@ -440,18 +440,8 @@ namespace SolidSilnique
                 Model modelToDraw = go.model;
                 if (go.LODModels != null && go.LODModels.Count > 0)
                 {
-                    // LODRanges should correspond to LODModels entries and be sorted ascending
-                    for (int i = 0; i < go.LODRanges.Count; i++)
-                    {
-                        if (distance < go.LODRanges[i])
-                        {
-                            modelToDraw = go.LODModels[i];
-                            break;
-                        }
-                    }
-                    // If beyond all ranges, use the last LOD
-                    if (modelToDraw == go.model)
-                        modelToDraw = go.LODModels[go.LODModels.Count - 1];
+                    modelToDraw = go.GetLODModel(distance);
+                    
                 }
 
                 // Cull and draw each mesh of the selected model

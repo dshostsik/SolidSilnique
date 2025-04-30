@@ -101,8 +101,9 @@ namespace SolidSilnique.GameContent
                        // Assign the highest-detail model by default
             gun.model = loadedModels["gun_high"];
             gun.texture = loadedTextures["deimos"];
-                       // Register LOD variants with distance thresholds
-            gun.AddLOD(loadedModels["gun_mid"], 20f);
+			// Register LOD variants with distance thresholds
+			gun.AddLOD(loadedModels["gun_high"], 0f);
+            gun.AddLOD(loadedModels["gun_mid"], 30f);
             gun.AddLOD(loadedModels["gun_low"], 50f);
 
 

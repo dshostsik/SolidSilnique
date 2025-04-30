@@ -44,23 +44,23 @@ namespace SolidSilnique.Core
         }
 
 
-        public void AddLOD(Model lodModel, float maxDistance)
+        public void AddLOD(Model lodModel, float minDistance)
         {
             LODModels.Add(lodModel);
-            LODRanges.Add(maxDistance);
+            LODRanges.Add(minDistance);
         }
 
         /// <summary>
         /// Gets the appropriate Model for the given camera distance.
         /// </summary>
-        internal Model GetLODModel(float distance)
+        public Model GetLODModel(float distance)
         {
             if (LODModels.Count == 0)
                 return model;
 
-            for (int i = 0; i < LODRanges.Count; i++)
+            for (int i = LODRanges.Count-1; i >= 0; i--)
             {
-                if (distance < LODRanges[i])
+                if (distance >= LODRanges[i])
                     return LODModels[i];
             }
             // Beyond all thresholds, return last LOD
