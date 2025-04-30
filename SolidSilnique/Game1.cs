@@ -3,6 +3,8 @@ using GUIRESOURCES;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SolidSilnique.Core;
+using SolidSilnique.GameContent;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace SolidSilnique
@@ -33,10 +35,9 @@ namespace SolidSilnique
         private SpriteFont _font;
         private SpriteBatch _text;
 
-        private Model _deimos;
-        private Texture2D _deimosTexture;
+        private Skybox _skybox;
 
-        private Camera camera;
+        
         private bool firstMouse;
 
         private float lastX;
@@ -91,30 +92,29 @@ namespace SolidSilnique
         /// </summary>
         protected override void Initialize()
         {
-            //Window.AllowUserResizing = true;
 
-            _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            // TODO
-            //_graphics.IsFullScreen = true;
-            _graphics.HardwareModeSwitch = true;
-            // TODO
+
+
+
+			//DISPLAY SETUP
+
+			//Window.AllowUserResizing = true;
+			_graphics.GraphicsProfile = GraphicsProfile.HiDef;
+			//_graphics.IsFullScreen = true;
+			_graphics.HardwareModeSwitch = true;
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
-            _graphics.SynchronizeWithVerticalRetrace = true;
-            _graphics.ApplyChanges();
+            _graphics.SynchronizeWithVerticalRetrace = true; //VSync
+			_graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
+			_graphics.ApplyChanges();
 
-            //Mouse.SetPosition(Window.ClientBounds.Center.X, Window.ClientBounds.Center.Y);
-            Console.WriteLine("Initial mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
-            Console.WriteLine("Initial mouse position (using Mouse.GetState().Position): " +
-                              Mouse.GetState().Position.X + " " + Mouse.GetState().Position.Y);
-
-            Console.WriteLine("Client bounds: " + Window.ClientBounds.Width + "x" + Window.ClientBounds.Height);
 
             // Create camera
-            camera = new Camera(new Vector3(0, 0, 25));
-            camera.mouseMovement(0, 0, 0);
+                                          //TODO delete
+                                                          //TODO delete
             // matrices initialisations
-            _world = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.Up);
+            _world = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.Up);           //TODO delete
+            
             // Resize world matrix
             _world = Matrix.CreateScale(1.0f) * _world;
 
@@ -136,14 +136,22 @@ namespace SolidSilnique
                 DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
 
 
-            dirlight_ambient = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
+            dirlight_ambient = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
             dirlight_diffuse = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
             dirlight_specular = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
             spotlight_position = new Vector3(-15.0f, 0.0f, 0.0f);
             pointlight_position = new Vector3(10.0f, 0.0f, 0.0f);
 
-            testDirectionalLight = new DirectionalLight(Vector3.Zero);
+			_projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
+				GraphicsDevice.Viewport.AspectRatio,
+				0.1f,
+				500f);
+
+			
+
+			
+            testDirectionalLight = new DirectionalLight(new Vector3(1,-1,0));
             testDirectionalLight.AmbientColor = dirlight_ambient;
             testDirectionalLight.DiffuseColor = dirlight_diffuse;
             testDirectionalLight.SpecularColor = dirlight_specular;
@@ -155,12 +163,18 @@ namespace SolidSilnique
 
             testSpotlight = new Spotlight( 0.007f, 0.0002f, 1, new Vector3(-10, 0, 0), 5.5f, 7.5f);
 
-            testDirectionalLight.Enabled = false;
+            testDirectionalLight.Enabled = true;
             testPointLight.Enabled = false;
-            testSpotlight.Enabled = true;
+            testSpotlight.Enabled = false;
             
             sunPosition = new Vector3(50.0f, 50.0f, 0.0f);
             //testSpotlight.Enabled = false;
+
+            EngineManager.scene = new TestScene();
+
+            _skybox = new Skybox();
+            _skybox.Setup(Content,_graphics,GraphicsDevice,_projection);
+
 
             base.Initialize();
         }
@@ -171,15 +185,37 @@ namespace SolidSilnique
         protected override void LoadContent()
         {
             // Load the model
-            _deimos = Content.Load<Model>("deimos");
-            _deimosTexture = Content.Load<Texture2D>("deimos_texture");
+            
+            
 
             _font = Content.Load<SpriteFont>("Megafont");
             _text = new SpriteBatch(GraphicsDevice);
 
             _gui = new GUI("GUI/resources/UI.xml", Content);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-        }
+
+            /*foreach(var child in EngineManager.scene.gameObjects)
+            {
+                child.texture = _deimosTexture;
+                child.model = _deimos;
+				foreach (var che in child.children)
+				{
+					che.texture = _deimosTexture;
+					che.model = _deimos;
+					foreach (var c in che.children)
+					{
+						c.texture = _deimosTexture;
+						c.model = _deimos;
+					}
+				}
+			}*/
+            EngineManager.scene.LoadContent(Content);
+            EngineManager.scene.Setup();
+
+			EngineManager.scene.mainCamera.mouseMovement(0, 0, 0);
+
+			EngineManager.Start();
+		}
 
         /// <summary>
         /// Function defining mouse behaviour
@@ -201,7 +237,7 @@ namespace SolidSilnique
             float xOffset = (mouseX);
             float yOffset = (mouseY);
 
-            camera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
+			EngineManager.scene.mainCamera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
             Mouse.SetPosition(w, h);
         }
 
@@ -211,26 +247,47 @@ namespace SolidSilnique
         /// <param name="gameTime">Object containing time values</param>
         private void processKeyboard(GameTime gameTime)
         {
+
+            Camera cam = EngineManager.scene.mainCamera;
             if (Keyboard.GetState().IsKeyDown(Keys.W))
             {
-                camera.move(Camera.directions.FORWARD, gameTime.ElapsedGameTime.Milliseconds);
+				cam.move(Camera.directions.FORWARD, Time.deltaTime);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.S))
             {
-                camera.move(Camera.directions.BACKWARD, gameTime.ElapsedGameTime.Milliseconds);
+				cam.move(Camera.directions.BACKWARD, Time.deltaTime);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
-                camera.move(Camera.directions.LEFT, gameTime.ElapsedGameTime.Milliseconds);
+				cam.move(Camera.directions.LEFT, Time.deltaTime);
             }
 
             if (Keyboard.GetState().IsKeyDown(Keys.D))
             {
-                camera.move(Camera.directions.RIGHT, gameTime.ElapsedGameTime.Milliseconds);
+				cam.move(Camera.directions.RIGHT, Time.deltaTime);
             }
-        }
+
+			if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
+			{
+				cam.move(Camera.directions.DOWN, Time.deltaTime);
+			}
+
+			if (Keyboard.GetState().IsKeyDown(Keys.Space))
+			{
+				cam.move(Camera.directions.UP, Time.deltaTime);
+			}
+
+			if (Keyboard.GetState().IsKeyDown(Keys.F1))
+			{
+                EngineManager.celShadingEnabled = false;
+			}
+			if (Keyboard.GetState().IsKeyDown(Keys.F2))
+			{
+				EngineManager.celShadingEnabled = true;
+			}
+		}
 
         /// <summary>
         /// Add your update logic here
@@ -243,7 +300,8 @@ namespace SolidSilnique
                 Exit();
 
             // Get current camera view
-            _view = camera.getViewMatrix();
+            _view = EngineManager.scene.mainCamera.getViewMatrix(); //TODO Delete
+            
 
             _lightView = Matrix.CreateLookAt(sunPosition, sunPosition + testDirectionalLight.Direction, Vector3.Up);
             _lightProjection = Matrix.CreateOrthographic(200, 200, 0.1f, 100f);
@@ -256,53 +314,59 @@ namespace SolidSilnique
             currentScrollWheelValue = Mouse.GetState().ScrollWheelValue;
             if (scrollWheelValue != currentScrollWheelValue)
             {
-                if (scrollWheelValue - currentScrollWheelValue < 0.0f) camera.processScroll(1);
-                else camera.processScroll(-1);
-                scrollWheelValue = currentScrollWheelValue;
+                //if (scrollWheelValue - currentScrollWheelValue < 0.0f) camera.processScroll(1);
+                //else camera.processScroll(-1);
+                //scrollWheelValue = currentScrollWheelValue;
             }
 
-            _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(camera.Zoom),
-                GraphicsDevice.Viewport.AspectRatio,
-                0.1f,
-                100f);
+            Vector3 originalVector = testDirectionalLight.Direction; // vector to rotate
+			Vector3 axis = Vector3.Up; // e.g., Y-axis (0, 1, 0)
+			float angleRadians = MathHelper.ToRadians(10*Time.deltaTime); // 90 degrees
 
-            processKeyboard(gameTime);
+			Matrix rotation = Matrix.CreateFromAxisAngle(axis, angleRadians);
+			testDirectionalLight.Direction = Vector3.Transform(originalVector, rotation);
+
+
+			processKeyboard(gameTime);
             processMouse(gameTime);
             counter.Update(gameTime);
+
+            EngineManager.Update(gameTime);
 
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            // TODO: Add your drawing code here
-            GraphicsDevice.Clear(Color.Black);
-            try
-            {
-                //GraphicsDevice.SetRenderTarget(shadowMapRenderTarget);
-                foreach (ModelMesh mesh in _deimos.Meshes)
-                {
-                    foreach (ModelMeshPart part in mesh.MeshParts)
-                    {
-                        part.Effect = shader.Effect;
-                        shader.SetUniform("texture_diffuse1", _deimosTexture);
-                        shader.SetUniform("World", _world);
-                        shader.SetUniform("View", _view);
-                        shader.SetUniform("Projection", _projection);
-                        shader.SetUniform("viewPos", camera.CameraPosition);
-                        testDirectionalLight.SendToShader(shader);
-                        // TODO: Integrate light objects inheritance from GameObject class
-                        shader.SetUniform("pointlight1_position", pointlight_position);
-                        testPointLight.SendToShader(shader);
-                        // TODO: Integrate light objects inheritance from GameObject class
-                        shader.SetUniform("spotlight1_position", spotlight_position);
-                        testSpotlight.SendToShader(shader);
-                    }
+			// TODO: Add your drawing code here
+			GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
 
-                    mesh.Draw();
+			GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+			GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-                    // src: https://community.monogame.net/t/shadow-mapping-on-monogame/8212/2
-                    foreach (ModelMeshPart part in mesh.MeshParts)
+			_skybox.Draw(_graphics,_view);
+
+			GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+			GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+
+            
+            shader.SetUniform("View", _view);
+            shader.SetUniform("Projection", _projection);
+            shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
+            testDirectionalLight.SendToShader(shader);
+            // TODO: Integrate light objects inheritance from GameObject class
+            shader.SetUniform("pointlight1_position", pointlight_position);
+            testPointLight.SendToShader(shader);
+            // TODO: Integrate light objects inheritance from GameObject class
+            shader.SetUniform("spotlight1_position", spotlight_position);
+            testSpotlight.SendToShader(shader);
+			
+
+
+			EngineManager.Draw(shader);
+
+            /*
+            foreach (ModelMeshPart part in mesh.MeshParts)
                     {
                         shadowShader.SetUniform("LightViewProj", _world * _lightViewProjection);
 
@@ -316,19 +380,7 @@ namespace SolidSilnique
 
                         GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, vertexOffset, startIndex, primitiveCount);
                     }
-                }
-            }
-            catch (NullReferenceException e)
-            {
-                Console.WriteLine(
-                    "Check uniforms!\nIf you have missed any uniforms or they are not used in shader, this NullReferenceException is thrown");
-                throw;
-            }
-            catch (UniformNotFoundException u)
-            {
-                Console.WriteLine(u.Message);
-                throw;
-            }
+                    */
 
             _text.Begin();
             _text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Aqua);

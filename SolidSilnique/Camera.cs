@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using SolidSilnique.Core.Components;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace SolidSilnique
@@ -13,23 +14,25 @@ namespace SolidSilnique
         private const float PITCH = .0f;
         private const float ZOOM = 35.0f;
         private const float SENSE = 10.0f;
-        private const float SPEED = .01f;
+        private const float SPEED = 10f;
 
         public enum directions
         {
             FORWARD,
             BACKWARD,
             LEFT,
-            RIGHT
+            RIGHT,
+            UP,
+            DOWN,
         }
 
-        Vector3 Position;
+        
         Vector3 Front;
         Vector3 Up;
         Vector3 Right;
         Vector3 WorldUp;
 
-        public Vector3 CameraPosition { get { return Position; } }
+        public Vector3 CameraPosition { get { return cameraComponent.gameObject.transform.position; } }
         
         float Yaw;
         float Pitch;
@@ -37,11 +40,13 @@ namespace SolidSilnique
         float MovementSpeed;
         float MouseSensitivity;
         public float Zoom;
+        CameraComponent cameraComponent;
 
-        public Camera(Vector3 position, float yaw = YAW, float pitch = PITCH)
+        public Camera(CameraComponent camComponent, float yaw = YAW, float pitch = PITCH)
         {
-            Position = position;
-            WorldUp = -Vector3.Up;
+            cameraComponent = camComponent;
+            //Position = position;
+            WorldUp = Vector3.Up;
             Yaw = yaw;
             Pitch = pitch;
 
@@ -64,27 +69,33 @@ namespace SolidSilnique
 
         public Matrix getViewMatrix()
         {
-            return Matrix.CreateLookAt(Position, Position + Front, Up);
+            return Matrix.CreateLookAt(cameraComponent.gameObject.transform.position, cameraComponent.gameObject.transform.position + Front, Up);
         }
 
         public void move(directions direction, float deltaTime)
         {
             float speed = MovementSpeed * deltaTime;
+            Vector3 pos = cameraComponent.gameObject.transform.position;
 
-            if (direction == directions.FORWARD) Position += Front * speed;
-            if (direction == directions.BACKWARD) Position -= Front * speed;
+			if (direction == directions.FORWARD) pos += Front * speed;
+            if (direction == directions.BACKWARD) pos -= Front * speed;
 
-            if (direction == directions.RIGHT) Position += Right * speed;
-            if (direction == directions.LEFT) Position -= Right * speed;
-        }
+            if (direction == directions.RIGHT) pos += Right * speed;
+            if (direction == directions.LEFT) pos -= Right * speed;
+
+			if (direction == directions.UP) pos += Vector3.Up * speed;
+			if (direction == directions.DOWN) pos -= Vector3.Up * speed;
+
+			cameraComponent.gameObject.transform.position = pos;
+		}
 
         public void mouseMovement(float xOffset, float yOffset, float deltaTime, bool constrainPitch = true)
         {
             xOffset *= MouseSensitivity;
             yOffset *= MouseSensitivity;
 
-            Yaw += xOffset * (deltaTime / 1000.0f);
-            Pitch += yOffset * (deltaTime / 1000.0f);
+            Yaw -= xOffset * (deltaTime / 1000.0f);
+            Pitch -= yOffset * (deltaTime / 1000.0f);
 
             //Yaw += xOffset;
             //Pitch += yOffset;
