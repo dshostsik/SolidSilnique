@@ -1,8 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace SolidSilnique
+namespace SolidSilnique.Core
 {
-    public abstract class Light
+    public abstract class Light : GameObject
     {
         private Vector4 ambientColor;
         private Vector4 diffuseColor;
@@ -10,7 +10,7 @@ namespace SolidSilnique
 
         private bool enabled;
 
-        protected Light()
+        protected Light(string name) : base(name)
         {
             enabled = true;
         }

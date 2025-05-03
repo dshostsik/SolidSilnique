@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SolidSilnique
+namespace SolidSilnique.Core.Diagnostics
 {
     /// <summary>
     /// Custom exception for indicating uniform issues

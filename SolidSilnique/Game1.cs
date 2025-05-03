@@ -5,7 +5,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core;
 using SolidSilnique.GameContent;
+// Use this to prevent conflicts with System.Numerics.Vector3
 using Vector3 = Microsoft.Xna.Framework.Vector3;
+// Use this to prevent conflicts with Microsoft.Xna.Framework.Graphics.DirectionalLight
+using DirectionalLight = SolidSilnique.Core.DirectionalLight;
 
 namespace SolidSilnique
 {

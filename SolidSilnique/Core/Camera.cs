@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using SolidSilnique.Core.Components;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 
-namespace SolidSilnique
+namespace SolidSilnique.Core
 {
     /// <summary>
     /// Class representing camera

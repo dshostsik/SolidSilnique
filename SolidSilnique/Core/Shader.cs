@@ -1,8 +1,9 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SolidSilnique.Core.Diagnostics;
 
-namespace SolidSilnique
+namespace SolidSilnique.Core
 {
     /// <summary>
     /// Shader handler class

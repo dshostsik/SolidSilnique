@@ -1,12 +1,26 @@
 ﻿using Microsoft.Xna.Framework;
+using SolidSilnique.Core.Diagnostics;
 
-namespace SolidSilnique
+namespace SolidSilnique.Core
 {
     public class PointLight : Light
     {
         private float linear;
         private float quadratic;
         private float constant;
+
+        private static int INSTANCES = 0;
+        private int index;
+
+        public int Instances
+        {
+            get => INSTANCES;
+        }
+
+        public int Index
+        {
+            get => index;
+        }
 
         public float Linear
         {
@@ -26,8 +40,12 @@ namespace SolidSilnique
             set => constant = value;
         }
 
-        public PointLight(float linear, float quadratic, float constant)
+        public PointLight(float linear, float quadratic, float constant, string name = "PointLight") : base(name)
         {
+            index = INSTANCES;
+
+            if (INSTANCES < 10) INSTANCES++;
+
             this.linear = linear;
             this.quadratic = quadratic;
             this.constant = constant;

@@ -33,7 +33,7 @@ namespace SolidSilnique.Core
 
 
         /// <summary>
-        /// Wykonywana na początku programu
+        /// Executed in the start of the program.
         /// </summary>
         public void Start()
         {
@@ -49,7 +49,7 @@ namespace SolidSilnique.Core
         }
 
         /// <summary>
-        /// Wykonywana w każdej klatce programu
+        /// Executed in every frame.
         /// </summary>
         public void Update()
         {
@@ -68,7 +68,7 @@ namespace SolidSilnique.Core
 		}
 
         /// <summary>
-        /// Wykonywana w pętli rysowania
+        /// Executed in the render loop.
         /// </summary>
         public void Draw()
         {
@@ -82,7 +82,7 @@ namespace SolidSilnique.Core
 		}
 
         /// <summary>
-        /// Służy do usuwania
+        /// Made to destroy game objects.
         /// </summary>
         public void Destroy()
         {

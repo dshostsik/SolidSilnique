@@ -1,13 +1,14 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using SolidSilnique.Core.Diagnostics;
 
-namespace SolidSilnique
+namespace SolidSilnique.Core
 {
     public class DirectionalLight : Light
     {
         private Vector3 _direction;
 
-        public DirectionalLight(Vector3 direction)
+        public DirectionalLight(Vector3 direction, string name = "DirectionalLight") : base(name)
         {
             _direction = direction;
             AmbientColor = new Vector4(.2f, .2f, .2f, .0f);
