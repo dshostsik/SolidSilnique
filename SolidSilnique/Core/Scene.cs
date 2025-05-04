@@ -15,8 +15,8 @@ namespace SolidSilnique.Core
 		public Camera mainCamera;
 
 
-		abstract public void Setup();
-		abstract public void LoadContent(ContentManager Content);
+		public abstract void Setup();
+		public abstract void LoadContent(ContentManager Content);
 
 
 		/// <summary>
