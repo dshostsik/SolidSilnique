@@ -22,8 +22,8 @@ namespace SolidSilnique.Core
 		public Model model = null;
 		public Texture2D texture = null;
 
-		//Components
-		List<Component> components = [];
+        //Components
+        List<Component> components = [];
 
         public Texture2D normalMap = null;
 

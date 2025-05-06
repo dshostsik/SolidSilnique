@@ -438,6 +438,7 @@ namespace SolidSilnique
             shader.SetUniform("usePBR", usePBR);
             shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
 
+
             // Debug wireframe setup if enabled
             var prevRasterizer = GraphicsDevice.RasterizerState;
             if (useDebugWireframe)
@@ -511,9 +512,8 @@ namespace SolidSilnique
                     shader.SetUniform("pointlight1Enabled", testPointLight.Enabled);
                     shader.SetUniform("spotlight1Enabled", testSpotlight.Enabled);
                     // Bind normal map (for PBR) or a white 2×2 normal if null
-                    if (usePBR)
-                        shader.SetUniform("texture_normal1",
-                        go.normalMap ?? defaultWhiteNormalTexture);
+                    if (usePBR && go.normalMap != null)
+                        shader.SetUniform("texture_normal1", go.normalMap);
 
                     shader.Effect.CurrentTechnique.Passes[0].Apply();
                     mesh.Draw();
