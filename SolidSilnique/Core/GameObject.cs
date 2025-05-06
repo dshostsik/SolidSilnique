@@ -2,29 +2,47 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Xml;
 
 namespace SolidSilnique.Core
 {
+
+	
 	public class GameObject
     {
 
 		//Identifiers
-		public string name = "GameObject";
-		public int tag = 0;
-		public int layer = 0;
+		public string name  { get; set; } = "GameObject";
+        public int tag      { get; set; } = 0;
+		public int layer    { get; set; } = 0;
 
 		//Scene Graph
+		[JsonIgnore]
 		public GameObject parent = null;
-		public Transform transform = null;
-		public List<GameObject> children = [];
+
+		public Transform transform { get; set; } = null;
+		
+		public List<GameObject> children { get; set; } = [];
 
 		//Rendering
+		[JsonIgnore]
 		public Model model = null;
+
+		[JsonIgnore]
 		public Texture2D texture = null;
 
+        public string modelAssetName    { get; set; } = string.Empty;
+        public string textureAssetName { get; set; } = string.Empty;
+
 		//Components
+		[JsonIgnore]
 		List<Component> components = [];
 
+        
 		public GameObject(string name)
         {
             this.name = name;
@@ -168,7 +186,23 @@ namespace SolidSilnique.Core
             throw new NotImplementedException();
         }
 
+		//Serialization
 
+        public void Serialize() {
+
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true, // for human-readable formatting
+
+				Converters = { new Vector3Converter() } // Add the custom converter
+			
+		    };
+
+			string json = JsonSerializer.Serialize(this, options);
+			File.WriteAllText("scene1.scn", json);
+
+
+		}
 
 
 

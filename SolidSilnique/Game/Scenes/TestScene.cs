@@ -40,6 +40,7 @@ namespace SolidSilnique.GameContent
 			cam.SetMain();
 			go.AddComponent(cam);
 			go.AddComponent(new SphereColliderComponent(0.5f));
+			
 			this.AddChild(go);
 
 			go = new GameObject("ground");
@@ -77,7 +78,10 @@ namespace SolidSilnique.GameContent
 			go2.transform.scale = new Vector3(0.75f);
 			go2.model = loadedModels["deimos"];
 			go2.texture = loadedTextures["deimos"];
+
+			
 			go.AddChild(go2);
+			go.Serialize();
 		}
 
 		void AddTree()

@@ -1,16 +1,28 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolidSilnique", "SolidSilnique\SolidSilnique.csproj", "{B062EFA4-80C0-4A29-971B-166595B37A58}"
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34714.143
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SolidSilnique", "SolidSilnique\SolidSilnique.csproj", "{B062EFA4-80C0-4A29-971B-166595B37A58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		SceneEditor|Any CPU = SceneEditor|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{B062EFA4-80C0-4A29-971B-166595B37A58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B062EFA4-80C0-4A29-971B-166595B37A58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B062EFA4-80C0-4A29-971B-166595B37A58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B062EFA4-80C0-4A29-971B-166595B37A58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B062EFA4-80C0-4A29-971B-166595B37A58}.SceneEditor|Any CPU.ActiveCfg = SceneEditor|Any CPU
+		{B062EFA4-80C0-4A29-971B-166595B37A58}.SceneEditor|Any CPU.Build.0 = SceneEditor|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {28972741-9867-419C-B803-4DF5C10D9742}
 	EndGlobalSection
 EndGlobal
