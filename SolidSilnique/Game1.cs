@@ -1,5 +1,6 @@
 ﻿using System;
-using GUIRESOURCES;
+using App1;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -170,7 +171,7 @@ namespace SolidSilnique
             sunPosition = new Vector3(50.0f, 50.0f, 0.0f);
             //testSpotlight.Enabled = false;
 
-            EngineManager.scene = new TestScene();
+            EngineManager.scene = new ProceduralTest();
 
             _skybox = new Skybox();
             _skybox.Setup(Content,_graphics,GraphicsDevice,_projection);
@@ -191,7 +192,7 @@ namespace SolidSilnique
             _font = Content.Load<SpriteFont>("Megafont");
             _text = new SpriteBatch(GraphicsDevice);
 
-            _gui = new GUI("GUI/resources/UI.xml", Content);
+            
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             /*foreach(var child in EngineManager.scene.gameObjects)
@@ -390,9 +391,7 @@ namespace SolidSilnique
             _text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Aqua);
             _text.End();
 
-            _spriteBatch.Begin();
-            _gui.Draw(_spriteBatch);
-            _spriteBatch.End();
+           
             base.Draw(gameTime);
         }
     }
