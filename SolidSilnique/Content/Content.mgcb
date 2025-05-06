@@ -267,6 +267,12 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/ShadowMapShader.fx
 
+#begin Shaders/SkyBoxShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/SkyBoxShader.fx
+
 #begin simpleGreen.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -350,12 +356,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Skybox/top.png
-
-#begin SkyBoxShader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:SkyBoxShader.fx
 
 #begin testTex.png
 /importer:TextureImporter
