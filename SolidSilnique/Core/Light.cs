@@ -2,7 +2,7 @@
 
 namespace SolidSilnique.Core
 {
-    public abstract class Light : GameObject
+    public abstract class Light : Component
     {
         private Vector4 ambientColor;
         private Vector4 diffuseColor;
@@ -10,7 +10,7 @@ namespace SolidSilnique.Core
 
         private bool enabled;
 
-        protected Light(string name) : base(name)
+        protected Light()
         {
             enabled = true;
         }

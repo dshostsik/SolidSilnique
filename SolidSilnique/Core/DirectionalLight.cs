@@ -8,7 +8,7 @@ namespace SolidSilnique.Core
     {
         private Vector3 _direction;
 
-        public DirectionalLight(Vector3 direction, string name = "DirectionalLight") : base(name)
+        public DirectionalLight(Vector3 direction, string name = "DirectionalLight")
         {
             _direction = direction;
             AmbientColor = new Vector4(.2f, .2f, .2f, .0f);
@@ -36,6 +36,16 @@ namespace SolidSilnique.Core
             {
                 throw new UniformNotFoundException(e.Message, " error source: DirectionalLight.cs");
             }
+        }
+        
+        public override void Update()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public override void Start()
+        {
+            throw new NotImplementedException();
         }
     }
 }

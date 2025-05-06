@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using SolidSilnique.Core.Diagnostics;
 
 namespace SolidSilnique.Core
@@ -31,8 +32,8 @@ namespace SolidSilnique.Core
         }
 
         public Spotlight(float linear, float quadratic, float constant, Vector3 direction, float innerCut,
-            float outerCut, string name = "Spotlight") :
-            base(linear, quadratic, constant, name)
+            float outerCut) :
+            base(linear, quadratic, constant)
         {
             index = INSTANCES;
 
@@ -61,6 +62,16 @@ namespace SolidSilnique.Core
             {
                 throw new UniformNotFoundException(e.Message, " error source: Spotlight.cs");
             }
+        }
+        
+        public override void Update()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public override void Start()
+        {
+            throw new NotImplementedException();
         }
     }
 }

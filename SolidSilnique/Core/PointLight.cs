@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using SolidSilnique.Core.Diagnostics;
 
 namespace SolidSilnique.Core
@@ -40,7 +41,7 @@ namespace SolidSilnique.Core
             set => constant = value;
         }
 
-        public PointLight(float linear, float quadratic, float constant, string name = "PointLight") : base(name)
+        public PointLight(float linear, float quadratic, float constant)
         {
             index = INSTANCES;
 
@@ -72,6 +73,16 @@ namespace SolidSilnique.Core
             {
                 throw new UniformNotFoundException(e.Message, " error source: PointLight.cs");
             }
+        }
+
+        public override void Update()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public override void Start()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -11,9 +11,9 @@ namespace SolidSilnique.Core
 		//gameObject
 		public GameObject gameObject;
 
-		abstract public void Start();
+		public abstract void Start();
 
-		abstract public void Update();
+		public abstract void Update();
 
 	}
 }
