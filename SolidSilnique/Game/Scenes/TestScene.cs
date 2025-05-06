@@ -14,8 +14,7 @@ namespace SolidSilnique.GameContent
 {
 	class TestScene : Scene
 	{
-		public Dictionary<string, Model>		loadedModels = new Dictionary<string, Model>();
-		public Dictionary<string, Texture2D>	loadedTextures = new Dictionary<string, Texture2D>();
+		
 
 		public TestScene() {
 
@@ -52,13 +51,13 @@ namespace SolidSilnique.GameContent
 
 			for(int i= 0; i < 150;i++)
 			{
-				AddTree();
+				//AddTree();
 
 			}
 
 			for (int i = 0; i < 5; i++)
 			{
-				AddPlanet();
+				//AddPlanet();
 
 			}
 
@@ -81,7 +80,7 @@ namespace SolidSilnique.GameContent
 
 			
 			go.AddChild(go2);
-			go.Serialize();
+			this.Serialize();
 		}
 
 		void AddTree()

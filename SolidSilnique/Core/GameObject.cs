@@ -38,9 +38,9 @@ namespace SolidSilnique.Core
         public string modelAssetName    { get; set; } = string.Empty;
         public string textureAssetName { get; set; } = string.Empty;
 
-		//Components
-		[JsonIgnore]
-		List<Component> components = [];
+        //Components
+        [JsonInclude]
+		List<Component> components { get; set; } = [];
 
         
 		public GameObject(string name)
@@ -117,6 +117,7 @@ namespace SolidSilnique.Core
         {
             child.parent = this;
             children.Add(child);
+            
 
         }
 
@@ -186,23 +187,7 @@ namespace SolidSilnique.Core
             throw new NotImplementedException();
         }
 
-		//Serialization
-
-        public void Serialize() {
-
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true, // for human-readable formatting
-
-				Converters = { new Vector3Converter() } // Add the custom converter
-			
-		    };
-
-			string json = JsonSerializer.Serialize(this, options);
-			File.WriteAllText("scene1.scn", json);
-
-
-		}
+		
 
 
 
