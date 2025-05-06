@@ -73,6 +73,8 @@ namespace SolidSilnique
 
         private Shader shader;
         private Shader shadowShader;
+        private Shader pbrShader;
+        private Shader basicShader;
 
         public bool useCulling = true;
 
@@ -80,6 +82,12 @@ namespace SolidSilnique
 
         private bool useDebugWireframe = false;
         private bool wasBDownLastFrame = false;
+
+        private bool usePBR = false;
+        private float shininess = 32f;
+        // Fallback 1×1 “white” normal map (RGB = 128,128,255)
+        private Texture2D defaultWhiteNormalTexture;
+        private bool wasLDownLastFrame = false;
 
         /// <summary>
         /// Constructor
@@ -142,6 +150,9 @@ namespace SolidSilnique
                 GraphicsDevice,
                 this,
                 "ShadeTheSceneRightNow");
+
+            basicShader = new Shader("Shaders/CustomShader", GraphicsDevice, this, "BasicColorDrawingWithLights");
+            pbrShader = new Shader("Shaders/PBRShader", GraphicsDevice, this, "PBRTechnique");
             shadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, 1024, 1024, false, SurfaceFormat.Color,
                 DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
 
@@ -205,6 +216,11 @@ namespace SolidSilnique
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _debugEffect = new BasicEffect(GraphicsDevice) { VertexColorEnabled = true };
+                        // create a 1×1 normal map with neutral normals
+            defaultWhiteNormalTexture = new Texture2D(GraphicsDevice, 1, 1);
+            defaultWhiteNormalTexture.SetData(new[] { new Color(128, 128, 255) });
+
+            shader.SetUniform("shininess", shininess);
             /*foreach(var child in EngineManager.scene.gameObjects)
             {
                 child.texture = _deimosTexture;
@@ -291,17 +307,20 @@ namespace SolidSilnique
             }
 
             var kb = Keyboard.GetState();
-            bool isPDown = kb.IsKeyDown(Keys.P);
-
-            if (isPDown && !wasPDownLastFrame)
-                useCulling = !useCulling;
-
-            wasPDownLastFrame = isPDown;
-
-            bool isBDown = kb.IsKeyDown(Keys.B);
-            if (isBDown && !wasBDownLastFrame)
-                useDebugWireframe = !useDebugWireframe;
-            wasBDownLastFrame = isBDown;
+                        // Toggle frustum‐culling with P
+            bool pDown = kb.IsKeyDown(Keys.P);
+                        if (pDown && !wasPDownLastFrame) useCulling = !useCulling;
+            wasPDownLastFrame = pDown;
+            
+                        // Toggle wireframe debug with B
+            bool bDown = kb.IsKeyDown(Keys.B);
+                        if (bDown && !wasBDownLastFrame) useDebugWireframe = !useDebugWireframe;
+            wasBDownLastFrame = bDown;
+            
+                        // Toggle PBR on/off with L
+            bool lDown = kb.IsKeyDown(Keys.L);
+                        if (lDown && !wasLDownLastFrame) usePBR = !usePBR;
+            wasLDownLastFrame = lDown;
         }
 
         /// <summary>
@@ -358,16 +377,28 @@ namespace SolidSilnique
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
+            // === GLOBAL SHADER SETUP (once per frame) ===
 
-            shader.SetUniform("View", _view);
-            shader.SetUniform("Projection", _projection);
-            shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
+            var activeShader = usePBR ? pbrShader : basicShader;
+            // Bind lighting uniforms as needed
+            activeShader.SetUniform("dirlightEnabled", testDirectionalLight.Enabled);
+            activeShader.SetUniform("dirlightDirection", testDirectionalLight.Direction);
+            activeShader.SetUniform("dirlight_ambientColor", testDirectionalLight.AmbientColor);
+            activeShader.SetUniform("dirlight_diffuseColor", testDirectionalLight.DiffuseColor);
+            activeShader.SetUniform("dirlight_specularColor", testDirectionalLight.SpecularColor);
+            activeShader.SetUniform("View", _view);
+            activeShader.SetUniform("Projection", _projection);
+            
+            activeShader.SetUniform("usePBR", usePBR);
+            activeShader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
+            activeShader.SetUniform("shininess", 32f); // or per-object
+            activeShader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
             testDirectionalLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
-            shader.SetUniform("pointlight1_position", pointlight_position);
+            activeShader.SetUniform("pointlight1_position", pointlight_position);
             testPointLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
-            shader.SetUniform("spotlight1_position", spotlight_position);
+            activeShader.SetUniform("spotlight1_position", spotlight_position);
             testSpotlight.SendToShader(shader);
 
 
@@ -411,6 +442,10 @@ namespace SolidSilnique
             // Build view-projection frustum
             var viewProjection = _view * _projection;
             var frustum = new BoundingFrustum(viewProjection);
+            var activeShader = usePBR ? pbrShader : basicShader;
+            // Pass PBR toggle and camera pos into the shader
+            activeShader.SetUniform("usePBR", usePBR);
+            activeShader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
 
             // Debug wireframe setup if enabled
             var prevRasterizer = GraphicsDevice.RasterizerState;
@@ -422,36 +457,29 @@ namespace SolidSilnique
                 GraphicsDevice.RasterizerState = new RasterizerState { FillMode = FillMode.WireFrame };
             }
 
-            // Iterate through each GameObject in the scene
+            // Iterate through each GameObject
             foreach (var go in EngineManager.scene.gameObjects)
             {
                 if (go.model == null) continue;
 
-                // Compute world transform and object position
+                // Compute world matrix & object position
                 var world = go.transform.getModelMatrix();
                 var position = go.transform.position;
 
-                // Determine distance from camera to object
-                var distance = Vector3.Distance(
-                    EngineManager.scene.mainCamera.CameraPosition,
-                    position);
+                // LOD selection based on distance
+                float distance = Vector3.Distance(EngineManager.scene.mainCamera.CameraPosition, position);
+                Model modelToDraw = (go.LODModels != null && go.LODModels.Count > 0)
+                    ? go.GetLODModel(distance)
+                    : go.model;
 
-                // Select appropriate LOD model based on distance
-                Model modelToDraw = go.model;
-                if (go.LODModels != null && go.LODModels.Count > 0)
-                {
-                    modelToDraw = go.GetLODModel(distance);
-                    
-                }
-
-                // Cull and draw each mesh of the selected model
+                // Cull & draw each mesh
                 foreach (var mesh in modelToDraw.Meshes)
                 {
-                    // Transform bounding sphere to world space
+                    // Transform bounding sphere and test intersection
                     var sphere = mesh.BoundingSphere.Transform(world);
                     bool visible = frustum.Intersects(sphere);
 
-                    // Draw debug bounding box if enabled
+                    // Optional: draw debug bounding box
                     if (useDebugWireframe)
                     {
                         var box = BoundingBox.CreateFromSphere(sphere);
@@ -474,41 +502,36 @@ namespace SolidSilnique
                         foreach (var pass in _debugEffect.CurrentTechnique.Passes)
                         {
                             pass.Apply();
-                            GraphicsDevice.DrawUserPrimitives(
-                                PrimitiveType.LineList,
-                                lines,
-                                0,
-                                edges.GetLength(0));
+                            GraphicsDevice.DrawUserPrimitives(PrimitiveType.LineList, lines, 0, edges.GetLength(0));
                         }
                     }
 
-                    // Skip drawing if mesh is outside the frustum
+                    // Skip if outside view
                     if (!visible)
                         continue;
 
-                    // Configure effects and draw mesh
-                    foreach (var effect in mesh.Effects)
-                    {
-                        if (effect is BasicEffect basic)
-                        {
-                            basic.World = world;
-                            basic.View = _view;
-                            basic.Projection = _projection;
-                            basic.EnableDefaultLighting();
-                            basic.TextureEnabled = true;
-                            basic.Texture = go.texture;
-                        }
-                        else
-                        {
-                            shader.SetUniform("World", world);
-                        }
-                    }
+                    // Bind shader parameters and textures
+                    activeShader.SetUniform("World", world);
+                    activeShader.SetUniform("View", _view);
+                    activeShader.SetUniform("Projection", _projection);
+                    
+                    // Bind albedo (diffuse) texture
+                    activeShader.SetUniform("texture_diffuse1", go.texture);
+                    activeShader.SetUniform("pointlight1Enabled", testPointLight.Enabled);
+                    activeShader.SetUniform("spotlight1Enabled", testSpotlight.Enabled);
+                    // Bind normal map (for PBR) or a white 2×2 normal if null
+                    if (usePBR)
+                        activeShader.SetUniform("texture_normal1",
+                        go.normalMap ?? defaultWhiteNormalTexture);
+
+                    activeShader.Effect.CurrentTechnique.Passes[0].Apply();
                     mesh.Draw();
                 }
             }
 
-            // Restore original rasterizer state
+            // Restore previous rasterizer state
             GraphicsDevice.RasterizerState = prevRasterizer;
         }
+
     }
 }

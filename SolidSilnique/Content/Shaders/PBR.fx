@@ -1,84 +1,123 @@
 ﻿// PBR.fx
 // Simplified Metallic-Roughness PBR with normal map
+#if OPENGL
+    #define SV_POSITION POSITION
+    #define VS_SHADERMODEL vs_3_0
+    #define PS_SHADERMODEL ps_3_0
+#else
+    #define VS_SHADERMODEL vs_5_0
+    #define PS_SHADERMODEL ps_5_0
+#endif
 
-sampler TextureSampler : register(s0);
-sampler NormalSampler  : register(s1);
+//-------------------------------------
+// UNIFORMS
+//-------------------------------------
 
-float4x4 World;
-float4x4 View;
-float4x4 Projection;
+matrix World;
+matrix View;
+matrix Projection;
 
-float3 CameraPosition;
-float3 LightDirection;
-float4 LightColor;
+// Toggle PBR
+bool usePBR;
+// Camera
+float3 viewPos;
+
+// Material properties
+float shininess;
+
+// Textures
+texture texture_albedo  : register(t0);
+texture texture_normal  : register(t1);
+
+sampler sampler_albedo : register(s0)
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
+
+sampler sampler_normal : register(s1)
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
+};
+
+//-------------------------------------
+// INPUT / OUTPUT STRUCTS
+//-------------------------------------
 
 struct VS_INPUT
 {
     float4 Position : POSITION0;
     float3 Normal   : NORMAL0;
-    float2 TexCoord : TEXCOORD0;
+    float2 UV       : TEXCOORD0;
     float4 Tangent  : TANGENT0;
 };
 
 struct VS_OUTPUT
 {
-    float4 Position  : SV_POSITION;
-    float2 TexCoord  : TEXCOORD0;
-    float3 WorldPos  : TEXCOORD1;
-    float3x3 TBN     : TEXCOORD2; // tangent-space basis
+    float4 Position : SV_POSITION;
+    float3 WorldPos : TEXCOORD0;
+    float2 UV       : TEXCOORD1;
+    float3 Normal   : TEXCOORD2;
+    float3 T       : TEXCOORD3;
+    float3 B       : TEXCOORD4;
 };
 
-VS_OUTPUT VS_Main(VS_INPUT input)
+//-------------------------------------
+// VERTEX SHADER
+//-------------------------------------
+VS_OUTPUT VS_Main(VS_INPUT IN)
 {
-    VS_OUTPUT o;
-    // Transform position
-    float4 worldPos = mul(input.Position, World);
-    o.Position = mul(mul(input.Position, World), View);
-    o.Position = mul(o.Position, Projection);
-    o.WorldPos = worldPos.xyz;
-
-    // Construct TBN matrix
-    float3 N = normalize(mul(input.Normal, (float3x3)World));
-    float3 T = normalize(mul(input.Tangent.xyz, (float3x3)World));
-    float3 B = cross(N, T) * input.Tangent.w;
-    o.TBN = float3x3(T, B, N);
-
-    o.TexCoord = input.TexCoord;
-    return o;
+    VS_OUTPUT OUT;
+    // Transform to world
+    float4 worldPos = mul(IN.Position, World);
+    OUT.WorldPos = worldPos.xyz;
+    // Clip
+    OUT.Position = mul(mul(worldPos, View), Projection);
+    OUT.UV       = IN.UV;
+    // Normals
+    OUT.Normal = normalize(mul(IN.Normal, (float3x3)World));
+    float3 T = normalize(mul(IN.Tangent.xyz, (float3x3)World));
+    float3 B = cross(OUT.Normal, T) * IN.Tangent.w;
+    OUT.T = T; OUT.B = B;
+    return OUT;
 }
 
-float4 PS_Main(VS_OUTPUT input) : SV_TARGET
+//-------------------------------------
+// PIXEL SHADER
+//-------------------------------------
+float4 PS_Main(VS_OUTPUT IN) : SV_TARGET
 {
-    // Sample textures
-    float4 albedo    = tex2D(TextureSampler, input.TexCoord);
-    float3 normalMap = tex2D(NormalSampler,  input.TexCoord).xyz * 2 - 1;
-    float3 N = normalize(mul(normalMap, input.TBN));
-
-    // Simple diffuse + specular
-    float3 L = normalize(-LightDirection);
-    float3 V = normalize(CameraPosition - input.WorldPos);
+    // Albedo
+    float4 albedo = tex2D(sampler_albedo, IN.UV);
+    // Normal mapping
+    float3 N = normalize(IN.Normal);
+    if (usePBR)
+    {
+        float3 nm = tex2D(sampler_normal, IN.UV).xyz * 2 - 1;
+        float3x3 TBN = float3x3(IN.T, IN.B, IN.Normal);
+        N = normalize(mul(nm, TBN));
+    }
+    // View direction
+    float3 V = normalize(viewPos - IN.WorldPos);
+    // Lighting: simple directional for demo
+    float3 L = normalize(-float3(0,1,0));
     float3 H = normalize(L + V);
-
-    float  NdotL = saturate(dot(N, L));
-    float  NdotV = saturate(dot(N, V));
-    float  NdotH = saturate(dot(N, H));
-    float  VdotH = saturate(dot(V, H));
-
-    // Lambertian diffuse
-    float3 diffuse = albedo.rgb * NdotL;
-    // Blinn-Phong specular (placeholder for Cook-Torrance)
-    float  specPower = 16;
-    float3 specular = LightColor.rgb * pow(NdotH, specPower);
-
-    float3 color = diffuse + specular;
+    float NdotL = max(dot(N, L), 0);
+    float NdotH = max(dot(N, H), 0);
+    float3 diffuse  = albedo.rgb * NdotL;
+    float3 specular = pow(NdotH, shininess) * float3(1,1,1);
+    float3 color    = diffuse + specular;
     return float4(color, albedo.a);
 }
 
-technique PBR
+technique PBRTechnique
 {
     pass P0
     {
-        VertexShader = compile vs_4_0 VS_Main();
-        PixelShader  = compile ps_4_0 PS_Main();
+        VertexShader = compile VS_SHADERMODEL VS_Main();
+        PixelShader  = compile PS_SHADERMODEL PS_Main();
     }
-}
+};
