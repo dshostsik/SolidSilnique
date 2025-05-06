@@ -7,184 +7,203 @@
 	#define PS_SHADERMODEL ps_5_0
 #endif
 //-------------------------------------
-//              UNIFORMS            
+//              UNIFORMS             
 //-------------------------------------
+
 matrix World;
 matrix View;
 matrix Projection;
 
+// Toggle between Basic and PBR shading
+bool usePBR;
+// Specular exponent
+float shininess;
+// Camera position in world space
+float3 viewPos;
+
+// Directional Light
+bool dirlightEnabled;
+float3 dirlightDirection;
+float4 dirlight_ambientColor;
+float4 dirlight_diffuseColor;
+float4 dirlight_specularColor;
+
+// Point Light
+bool pointlight1Enabled;
+float3 pointlight1_position;
+float4 pointlight1_ambientColor;
+float4 pointlight1_diffuseColor;
+float4 pointlight1_specularColor;
+float pointlight1_constant;
+float pointlight1_linear;
+float pointlight1_quadratic;
+
+// Spotlight
+bool spotlight1Enabled;
+float3 spotlight1_position;
+float3 spotlight1_direction;
+float4 spotlight1_ambientColor;
+float4 spotlight1_diffuseColor;
+float4 spotlight1_specularColor;
+float spotlight1_constant;
+float spotlight1_linear;
+float spotlight1_quadratic;
+float spotlight1_innerCutoff;
+float spotlight1_outerCutoff;
+
 //-------------------------------------
-//           INPUT STRUCTURE            
+//         TEXTURE SAMPLERS           
 //-------------------------------------
-struct VertexShaderInput
+
+sampler2D texture_diffuse1 : register(s0)
 {
-	float4 aPos : POSITION0;
-	float4 aNormal : NORMAL0;
-	float2 aTexCoords : TEXCOORD0;
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
 };
-//-------------------------------------
-//           OUTPUT STRUCTURE            
-//-------------------------------------
-struct VertexShaderOutput
+
+sampler2D texture_normal1  : register(s1)
 {
-    float4 Position: SV_POSITION;
-	float4 Normal : TEXCOORD0;
-    float2 TexCoords : TEXCOORD1;
-    float3 FragPos : TEXCOORD2;
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = Wrap;
+    AddressV = Wrap;
 };
 
 //-------------------------------------
-//            VERTEX SHADER            
+//           INPUT STRUCTURE         
 //-------------------------------------
+
+struct VertexShaderInput
+{
+    float4 aPos       : POSITION0;
+    float3 aNormal    : NORMAL0;
+    float2 aTexCoords : TEXCOORD0;
+    float4 aTangent   : TANGENT0;
+};
+
+//-------------------------------------
+//          OUTPUT STRUCTURE         
+//-------------------------------------
+
+struct VertexShaderOutput
+{
+    float4 Position    : SV_POSITION;
+    float3 FragPos     : TEXCOORD0;
+    float2 TexCoords   : TEXCOORD1;
+    float3 NormalWS    : TEXCOORD2;
+    float3 TangentWS   : TEXCOORD3;
+    float3 BitangentWS : TEXCOORD4;
+};
+
+//-------------------------------------
+//           VERTEX SHADER           
+//-------------------------------------
+
 VertexShaderOutput MainVS(in VertexShaderInput input)
 {
-	VertexShaderOutput output = (VertexShaderOutput)0;
-    
-    output.Position = mul(input.aPos, mul(mul(World, View), Projection));
+    VertexShaderOutput output;
+
+    // Transform position
+    float4 worldPos4 = mul(input.aPos, World);
+    output.FragPos = worldPos4.xyz;
+    output.Position = mul(mul(worldPos4, View), Projection);
+
+    // Pass texture coordinates
     output.TexCoords = input.aTexCoords;
-    // output.Normal = float3x3(transpose(inverse(World))) * input.aNormal;
-    //output.Normal = transpose(inverse(input.aNormal));
-    output.Normal = mul(transpose(World), input.aNormal);
-    output.FragPos = mul(input.aPos, World).xyz;
+
+    // Compute normals and tangents in world space
+    float3 normalWS = normalize(mul(input.aNormal, (float3x3)World));
+    float3 tangentWS = normalize(mul(input.aTangent.xyz, (float3x3)World));
+    float3 bitangentWS = cross(normalWS, tangentWS) * input.aTangent.w;
+
+    output.NormalWS = normalWS;
+    output.TangentWS = tangentWS;
+    output.BitangentWS = normalize(bitangentWS);
+
     return output;
 }
 
 //-------------------------------------
-//              UNIFORMS            
-//-------------------------------------
-
-// Stupid shit looks like doesn't support structures
-    float3 dirlight_direction;
-
-    float4 dirlight_ambientColor;
-    float4 dirlight_diffuseColor;
-    float4 dirlight_specularColor;
-
-    float3 pointlight1_position;
-    // linear in HLSL is a key word, so linear -> linearAttenuation
-    float pointlight1_linearAttenuation;
-    float pointlight1_quadraticAttenuation;
-    float pointlight1_constant;
-    
-    float4 pointlight1_ambientColor;
-    float4 pointlight1_diffuseColor;
-    float4 pointlight1_specularColor;
-
-    float3 spotlight1_position;
-    float3 spotlight1_direction;
-    
-    float spotlight1_linearAttenuation;
-    float spotlight1_quadraticAttenuation;
-    float spotlight1_constant;
-    
-    float spotlight1_innerCut;
-    float spotlight1_outerCut;
-    
-    float4 spotlight1_ambientColor;
-    float4 spotlight1_diffuseColor;
-    float4 spotlight1_specularColor;
-
-bool dirlightEnabled;
-bool pointlight1Enabled;
-bool spotlight1Enabled;
-
-sampler2D texture_diffuse1;
-float3 viewPos;
-
-
-//-------------------------------------
 //           PIXEL SHADER            
 //-------------------------------------
+
 float4 MainPS(VertexShaderOutput input) : SV_TARGET
 {
-    float4 textureVector = tex2D(texture_diffuse1, input.TexCoords);
-    float3 norm = normalize(input.Normal.xyz);
-    float3 viewDir = normalize(viewPos - input.FragPos);
-    
-    float3 directionalLight = float3(0.f, 0.f, 0.f);
-    if (dirlightEnabled == true)
+    // Albedo
+    float4 albedo = tex2D(texture_diffuse1, input.TexCoords);
+
+    // Normal mapping
+    float3 N = input.NormalWS;
+    if (usePBR)
     {
-        float3 ambient = dirlight_ambientColor.rgb;
-        
-        float3 lightDir = normalize(-dirlight_direction);
-        float diff = max(dot(norm, lightDir), 0.0);
-        float3 diffuse = dirlight_diffuseColor.rgb * diff; 
-        
-        float3 reflectDir = reflect(-lightDir, norm);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-        float3 specular = dirlight_specularColor.rgb * spec;
-        directionalLight = ambient + diffuse + specular;
+        float3 nm = tex2D(texture_normal1, input.TexCoords).xyz * 2 - 1;
+        float3x3 TBN = float3x3(input.TangentWS, input.BitangentWS, input.NormalWS);
+        N = normalize(mul(nm, TBN));
     }
-        
-    float3 pointlight = float3(0.f, 0.f, 0.f);
-    if (pointlight1Enabled == true)
+
+    // View direction
+    float3 V = normalize(viewPos - input.FragPos);
+
+    // Initialize light sums
+    float3 result = float3(0,0,0);
+
+    // Directional Light
+    if (dirlightEnabled)
     {
-        float3 pointAmbient = float3(1.f, 1.f, 1.f);
-        float3 pointDiffuse = float3(1.f, 1.f, 1.f);
-        float3 pointSpecular = float3(1.f, 1.f, 1.f);
-        
-        pointAmbient = pointlight1_ambientColor.rgb;
-        
-        float3 lightDirPointLight = normalize(pointlight1_position - input.FragPos.xyz);
-        float pointDiff = max(dot(norm, lightDirPointLight), 0.0);
-        pointDiffuse = pointlight1_diffuseColor.rgb * pointDiff;
-        
-        float3 reflectDirPoint = reflect(-lightDirPointLight, norm);
-        float specPoint = pow(max(dot(viewDir, reflectDirPoint), 0.0), 32);
-        pointSpecular = pointlight1_specularColor.rgb * specPoint;
-        
-        float distance = length(pointlight1_position - input.FragPos);
-        float attenuation = 1.0f / (pointlight1_constant + pointlight1_linearAttenuation * distance + pointlight1_quadraticAttenuation * (distance * distance));
-        
-        pointAmbient *= attenuation;
-        pointDiffuse *= attenuation;
-        pointSpecular *= attenuation;
-        
-        pointlight = pointAmbient + pointDiffuse + pointSpecular; 
+        float3 L = normalize(-dirlightDirection);
+        float diff = max(dot(N, L), 0.0);
+        float3 D = dirlight_diffuseColor.rgb * diff;
+        float3 R = reflect(-L, N);
+        float spec = pow(max(dot(V, R), 0.0), shininess);
+        float3 S = dirlight_specularColor.rgb * spec;
+        result += dirlight_ambientColor.rgb + D + S;
     }
-    
-    float3 spotlight = float3(0.f, 0.f, 0.f);
-    if (spotlight1Enabled == true)
+
+    // Point Light
+    if (pointlight1Enabled)
     {
-        float3 spotAmbient = float3(1.f, 1.f, 1.f);
-        float3 spotDiffuse = float3(1.f, 1.f, 1.f);
-        float3 spotSpecular = float3(1.f, 1.f, 1.f);
-        
-        spotAmbient = spotlight1_ambientColor.rgb;
-        
-        float3 lightDirSpot = normalize(spotlight1_position - input.FragPos);
-        float spotDiff = max(dot(norm, lightDirSpot), 0.0f);
-        spotDiffuse = spotlight1_diffuseColor.rgb * spotDiff;
-        
-        float3 reflectSpot = reflect(-lightDirSpot, norm);
-        float specSpot = pow(max(dot(viewDir, reflectSpot), 0.0f), 32);
-        spotSpecular = spotlight1_specularColor.rgb * specSpot;
-        
-        float theta = dot(lightDirSpot, normalize(-spotlight1_direction));
-        float epsilon = spotlight1_innerCut - spotlight1_outerCut;
-        float intensity = clamp((theta - spotlight1_outerCut) / epsilon, 0.f, 1.f);
-        
-        spotDiffuse *= intensity;
-        spotSpecular *= intensity;
-        
-        float spotDistance = length(spotlight1_position - input.FragPos);
-        float spotAttenuation = 1.0f / (spotlight1_constant + spotlight1_linearAttenuation * spotDistance + spotlight1_quadraticAttenuation * (spotDistance * spotDistance));
-        
-         spotAmbient *= spotAttenuation;
-         spotDiffuse *= spotAttenuation;
-         spotSpecular *= spotAttenuation;
-         
-         spotlight = spotAmbient + spotDiffuse + spotSpecular;
+        float3 L = normalize(pointlight1_position - input.FragPos);
+        float diff = max(dot(N, L), 0.0);
+        float3 D = pointlight1_diffuseColor.rgb * diff;
+        float3 R = reflect(-L, N);
+        float spec = pow(max(dot(V, R), 0.0), shininess);
+        float3 S = pointlight1_specularColor.rgb * spec;
+        float dist = length(pointlight1_position - input.FragPos);
+        float att = 1.0 / (pointlight1_constant + pointlight1_linear*dist + pointlight1_quadratic*dist*dist);
+        result += (pointlight1_ambientColor.rgb + D + S) * att;
     }
-    
-	return float4(directionalLight + pointlight + spotlight, 1.0) * textureVector;
+
+    // Spotlight
+    if (spotlight1Enabled)
+    {
+        float3 L = normalize(spotlight1_position - input.FragPos);
+        float theta = dot(L, normalize(-spotlight1_direction));
+        float epsilon = spotlight1_innerCutoff - spotlight1_outerCutoff;
+        float intensity = saturate((theta - spotlight1_outerCutoff) / epsilon);
+        float diff = max(dot(N, L), 0.0);
+        float3 D = spotlight1_diffuseColor.rgb * diff * intensity;
+        float3 R = reflect(-L, N);
+        float spec = pow(max(dot(V, R), 0.0), shininess) * intensity;
+        float3 S = spotlight1_specularColor.rgb * spec;
+        float dist = length(spotlight1_position - input.FragPos);
+        float att = 1.0 / (spotlight1_constant + spotlight1_linear*dist + spotlight1_quadratic*dist*dist);
+        result += (spotlight1_ambientColor.rgb + D + S) * att;
+    }
+
+    // Final color
+    float3 finalCol = result * albedo.rgb;
+    return float4(finalCol, albedo.a);
 }
+
+//-------------------------------------
+//              TECHNIQUE             
+//-------------------------------------
 
 technique BasicColorDrawingWithLights
 {
-	pass P0
-	{
-		VertexShader = compile VS_SHADERMODEL MainVS();
-		PixelShader = compile PS_SHADERMODEL MainPS();
-	}
+    pass P0
+    {
+        VertexShader = compile VS_SHADERMODEL MainVS();
+        PixelShader  = compile PS_SHADERMODEL MainPS();
+    }
 };

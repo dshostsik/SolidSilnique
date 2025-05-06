@@ -73,8 +73,6 @@ namespace SolidSilnique
 
         private Shader shader;
         private Shader shadowShader;
-        private Shader pbrShader;
-        private Shader basicShader;
 
         public bool useCulling = true;
 
@@ -150,9 +148,6 @@ namespace SolidSilnique
                 GraphicsDevice,
                 this,
                 "ShadeTheSceneRightNow");
-
-            basicShader = new Shader("Shaders/CustomShader", GraphicsDevice, this, "BasicColorDrawingWithLights");
-            pbrShader = new Shader("Shaders/PBRShader", GraphicsDevice, this, "PBRTechnique");
             shadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, 1024, 1024, false, SurfaceFormat.Color,
                 DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
 
@@ -219,7 +214,6 @@ namespace SolidSilnique
                         // create a 1×1 normal map with neutral normals
             defaultWhiteNormalTexture = new Texture2D(GraphicsDevice, 1, 1);
             defaultWhiteNormalTexture.SetData(new[] { new Color(128, 128, 255) });
-
             shader.SetUniform("shininess", shininess);
             /*foreach(var child in EngineManager.scene.gameObjects)
             {
@@ -378,27 +372,24 @@ namespace SolidSilnique
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
             // === GLOBAL SHADER SETUP (once per frame) ===
+            shader.SetUniform("usePBR", usePBR);
+            shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
 
-            var activeShader = usePBR ? pbrShader : basicShader;
             // Bind lighting uniforms as needed
-            activeShader.SetUniform("dirlightEnabled", testDirectionalLight.Enabled);
-            activeShader.SetUniform("dirlightDirection", testDirectionalLight.Direction);
-            activeShader.SetUniform("dirlight_ambientColor", testDirectionalLight.AmbientColor);
-            activeShader.SetUniform("dirlight_diffuseColor", testDirectionalLight.DiffuseColor);
-            activeShader.SetUniform("dirlight_specularColor", testDirectionalLight.SpecularColor);
-            activeShader.SetUniform("View", _view);
-            activeShader.SetUniform("Projection", _projection);
-            
-            activeShader.SetUniform("usePBR", usePBR);
-            activeShader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
-            activeShader.SetUniform("shininess", 32f); // or per-object
-            activeShader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
+            shader.SetUniform("dirlightEnabled", testDirectionalLight.Enabled);
+            shader.SetUniform("dirlightDirection", testDirectionalLight.Direction);
+            shader.SetUniform("dirlight_ambientColor", testDirectionalLight.AmbientColor);
+            shader.SetUniform("dirlight_diffuseColor", testDirectionalLight.DiffuseColor);
+            shader.SetUniform("dirlight_specularColor", testDirectionalLight.SpecularColor);
+            shader.SetUniform("View", _view);
+            shader.SetUniform("Projection", _projection);
+            shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
             testDirectionalLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
-            activeShader.SetUniform("pointlight1_position", pointlight_position);
+            shader.SetUniform("pointlight1_position", pointlight_position);
             testPointLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
-            activeShader.SetUniform("spotlight1_position", spotlight_position);
+            shader.SetUniform("spotlight1_position", spotlight_position);
             testSpotlight.SendToShader(shader);
 
 
@@ -442,10 +433,10 @@ namespace SolidSilnique
             // Build view-projection frustum
             var viewProjection = _view * _projection;
             var frustum = new BoundingFrustum(viewProjection);
-            var activeShader = usePBR ? pbrShader : basicShader;
+
             // Pass PBR toggle and camera pos into the shader
-            activeShader.SetUniform("usePBR", usePBR);
-            activeShader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
+            shader.SetUniform("usePBR", usePBR);
+            shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
 
             // Debug wireframe setup if enabled
             var prevRasterizer = GraphicsDevice.RasterizerState;
@@ -511,20 +502,20 @@ namespace SolidSilnique
                         continue;
 
                     // Bind shader parameters and textures
-                    activeShader.SetUniform("World", world);
-                    activeShader.SetUniform("View", _view);
-                    activeShader.SetUniform("Projection", _projection);
+                    shader.SetUniform("World", world);
+                    shader.SetUniform("View", _view);
+                    shader.SetUniform("Projection", _projection);
                     
                     // Bind albedo (diffuse) texture
-                    activeShader.SetUniform("texture_diffuse1", go.texture);
-                    activeShader.SetUniform("pointlight1Enabled", testPointLight.Enabled);
-                    activeShader.SetUniform("spotlight1Enabled", testSpotlight.Enabled);
+                    shader.SetUniform("texture_diffuse1", go.texture);
+                    shader.SetUniform("pointlight1Enabled", testPointLight.Enabled);
+                    shader.SetUniform("spotlight1Enabled", testSpotlight.Enabled);
                     // Bind normal map (for PBR) or a white 2×2 normal if null
                     if (usePBR)
-                        activeShader.SetUniform("texture_normal1",
+                        shader.SetUniform("texture_normal1",
                         go.normalMap ?? defaultWhiteNormalTexture);
 
-                    activeShader.Effect.CurrentTechnique.Passes[0].Apply();
+                    shader.Effect.CurrentTechnique.Passes[0].Apply();
                     mesh.Draw();
                 }
             }
