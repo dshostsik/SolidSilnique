@@ -39,18 +39,21 @@ class ProceduralTest : Scene
 
 		public override void Setup()
 		{
-			ProceduralGrass newProc = new ProceduralGrass(200, 200);
+			
+			
+			ProceduralGrass newProc = new ProceduralGrass(100, 100);
 			Task task1 = Task.Run(() => newProc.precomputeNoise());
 			
 			GameObject go = new GameObject("Camera");
-			go.transform.position = new Vector3(0, 3, 0);
+			go.transform.position = new Vector3(250, 0.75f, 250);
 			CameraComponent cam = new CameraComponent();
 			cam.SetMain();
 			go.AddComponent(cam);
-			go.AddComponent(new SphereColliderComponent(0.5f));
+			go.AddComponent(new SphereColliderComponent(0.9f));
 			this.AddChild(go);
 
 			go = new GameObject("ground");
+			go.transform.position = new Vector3(250, 0, 250);
 			go.transform.scale = new Vector3(500, 1, 500);
 			go.model = loadedModels["plane"];
 			go.texture = loadedTextures["simpleGreen"];
@@ -93,7 +96,12 @@ class ProceduralTest : Scene
 
 		void AddTree(ProceduralGrass grass,int i,int j)
 		{
-			if (grass.computedNoise[i, j] > 180.5f)
+			
+			float radius = 80.0f;
+			Vector2 awooga = new Vector2(i*5, j*5);
+			Vector2 center = new Vector2(250, 250);
+			float len = Vector2.Distance(awooga, center);
+			if (grass.computedNoise[i, j] > 180.5f && len > radius)
 			{
 				GameObject go = new GameObject("Tree");
 				float randX = i*5, randZ = j*5;
@@ -109,6 +117,7 @@ class ProceduralTest : Scene
 				else if (Math.Round(grass.ChooseNoise[i, j] / 100) == 1)
 				{
 					go.model = loadedModels["sphere"];
+					go.AddComponent(new SphereColliderComponent(1,true));
 				}
 				else if (Math.Round(grass.ChooseNoise[i, j] / 100) == 0)
 				{
@@ -116,7 +125,7 @@ class ProceduralTest : Scene
 				}
 				else
 				{
-					go.model = loadedModels["drzewo"];
+					go.model = loadedModels["cube"];
 				}
 				go.texture = loadedTextures["deimos"];
 
