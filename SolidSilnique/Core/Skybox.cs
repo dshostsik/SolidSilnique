@@ -7,6 +7,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Content;
+using GUIRESOURCES;
 
 namespace SolidSilnique.Core
 {
@@ -135,8 +136,8 @@ namespace SolidSilnique.Core
 			);
 
 			vertexBuffer.SetData(cubeVertices);
-			
-		}
+  
+        }
 
 		public void Draw(GraphicsDeviceManager graphics, Matrix view)
 		{

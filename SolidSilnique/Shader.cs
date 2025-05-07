@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -308,6 +309,13 @@ namespace SolidSilnique
                     " uniform not found!\n Try to check if requested uniform is absent in shader or not in use (might be deprecated while shader optimization)");
             }
         }
+
+        public void SetTexture(string name, Texture2D texture)
+    {
+        var param = Effect.Parameters[name];
+        if (param != null)
+            param.SetValue(texture);
+    }
 
         /// <summary>
         /// Looks for uniform in shader and sets it to the value
