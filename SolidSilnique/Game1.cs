@@ -468,18 +468,7 @@ namespace SolidSilnique
                 var world = go.transform.getModelMatrix();
                 var position = go.transform.position;
 
-                // Determine distance from camera to object
-                var distance = Vector3.Distance(
-                    EngineManager.scene.mainCamera.CameraPosition,
-                    position);
-
-                // Select appropriate LOD model based on distance
-                Model modelToDraw = go.model;
-                if (go.LODModels != null && go.LODModels.Count > 0)
-                {
-                    modelToDraw = go.GetLODModel(distance);
-                    
-                }
+                
                 bool objectNormal = useNormalMap && go.normalMap != null;
 
                 //shader.SetTexture("texture_diffuse1", go.texture);
@@ -496,7 +485,7 @@ namespace SolidSilnique
                 shader.SetUniform("useNormalMap", (go.normalMap != null && useNormalMap) ? 1 : 0);
                 shader.SetUniform("useRoughnessMap", (go.roughnessMap != null) ? 1 : 0);
                 shader.SetUniform("useAOMap", (go.aoMap != null) ? 1 : 0);
-
+                Model modelToDraw = go.model;
 
                 // Cull and draw each mesh of the selected model
                 foreach (var mesh in modelToDraw.Meshes)
@@ -539,6 +528,19 @@ namespace SolidSilnique
                     // Skip drawing if mesh is outside the frustum
                     if (!visible)
                         continue;
+
+                    // Determine distance from camera to object
+                    var distance = Vector3.Distance(
+                        EngineManager.scene.mainCamera.CameraPosition,
+                        position);
+
+                    // Select appropriate LOD model based on distance
+                   
+                    if (go.LODModels != null && go.LODModels.Count > 0)
+                    {
+                        modelToDraw = go.GetLODModel(distance);
+
+                    }
 
                     // Configure effects and draw mesh
                     foreach (var effect in mesh.Effects)
