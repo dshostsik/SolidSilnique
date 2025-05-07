@@ -89,6 +89,9 @@ bool pointlight1Enabled;
 bool spotlight1Enabled;
 
 sampler2D texture_diffuse1;
+sampler2D texture_normal1;
+//bool useNormalMap;
+int useNormalMap;
 float3 viewPos;
 
 
@@ -102,6 +105,15 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
     float3 viewDir = normalize(viewPos - input.FragPos);
     
     float3 directionalLight = float3(0.f, 0.f, 0.f);
+    if (useNormalMap != 0)
+        {
+        
+        float3 nmap = tex2D(texture_normal1, input.TexCoords).rgb;
+         // Remap from [0,1] to [-1,1]
+        nmap = normalize(nmap * 2.0f - 1.0f);
+        norm = nmap;
+        
+    }
     if (dirlightEnabled == true)
     {
         float3 ambient = dirlight_ambientColor.rgb;

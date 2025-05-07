@@ -75,6 +75,9 @@ namespace SolidSilnique
         private Shader shadowShader;
 
         public bool useCulling = true;
+        private bool useNormalMap = false;
+        private bool wasLDownLastFrame = false;
+        private Texture2D _normalMap;
 
         private BasicEffect _debugEffect;
 
@@ -205,6 +208,7 @@ namespace SolidSilnique
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _debugEffect = new BasicEffect(GraphicsDevice) { VertexColorEnabled = true };
+            _normalMap = Content.Load<Texture2D>("Textures/normal_map");
             /*foreach(var child in EngineManager.scene.gameObjects)
             {
                 child.texture = _deimosTexture;
@@ -302,6 +306,12 @@ namespace SolidSilnique
             if (isBDown && !wasBDownLastFrame)
                 useDebugWireframe = !useDebugWireframe;
             wasBDownLastFrame = isBDown;
+
+            bool isLDown = kb.IsKeyDown(Keys.L);
+                        if (isLDown && !wasLDownLastFrame)
+               useNormalMap = !useNormalMap;
+            wasLDownLastFrame = isLDown;
+
         }
 
         /// <summary>
@@ -362,6 +372,10 @@ namespace SolidSilnique
             shader.SetUniform("View", _view);
             shader.SetUniform("Projection", _projection);
             shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
+            
+
+            //shader.SetUniform("useNormalMap", useNormalMap ? 1 : 0);
+            //shader.SetTexture("texture_normal1", _normalMap);
             testDirectionalLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
             shader.SetUniform("pointlight1_position", pointlight_position);
@@ -370,12 +384,11 @@ namespace SolidSilnique
             shader.SetUniform("spotlight1_position", spotlight_position);
             testSpotlight.SendToShader(shader);
 
-
+            
             if (useCulling)
                 PerformCulledDraw();
             else
                 EngineManager.Draw(shader);
-            //PerformCulledDraw();
             //EngineManager.Draw(shader);
             //Frustum Culling Setup
 
@@ -443,6 +456,10 @@ namespace SolidSilnique
                     modelToDraw = go.GetLODModel(distance);
                     
                 }
+
+                bool objectNormalEnabled = useNormalMap && go.normalMap != null;
+                shader.SetUniform("useNormalMap", objectNormalEnabled ? 1 : 0);
+                shader.SetTexture("texture_normal1", go.normalMap ?? _normalMap);
 
                 // Cull and draw each mesh of the selected model
                 foreach (var mesh in modelToDraw.Meshes)
