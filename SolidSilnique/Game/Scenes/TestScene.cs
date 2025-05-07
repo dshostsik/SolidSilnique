@@ -158,6 +158,8 @@ namespace SolidSilnique.GameContent
             
             this.AddChild(test4);
 
+            
+
             this.Serialize();
 		}
 
