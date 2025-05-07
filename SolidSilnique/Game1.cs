@@ -74,7 +74,7 @@ namespace SolidSilnique
         private Shader shader;
         private Shader shadowShader;
 
-        public bool useCulling = true;
+        public bool useCulling = false;
         private bool useNormalMap = false;
         private bool wasLDownLastFrame = false;
         private Texture2D _normalMap;
@@ -211,25 +211,12 @@ namespace SolidSilnique
             _gui = new GUI("GUI/resources/UI.xml", Content);
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            _debugEffect = new BasicEffect(GraphicsDevice) { VertexColorEnabled = true };
-            _normalMap = Content.Load<Texture2D>("Textures/normal_map");
-            _defaultRoughnessMap = Content.Load<Texture2D>("Textures/default_roughness");
-            _defaultAOMap = Content.Load<Texture2D>("Textures/default_ao");
-            /*foreach(var child in EngineManager.scene.gameObjects)
-            {
-                child.texture = _deimosTexture;
-                child.model = _deimos;
-				foreach (var che in child.children)
-				{
-					che.texture = _deimosTexture;
-					che.model = _deimos;
-					foreach (var c in che.children)
-					{
-						c.texture = _deimosTexture;
-						c.model = _deimos;
-					}
-				}
-			}*/
+            EngineManager.wireframeEffect = new BasicEffect(GraphicsDevice) { VertexColorEnabled = true };
+            EngineManager.normalMap = Content.Load<Texture2D>("Textures/normal_map");
+            EngineManager.defaultRoughnessMap = Content.Load<Texture2D>("Textures/default_roughness");
+            EngineManager.defaultAOMap = Content.Load<Texture2D>("Textures/default_ao");
+            
+
             EngineManager.scene.LoadContent(Content);
             EngineManager.scene.Setup();
 
@@ -304,13 +291,13 @@ namespace SolidSilnique
             bool isPDown = kb.IsKeyDown(Keys.P);
 
             if (isPDown && !wasPDownLastFrame)
-                useCulling = !useCulling;
+                EngineManager.useCulling = !EngineManager.useCulling;
 
             wasPDownLastFrame = isPDown;
 
             bool isBDown = kb.IsKeyDown(Keys.B);
             if (isBDown && !wasBDownLastFrame)
-                useDebugWireframe = !useDebugWireframe;
+                EngineManager.useWireframe = !EngineManager.useWireframe;
             wasBDownLastFrame = isBDown;
 
             bool isLDown = kb.IsKeyDown(Keys.L);
@@ -408,10 +395,10 @@ namespace SolidSilnique
             testSpotlight.SendToShader(shader);
 
             
-            if (useCulling)
-                PerformCulledDraw();
-            else
-                EngineManager.Draw(shader, GraphicsDevice);
+            //if (useCulling)
+                //PerformCulledDraw();
+            //else
+                EngineManager.Draw(shader, GraphicsDevice, _view, _projection);
             //PerformCulledDraw();
             //EngineManager.Draw(shader);
             //Frustum Culling Setup
