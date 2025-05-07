@@ -27,6 +27,9 @@ namespace SolidSilnique.Core
 		List<Component> components = [];
 
         public Texture2D normalMap = null;
+        public Texture2D roughnessMap = null;
+        public Texture2D aoMap = null;
+
 
         // Level of Detail (LOD)
         /// <summary>

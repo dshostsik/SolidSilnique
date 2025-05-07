@@ -78,6 +78,11 @@ namespace SolidSilnique
         private bool useNormalMap = false;
         private bool wasLDownLastFrame = false;
         private Texture2D _normalMap;
+       
+
+
+        private Texture2D _defaultRoughnessMap;
+        private Texture2D _defaultAOMap;
 
         private BasicEffect _debugEffect;
 
@@ -209,6 +214,8 @@ namespace SolidSilnique
 
             _debugEffect = new BasicEffect(GraphicsDevice) { VertexColorEnabled = true };
             _normalMap = Content.Load<Texture2D>("Textures/normal_map");
+            _defaultRoughnessMap = Content.Load<Texture2D>("Textures/default_roughness");
+            _defaultAOMap = Content.Load<Texture2D>("Textures/default_ao");
             /*foreach(var child in EngineManager.scene.gameObjects)
             {
                 child.texture = _deimosTexture;
@@ -456,11 +463,23 @@ namespace SolidSilnique
                     modelToDraw = go.GetLODModel(distance);
                     
                 }
-
-                shader.SetTexture("texture_diffuse1", go.texture);
                 bool objectNormal = useNormalMap && go.normalMap != null;
-                shader.SetUniform("useNormalMap", objectNormal ? 1 : 0);
+
+                //shader.SetTexture("texture_diffuse1", go.texture);
+                //shader.SetUniform("useNormalMap", objectNormal ? 1 : 0);
+                //shader.SetTexture("texture_normal1", go.normalMap ?? _normalMap);
+
+                // bind per-object PBR maps (fall back to defaults)
+                shader.SetTexture("texture_diffuse1", go.texture);
                 shader.SetTexture("texture_normal1", go.normalMap ?? _normalMap);
+                shader.SetTexture("texture_roughness1", go.roughnessMap ?? _defaultRoughnessMap);
+                shader.SetTexture("texture_ao1", go.aoMap ?? _defaultAOMap);
+                
+                            // toggles (as ints) for the HLSL if-tests
+                shader.SetUniform("useNormalMap", (go.normalMap != null && useNormalMap) ? 1 : 0);
+                shader.SetUniform("useRoughnessMap", (go.roughnessMap != null) ? 1 : 0);
+                shader.SetUniform("useAOMap", (go.aoMap != null) ? 1 : 0);
+
 
                 // Cull and draw each mesh of the selected model
                 foreach (var mesh in modelToDraw.Meshes)

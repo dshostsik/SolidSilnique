@@ -90,7 +90,12 @@ bool spotlight1Enabled;
 
 sampler2D texture_diffuse1;
 sampler2D texture_normal1;
+sampler2D texture_roughness1;
+sampler2D texture_ao1;
 //bool useNormalMap;
+
+int useRoughnessMap;
+int useAOMap;
 int useNormalMap;
 float3 viewPos;
 
@@ -113,17 +118,28 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
         nmap = normalize(nmap * 2.0f - 1.0f);
         norm = nmap;
         
+        
     }
+    // Sample roughness
+        
+    float roughness = 0.5;
+    if (useRoughnessMap != 0)
+        roughness = tex2D(texture_roughness1, input.TexCoords).r;
+    // Sample ambient occlusion
+    float ao = 1.0;
+    if (useAOMap != 0)
+        ao = tex2D(texture_ao1, input.TexCoords).r;
     if (dirlightEnabled == true)
     {
-        float3 ambient = dirlight_ambientColor.rgb;
+        float3 ambient = dirlight_ambientColor.rgb * ao;
         
         float3 lightDir = normalize(-dirlight_direction);
         float diff = max(dot(norm, lightDir), 0.0);
         float3 diffuse = dirlight_diffuseColor.rgb * diff; 
         
         float3 reflectDir = reflect(-lightDir, norm);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+        float specPower = lerp(64.0, 2.0, roughness);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), specPower);
         float3 specular = dirlight_specularColor.rgb * spec;
         directionalLight = ambient + diffuse + specular;
     }

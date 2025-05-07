@@ -33,6 +33,11 @@ namespace SolidSilnique.GameContent
             loadedModels.Add("gun_low", Content.Load<Model>("gun_low"));
             loadedTextures.Add("gun", Content.Load<Texture2D>("Textures/gun_texture"));
             loadedTextures.Add("gun_normal", Content.Load<Texture2D>("Textures/gun_normal"));
+			loadedTextures.Add("test", Content.Load<Texture2D>("Textures/test_tex"));
+            loadedTextures.Add("test_ro", Content.Load<Texture2D>("Textures/test_roughness"));
+            loadedTextures.Add("test_ao", Content.Load<Texture2D>("Textures/test_ao"));
+            loadedTextures.Add("test_no", Content.Load<Texture2D>("Textures/test_normal"));
+
         }
 
 		public override void Setup()
@@ -110,6 +115,20 @@ namespace SolidSilnique.GameContent
 
 
             this.AddChild(gun);
+
+            var test = new GameObject("Square6");
+            test.transform.position = new Vector3(70, 20, -5);
+            // Assign the highest-detail model by default
+            test.model = loadedModels["deimos"];
+            test.texture = loadedTextures["test"];
+
+            test.normalMap = loadedTextures["test_no"];
+			test.roughnessMap = loadedTextures["test_ro"];
+			test.aoMap = loadedTextures["test_ao"];
+
+
+            this.AddChild(test);
+
         }
 	}
 }
