@@ -24,16 +24,17 @@ namespace SolidSilnique.GameContent
 
 		public override void LoadContent(ContentManager Content)
 		{
-            loadedModels.Add("deimos", Content.Load<Model>("deimos"));
-			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 
 			loadedTextures.Add("test", Content.Load<Texture2D>("Textures/test_tex"));
             loadedTextures.Add("test_ro", Content.Load<Texture2D>("Textures/test_roughness"));
             loadedTextures.Add("test_ao", Content.Load<Texture2D>("Textures/test_ao"));
             loadedTextures.Add("test_no", Content.Load<Texture2D>("Textures/test_normal"));
+            loadedTextures.Add("wood", Content.Load<Texture2D>("Textures/wood_tex"));
+            loadedTextures.Add("wood_ro", Content.Load<Texture2D>("Textures/wood_ro"));
+            loadedTextures.Add("wood_ao", Content.Load<Texture2D>("Textures/wood_ao"));
+            loadedTextures.Add("wood_no", Content.Load<Texture2D>("Textures/wood_no"));
 
-        
-			loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
+            loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
 			loadedModels.Add("deimos", Content.Load<Model>("deimos"));
 			loadedModels.Add("plane", Content.Load<Model>("plane"));
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
@@ -126,7 +127,38 @@ namespace SolidSilnique.GameContent
 			test.roughnessMap = loadedTextures["test_ro"];
 			test.aoMap = loadedTextures["test_ao"];
             this.AddChild(test);
-			this.Serialize();
+
+            var test2 = new GameObject("Square6");
+            test2.transform.position = new Vector3(70, 20, -15);
+            // Assign the highest-detail model by default
+            test2.model = loadedModels["deimos"];
+            test2.texture = loadedTextures["test"];
+
+            test2.normalMap = loadedTextures["test_no"];
+
+            this.AddChild(test2);
+
+            var test3 = new GameObject("Square6");
+            test3.transform.position = new Vector3(70, 20, -25);
+            // Assign the highest-detail model by default
+            test3.model = loadedModels["deimos"];
+            test3.texture = loadedTextures["wood"];
+            test3.normalMap = loadedTextures["wood_no"];
+            test3.roughnessMap = loadedTextures["wood_ro"];
+            test3.roughnessMap = loadedTextures["wood_ao"];
+            this.AddChild(test3);
+
+            var test4 = new GameObject("Square6");
+            test4.transform.position = new Vector3(70, 20, -35);
+            // Assign the highest-detail model by default
+            test4.model = loadedModels["deimos"];
+            test4.texture = loadedTextures["test"];
+
+            test4.aoMap = loadedTextures["test_ao"];
+            
+            this.AddChild(test4);
+
+            this.Serialize();
 		}
 
 		void AddTree()
