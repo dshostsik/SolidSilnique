@@ -14,7 +14,7 @@ namespace SolidSilnique.Core
 	{
 		public static Scene scene = null;
 		public static Queue<GameObject> renderQueue = [];
-
+		public static bool celShadingEnabled = false;
 		public static void Start()
 		{
 
@@ -29,28 +29,51 @@ namespace SolidSilnique.Core
 			scene.Update();
 		}
 
-		public static void Draw(Shader shader)
+		public static void Draw(Shader shader, GraphicsDevice graphics)
 		{
 			scene.Draw();
 
 			while (renderQueue.Count > 0)
 			{
 
-				GameObject go = renderQueue.Dequeue(); 
+				GameObject go = renderQueue.Dequeue();
+				if (go.model == null) {
+					continue;
+				}
 				try
 				{
+					Matrix model = go.transform.getModelMatrix();
 					shader.SetUniform("texture_diffuse1", go.texture);
-					shader.SetUniform("World", go.transform.getModelMatrix());
+					shader.SetUniform("World", model);
+					Matrix modelTransInv = Matrix.Transpose(Matrix.Invert(go.transform.getModelMatrix()));
+					shader.SetUniform("WorldTransInv", modelTransInv);
 
 					foreach (ModelMesh mesh in go.model.Meshes)
 					{
 						foreach (ModelMeshPart part in mesh.MeshParts)
 						{
 							part.Effect = shader.Effect;
+							if (celShadingEnabled)
+							{
+                                part.Effect.CurrentTechnique = shader.Effect.Techniques["CelShadingOutline"];
+                                graphics.RasterizerState = RasterizerState.CullClockwise;
+                                mesh.Draw();
+
+                                part.Effect.CurrentTechnique = shader.Effect.Techniques["CelShading"];
+                                graphics.RasterizerState = RasterizerState.CullCounterClockwise;
+                                mesh.Draw();
+
+                                
+                            }
+							else {
+								part.Effect.CurrentTechnique = shader.Effect.Techniques["BasicColorDrawingWithLights"];
+                                mesh.Draw();
+                            }
+							
 
 						}
 
-						mesh.Draw();
+						
 					}
 				}
 				catch (NullReferenceException e)

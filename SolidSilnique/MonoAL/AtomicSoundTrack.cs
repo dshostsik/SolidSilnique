@@ -10,10 +10,10 @@ public class AtomicSoundTrack
     private string path;
     private Song song;
     private float volume;
-    public AtomicSoundTrack(string name,ContentManager Content,float volume)
+    public AtomicSoundTrack(string path,ContentManager Content,float volume)
     {
         this.path = path;
-        song = Content.Load<Song>("rock_loop_stereo");
+        song = Content.Load<Song>(path);
         this.volume = volume;
     }
 

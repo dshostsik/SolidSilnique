@@ -1,4 +1,6 @@
-﻿namespace SolidSilnique.MonoAL;
+﻿using System;
+
+namespace SolidSilnique.MonoAL;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -11,7 +13,7 @@ public class AudioPlayer
     private AudioEmitter emitter;
     private PositionalHelper helper;
 
-    public AudioPlayer(string[] sounds)
+    public AudioPlayer(string[] sounds,PositionalHelper helper,float volume,float pitch)
     {
        SoundEffects = new SoundEffect[sounds.Length];
        for(int i=0;i<SoundEffects.Length;i++)
@@ -19,6 +21,9 @@ public class AudioPlayer
            using Stream soundfile = TitleContainer.OpenStream(sounds[i]);
            SoundEffects[i] = SoundEffect.FromStream(soundfile);
        }
+       this.helper = helper;
+       this.volume = volume;
+       this.pitch = pitch;
     }
 
     public void setAudioVolume(float volume)
@@ -28,7 +33,7 @@ public class AudioPlayer
 
     public void setPitch(float pitch)
     {
-        pitch = pitch;
+        this.pitch = pitch;
     }
 
     public void playAudio(int audio,float volChange=0, float pitchChange=0)
@@ -39,10 +44,11 @@ public class AudioPlayer
         if (positional)
         {
             playPositional(sound);
+            
         }
         else
         {
-            playPositional(sound);
+            playNotPositional(sound);
         }
     }
 

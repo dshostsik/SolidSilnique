@@ -22,7 +22,7 @@ namespace SolidSilnique.Core.Components
 			float vert = Convert.ToInt32(Keyboard.GetState().IsKeyDown(Keys.Up)) - Convert.ToInt32(Keyboard.GetState().IsKeyDown(Keys.Down));
 
 
-			gameObject.transform.position += new Vector3(hor,0,vert) * Time.deltaTime * 10;
+			gameObject.transform.position += new Vector3(hor,-0.5f,vert) * Time.deltaTime * 10;
 
 		}
 	}

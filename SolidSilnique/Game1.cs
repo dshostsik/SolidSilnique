@@ -146,22 +146,21 @@ namespace SolidSilnique
                 DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
 
 
-            dirlight_ambient = new Vector4(0.3f, 0.3f, 0.3f, 1.0f);
+            dirlight_ambient = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
             dirlight_diffuse = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
             dirlight_specular = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
             spotlight_position = new Vector3(-15.0f, 0.0f, 0.0f);
             pointlight_position = new Vector3(10.0f, 0.0f, 0.0f);
 
-            _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
-                GraphicsDevice.Viewport.AspectRatio,
-                0.1f,
-                100f);
+			_projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
+				GraphicsDevice.Viewport.AspectRatio,
+				0.1f,
+				500f);
 
 
-
-
-            testDirectionalLight = new DirectionalLight(Vector3.Zero);
+			
+            testDirectionalLight = new DirectionalLight(new Vector3(1,-1,0));
             testDirectionalLight.AmbientColor = dirlight_ambient;
             testDirectionalLight.DiffuseColor = dirlight_diffuse;
             testDirectionalLight.SpecularColor = dirlight_specular;
@@ -173,10 +172,10 @@ namespace SolidSilnique
 
             testSpotlight = new Spotlight(0.007f, 0.0002f, 1, new Vector3(-10, 0, 0), 5.5f, 7.5f);
 
-            testDirectionalLight.Enabled = false;
+            testDirectionalLight.Enabled = true;
             testPointLight.Enabled = false;
-            testSpotlight.Enabled = true;
-
+            testSpotlight.Enabled = false;
+            
             sunPosition = new Vector3(50.0f, 50.0f, 0.0f);
             //testSpotlight.Enabled = false;
 
@@ -302,6 +301,17 @@ namespace SolidSilnique
             if (isBDown && !wasBDownLastFrame)
                 useDebugWireframe = !useDebugWireframe;
             wasBDownLastFrame = isBDown;
+			
+
+			if (Keyboard.GetState().IsKeyDown(Keys.F1))
+			{
+                EngineManager.celShadingEnabled = false;
+			}
+			if (Keyboard.GetState().IsKeyDown(Keys.F2))
+			{
+				EngineManager.celShadingEnabled = true;
+			}
+            
         }
 
         /// <summary>
@@ -334,9 +344,15 @@ namespace SolidSilnique
                 //scrollWheelValue = currentScrollWheelValue;
             }
 
+            Vector3 originalVector = testDirectionalLight.Direction; // vector to rotate
+			Vector3 axis = Vector3.Up; // e.g., Y-axis (0, 1, 0)
+			float angleRadians = MathHelper.ToRadians(10*Time.deltaTime); // 90 degrees
+
+			Matrix rotation = Matrix.CreateFromAxisAngle(axis, angleRadians);
+			testDirectionalLight.Direction = Vector3.Transform(originalVector, rotation);
 
 
-            processKeyboard(gameTime);
+			processKeyboard(gameTime);
             processMouse(gameTime);
             counter.Update(gameTime);
 

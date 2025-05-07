@@ -7,7 +7,12 @@ using System.Threading.Tasks;
 
 namespace SolidSilnique.Core.Components
 {
-	class SphereColliderComponent : Component
+
+	public struct BoundingCapsule
+	{
+		
+	}
+	class CapsuleColliderComponent : Component
 	{
 		static List<GameObject> instances = [];
 
@@ -15,7 +20,7 @@ namespace SolidSilnique.Core.Components
 		
 		public bool isStatic = false;
 
-		public SphereColliderComponent(float radius, bool isStatic = false) {
+		public CapsuleColliderComponent(float radius, bool isStatic = false) {
 			boundingSphere = new BoundingSphere();
 			boundingSphere.Radius = radius;
 			this.isStatic = isStatic;
