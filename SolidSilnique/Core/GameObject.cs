@@ -2,29 +2,41 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Xml;
 
 namespace SolidSilnique.Core
 {
+
+	
 	public class GameObject
     {
 
 		//Identifiers
-		public string name = "GameObject";
-		public int tag = 0;
-		public int layer = 0;
+		public string name  { get; set; } = "GameObject";
+        public int tag      { get; set; } = 0;
+		public int layer    { get; set; } = 0;
 
 		//Scene Graph
+		[JsonIgnore]
 		public GameObject parent = null;
-		public Transform transform = null;
-		public List<GameObject> children = [];
+
+		public Transform transform { get; set; } = null;
+		
+		public List<GameObject> children { get; set; } = [];
 
 		//Rendering
+		[JsonIgnore]
 		public Model model = null;
+
+		[JsonIgnore]
 		public Texture2D texture = null;
 
-
-		//Components
-		List<Component> components = [];
+        public string modelAssetName    { get; set; } = string.Empty;
+        public string textureAssetName { get; set; } = string.Empty;
 
         public Texture2D normalMap = null;
         public Texture2D roughnessMap = null;
@@ -36,12 +48,19 @@ namespace SolidSilnique.Core
         /// List of LOD models, sorted by increasing distance threshold.
         /// </summary>
         public List<Model> LODModels { get; private set; } = new List<Model>();
+        
         /// <summary>
         /// Distance thresholds corresponding to each LODModel entry.
         /// </summary>
         public List<float> LODRanges { get; private set; } = new List<float>();
 
-        public GameObject(string name)
+        
+        //Components
+        [JsonInclude]
+		List<Component> components { get; set; } = [];
+
+        
+		public GameObject(string name)
         {
             this.name = name;
             this.transform = new Transform(this);
@@ -138,6 +157,7 @@ namespace SolidSilnique.Core
         {
             child.parent = this;
             children.Add(child);
+            
 
         }
 
@@ -207,7 +227,7 @@ namespace SolidSilnique.Core
             throw new NotImplementedException();
         }
 
-
+		
 
 
 

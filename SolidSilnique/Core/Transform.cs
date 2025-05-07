@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SolidSilnique.Core
@@ -10,9 +12,9 @@ namespace SolidSilnique.Core
 	public class Transform
 	{
 		//Locals (Globals in future maybe?)
-		Vector3 _position = new Vector3(0);
-		Vector3 _rotation = new Vector3(0);
-		Vector3 _scale = new Vector3(1);
+		Vector3 _position	= new Vector3(0);
+		Vector3 _rotation	= new Vector3(0);
+		Vector3 _scale		= new Vector3(1);
 
 		public Vector3 position
 		{
@@ -31,11 +33,13 @@ namespace SolidSilnique.Core
 		}
 
 		//Model Matrix
+		[JsonIgnore]
 		public Matrix modelMatrix = new Matrix();
 
 		//Flags
 		bool _dirtyFlag = true;
 
+		[JsonIgnore]
 		public bool dirtyFlag
 		{
 			get { return _dirtyFlag; }
@@ -85,5 +89,34 @@ namespace SolidSilnique.Core
 		//public void RotateZ();
 		//public void Rotate();
 
+	}
+
+	public class Vector3Converter : JsonConverter<Vector3>
+	{
+		public override Vector3 Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+		{
+			// Reading a JSON object representing a Vector3
+			using (JsonDocument doc = JsonDocument.ParseValue(ref reader))
+			{
+				var root = doc.RootElement;
+
+				// Extract X, Y, Z values from the JSON
+				float x = root.GetProperty("X").GetSingle();
+				float y = root.GetProperty("Y").GetSingle();
+				float z = root.GetProperty("Z").GetSingle();
+
+				return new Vector3(x, y, z);
+			}
+		}
+
+		public override void Write(Utf8JsonWriter writer, Vector3 value, JsonSerializerOptions options)
+		{
+			// Writing the Vector3 as a JSON object with X, Y, Z components
+			writer.WriteStartObject();
+			writer.WriteNumber("X", value.X);
+			writer.WriteNumber("Y", value.Y);
+			writer.WriteNumber("Z", value.Z);
+			writer.WriteEndObject();
+		}
 	}
 }

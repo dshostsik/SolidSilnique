@@ -10,6 +10,7 @@
 //              UNIFORMS            
 //-------------------------------------
 matrix World;
+matrix WorldTransInv;
 matrix View;
 matrix Projection;
 
@@ -42,9 +43,9 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     
     output.Position = mul(input.aPos, mul(mul(World, View), Projection));
     output.TexCoords = input.aTexCoords;
-    // output.Normal = float3x3(transpose(inverse(World))) * input.aNormal;
+    //output.Normal = float3x3(transpose(inverse(World))) * input.aNormal;
     //output.Normal = transpose(inverse(input.aNormal));
-    output.Normal = mul(transpose(World), input.aNormal);
+    output.Normal = mul(transpose(WorldTransInv), input.aNormal);
     output.FragPos = mul(input.aPos, World).xyz;
     return output;
 }
@@ -106,7 +107,7 @@ float3 viewPos;
 float4 MainPS(VertexShaderOutput input) : SV_TARGET
 {
     float4 textureVector = tex2D(texture_diffuse1, input.TexCoords);
-    float3 norm = normalize(input.Normal.xyz);
+    float3 norm = normalize(input.Normal.xyz); 
     float3 viewDir = normalize(viewPos - input.FragPos);
     
     float3 directionalLight = float3(0.f, 0.f, 0.f);
@@ -208,6 +209,77 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
 	return float4(directionalLight + pointlight + spotlight, 1.0) * textureVector;
 }
 
+//-------------------------------------
+//           CEL SHADER          
+//-------------------------------------
+float4 CelShader(VertexShaderOutput input) : SV_TARGET
+{
+    float4 textureVector = tex2D(texture_diffuse1, input.TexCoords);
+    float3 norm = normalize(input.Normal.xyz);
+    float3 viewDir = normalize(viewPos - input.FragPos);
+    
+    float3 directionalLight = float3(0.f, 0.f, 0.f);
+    if (dirlightEnabled == true)
+    {
+        
+        float3 ambient = dirlight_ambientColor.rgb;
+        
+        float3 lightDir = normalize(-dirlight_direction);
+        float diff = max(dot(norm, lightDir), 0.0);
+        
+        // Quantize diffuse into bands (cel shading)
+        float shade;
+        if (diff > 0.95)
+            shade = 1.0;
+        else if (diff > 0.5)
+            shade = 0.7;
+        else if (diff > 0.25)
+            shade = 0.4;
+        else
+            shade = 0.1;
+        
+        
+        float3 diffuse = dirlight_diffuseColor.rgb * shade;
+        
+        float3 reflectDir = reflect(-lightDir, norm);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+        spec = step(0.98, spec); // binary highlight
+        float3 specular = dirlight_specularColor.rgb * spec;
+        
+        directionalLight = ambient + diffuse + specular;
+    }
+        
+    float3 pointlight = float3(0.f, 0.f, 0.f);
+    
+    return float4(directionalLight, 1.0) * textureVector;
+}
+
+VertexShaderOutput OutlineVS(in VertexShaderInput input){
+
+    VertexShaderOutput output = (VertexShaderOutput)0;
+
+
+    float inflate = -0.05f;
+
+    float4 posInflated = input.aPos + input.aNormal * inflate;
+
+    output.Position = mul(posInflated, mul(mul(World, View), Projection));
+    output.TexCoords = input.aTexCoords;
+
+    output.Normal = mul(transpose(WorldTransInv), input.aNormal);
+    output.FragPos = mul(input.aPos, World).xyz;
+
+    return output;
+
+
+}
+
+float4 OutlinePS(VertexShaderOutput input) : SV_TARGET
+{
+    
+    return float4(0.0, 0.0, 0.0, 1.0);
+}
+
 technique BasicColorDrawingWithLights
 {
 	pass P0
@@ -215,4 +287,22 @@ technique BasicColorDrawingWithLights
 		VertexShader = compile VS_SHADERMODEL MainVS();
 		PixelShader = compile PS_SHADERMODEL MainPS();
 	}
+}
+
+technique CelShadingOutline
+{
+    pass P0
+    {
+        VertexShader = compile VS_SHADERMODEL OutlineVS();
+        PixelShader = compile PS_SHADERMODEL OutlinePS();
+    }
+    };
+
+technique CelShading
+{
+    pass P0
+    {
+        VertexShader = compile VS_SHADERMODEL MainVS();
+        PixelShader = compile PS_SHADERMODEL CelShader();
+    }
 };
