@@ -29,10 +29,10 @@ namespace SolidSilnique.GameContent
 			loadedModels.Add("plane", Content.Load<Model>("plane"));
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 
-            loadedModels.Add("gun_high", Content.Load<Model>("gun_high"));
-            loadedModels.Add("gun_mid", Content.Load<Model>("gun_mid"));
-            loadedModels.Add("gun_low", Content.Load<Model>("gun_low"));
-            loadedTextures.Add("gun", Content.Load<Texture2D>("deimos_texture"));
+            //loadedModels.Add("gun_high", Content.Load<Model>("gun_high"));
+            //loadedModels.Add("gun_mid", Content.Load<Model>("gun_mid"));
+            //loadedModels.Add("gun_low", Content.Load<Model>("gun_low"));
+            //loadedTextures.Add("gun", Content.Load<Texture2D>("deimos_texture"));
         
 			loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
 			loadedTextures.Add("simpleGreen", Content.Load<Texture2D>("simpleGreen"));
@@ -58,13 +58,13 @@ namespace SolidSilnique.GameContent
 
 			for(int i= 0; i < 150;i++)
 			{
-				//AddTree();
+				AddTree();
 
 			}
 
 			for (int i = 0; i < 5; i++)
 			{
-				//AddPlanet();
+				AddPlanet();
 
 			}
 
@@ -87,7 +87,7 @@ namespace SolidSilnique.GameContent
 
 			
 			go.AddChild(go2);
-
+			/*
             //--------------------
             var gun = new GameObject("Gun");
             gun.transform.position = new Vector3(70, 0, -5);
@@ -101,7 +101,7 @@ namespace SolidSilnique.GameContent
 
 
             this.AddChild(gun);
-        
+        */
 			this.Serialize();
 		}
 
