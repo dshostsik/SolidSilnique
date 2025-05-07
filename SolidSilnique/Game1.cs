@@ -457,8 +457,9 @@ namespace SolidSilnique
                     
                 }
 
-                bool objectNormalEnabled = useNormalMap && go.normalMap != null;
-                shader.SetUniform("useNormalMap", objectNormalEnabled ? 1 : 0);
+                shader.SetTexture("texture_diffuse1", go.texture);
+                bool objectNormal = useNormalMap && go.normalMap != null;
+                shader.SetUniform("useNormalMap", objectNormal ? 1 : 0);
                 shader.SetTexture("texture_normal1", go.normalMap ?? _normalMap);
 
                 // Cull and draw each mesh of the selected model
