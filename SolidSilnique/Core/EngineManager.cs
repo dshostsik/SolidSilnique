@@ -56,9 +56,22 @@ namespace SolidSilnique.Core
                 var viewProjection = view * projection;
                 var frustum = new BoundingFrustum(viewProjection);
 
+                var position = go.transform.position;
+
+                // Determine distance from camera to object
+                var distance = Vector3.Distance(
+                    EngineManager.scene.mainCamera.CameraPosition,
+                    position);
+
+                // Select appropriate LOD model based on distance
+
+                if (go.LODModels != null && go.LODModels.Count > 0)
+                {
+                    go.model = go.GetLODModel(distance);
+
+                }
 
 
-                
 
 
 
@@ -136,7 +149,9 @@ namespace SolidSilnique.Core
                             }
 
                             if (!visible)
-                                continue;   
+                                continue;
+
+                            
                         }
 
                         foreach (ModelMeshPart part in mesh.MeshParts)

@@ -11,6 +11,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using SolidSilnique.ProcderuralFoliage;
+using GUIRESOURCES;
 
 namespace SolidSilnique.GameContent;
 
@@ -32,10 +33,18 @@ class ProceduralTest : Scene
 			loadedModels.Add("cube", Content.Load<Model>("cube"));
 			loadedModels.Add("cone", Content.Load<Model>("cone"));
 			loadedModels.Add("sphere", Content.Load<Model>("sphere"));
+
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 			loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
 			loadedTextures.Add("simpleGreen", Content.Load<Texture2D>("simpleGreen"));
-		}
+			loadedTextures.Add("gabTex", Content.Load<Texture2D>("Textures/gab_tex"));
+			loadedTextures.Add("gabNo", Content.Load<Texture2D>("Textures/gab_no"));
+			loadedTextures.Add("gabRo", Content.Load<Texture2D>("Textures/gab_ro"));
+			loadedTextures.Add("gabAo", Content.Load<Texture2D>("Textures/gab_ao"));
+
+			loadedTextures.Add("eye", Content.Load<Texture2D>("Textures/eye_tex"));
+
+    }
 
 		public override void Setup()
 		{
@@ -59,7 +68,9 @@ class ProceduralTest : Scene
 			go.texture = loadedTextures["simpleGreen"];
 			go.AddComponent(new PlaneColliderComponent(new Vector3(0,1,0), true));
 			this.AddChild(go);
-			Task.WhenAll(task1).Wait();
+			Task.WhenAll(task1).Wait(); //:O
+
+
 			
 			for(int i= 0; i < newProc.lenght;i++)
 			{
@@ -80,7 +91,7 @@ class ProceduralTest : Scene
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];
 			
-			go.AddComponent(new DebugMoveComponent()); //<-- Dodawanie componentów
+			//go.AddComponent(new DebugMoveComponent()); //<-- Dodawanie componentów
 			go.AddComponent(new SphereColliderComponent(3.5f));
 
 			this.AddChild(go);
@@ -92,7 +103,35 @@ class ProceduralTest : Scene
 			go2.model = loadedModels["deimos"];
 			go2.texture = loadedTextures["deimos"];
 			go.AddChild(go2);
-		}
+
+			GameObject gab = new GameObject("gab");
+			gab.transform.position = new Vector3(250, 15, 220);
+			gab.transform.scale = new Vector3(1f);
+			gab.model = loadedModels["cube"];
+			gab.texture = loadedTextures["gabTex"];
+			gab.normalMap = loadedTextures["gabNo"];
+			gab.roughnessMap = loadedTextures["gabRo"];
+			gab.aoMap = loadedTextures["gabAo"];
+			gab.AddComponent(new DebugMoveComponent());
+			gab.AddComponent(new SphereColliderComponent(1));
+			this.AddChild(gab);
+
+
+			GameObject eye1 = new GameObject("eye1");
+			eye1.transform.position = new Vector3(-0.25f*2, 0.209f, 0.427f * 2);
+			eye1.transform.scale = new Vector3(0.4f);
+			eye1.model = loadedModels["sphere"];
+			eye1.texture = loadedTextures["eye"];
+			gab.AddChild(eye1);
+
+			GameObject eye2 = new GameObject("eye2");
+			eye2.transform.position = new Vector3(0.25f*2, 0.209f, 0.427f*2);
+			eye2.transform.scale = new Vector3(0.4f);
+			eye2.model = loadedModels["sphere"];
+			eye2.texture = loadedTextures["eye"];
+			gab.AddChild(eye2);
+
+    }
 
 		void AddTree(ProceduralGrass grass,int i,int j)
 		{
@@ -108,12 +147,17 @@ class ProceduralTest : Scene
 				
 				randX += grass.DisNoise[i,j] / 60f;
 				randZ -= grass.DisNoise[i,j] / 60f;
-
+				Random rand = new Random();
 				go.transform.position = new Vector3(randX, 0, randZ);
-				if (Math.Round(grass.ChooseNoise[i, j] / 100) == 2)
+			
+
+            if (Math.Round(grass.ChooseNoise[i, j] / 100) == 2)
 				{
 					go.model = loadedModels["drzewo"];
-				}
+                go.AddLOD(loadedModels["drzewo"], 0f);
+                go.AddLOD(loadedModels["deimos"], 100f);
+                go.AddLOD(null, 200f);
+            }
 				else if (Math.Round(grass.ChooseNoise[i, j] / 100) == 1)
 				{
 					go.model = loadedModels["sphere"];
