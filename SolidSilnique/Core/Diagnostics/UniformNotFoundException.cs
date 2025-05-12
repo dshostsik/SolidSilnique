@@ -5,10 +5,5 @@ namespace SolidSilnique.Core.Diagnostics
     /// <summary>
     /// Custom exception for indicating uniform issues
     /// </summary>
-    public class UniformNotFoundException : Exception
-    {
-        public UniformNotFoundException(string guiltyUniform, string message) : base(guiltyUniform + message)
-        {
-        }
-    }
+    public class  UniformNotFoundException(string guiltyUniform, string message) : Exception(guiltyUniform + message);
 }
