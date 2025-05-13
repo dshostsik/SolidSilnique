@@ -33,21 +33,6 @@ namespace SolidSilnique.Core.Components
         private readonly Spotlight[] _spotlights;
 
         /// <summary>
-        /// Default ambient color. Used for instancing the light source. <p><b>Feel free to change it with another value by changing light objects fields.</b></p>
-        /// </summary>
-        private Vector4 _defaultAmbientColor;
-
-        /// <summary>
-        /// Default diffuse color. Used for instancing the light source. <p><b>Feel free to change it with another value by changing light objects fields.</b></p>
-        /// </summary>
-        private Vector4 _defaultDiffuseColor;
-
-        /// <summary>
-        /// Default specular color. Used for instancing the light source. <p><b>Feel free to change it with another value by changing light objects fields.</b></p>
-        /// </summary>
-        private Vector4 _defaultSpecularColor;
-
-        /// <summary>
         /// Object of class <see cref="DirectionalLight"/> representing global illumination.
         /// </summary>
         public DirectionalLight DirectionalLight
@@ -77,10 +62,6 @@ namespace SolidSilnique.Core.Components
 
         public LightsManagerComponent()
         {
-            _defaultAmbientColor = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
-            _defaultDiffuseColor = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
-            _defaultSpecularColor = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-
             _directionalLight = new DirectionalLight(new Vector3(1, -1, 0));
 
             _pointLights = new PointLight[_maximumAmountOfInstances];
