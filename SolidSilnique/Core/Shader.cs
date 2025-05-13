@@ -30,7 +30,7 @@ namespace SolidSilnique.Core
         /// <param name="game">Object containing the main game loop that's responsible for loading content</param>
         /// <param name="defaultTechnique">Name of default technique to be used</param>
         /// <throws>ArgumentException if the shader file extension is not .fx OR if the shader technique was not found in the shader</throws>
-        public Shader(string path, GraphicsDevice GraphicsDevice, Game game, string defaultTechnique)
+        public Shader(string path, GraphicsDevice GraphicsDevice, Microsoft.Xna.Framework.Game game, string defaultTechnique)
         {
             effect = new BasicEffect(GraphicsDevice);
             effect = game.Content.Load<Effect>(path);

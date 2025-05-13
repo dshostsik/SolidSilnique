@@ -12,7 +12,7 @@ using DirectionalLight = SolidSilnique.Core.DirectionalLight;
 
 namespace SolidSilnique
 {
-    public class Game1 : Game
+    public class Game1 : Microsoft.Xna.Framework.Game
     {
         private readonly GraphicsDeviceManager _graphics;
 
