@@ -11,7 +11,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using SolidSilnique.ProcderuralFoliage;
-using GUIRESOURCES;
+
 
 namespace SolidSilnique.GameContent;
 
@@ -19,7 +19,11 @@ class ProceduralTest : Scene
 {
     public Dictionary<string, Model>		loadedModels = new Dictionary<string, Model>();
 		public Dictionary<string, Texture2D>	loadedTextures = new Dictionary<string, Texture2D>();
-
+		List<Model>models = new List<Model>();
+		List<Texture2D>textures = new List<Texture2D>();
+		List<Model> treeModels = new List<Model>();
+		List<Texture2D> treeTextures = new List<Texture2D>();
+		ContentManager content;
 		public ProceduralTest() {
 
 			
@@ -43,14 +47,33 @@ class ProceduralTest : Scene
 			loadedTextures.Add("gabAo", Content.Load<Texture2D>("Textures/gab_ao"));
 
 			loadedTextures.Add("eye", Content.Load<Texture2D>("Textures/eye_tex"));
+			
+			
+			models.Add(Content.Load<Model>("pModels/stone"));
+			models.Add(Content.Load<Model>("pModels/stone1"));
+			models.Add(Content.Load<Model>("pModels/stone2"));
+			models.Add(Content.Load<Model>("pModels/grass"));
+			models.Add(Content.Load<Model>("pModels/grass1"));
+			textures.Add(Content.Load<Texture2D>("deimos_texture"));
+			
+			treeModels.Add(Content.Load<Model>("pModels/klon"));
+			treeModels.Add(Content.Load<Model>("pModels/tree1"));
+			
+			treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
 
-    }
+			content = Content;
+
+
+
+
+
+		}
 
 		public override void Setup()
 		{
-			
-			
-			ProceduralGrass newProc = new ProceduralGrass(100, 100);
+
+
+			ProceduralGrass newProc = new ProceduralGrass(models,textures,treeModels,treeTextures,content);
 			Task task1 = Task.Run(() => newProc.precomputeNoise());
 			
 			GameObject go = new GameObject("Camera");
@@ -69,16 +92,15 @@ class ProceduralTest : Scene
 			go.AddComponent(new PlaneColliderComponent(new Vector3(0,1,0), true));
 			this.AddChild(go);
 			Task.WhenAll(task1).Wait(); //:O
-
-
 			
-			for(int i= 0; i < newProc.lenght;i++)
+			newProc.GenerateObjects();
+			List<GameObject> goList = newProc.createdObjects;
+
+			for (int a = 0; a < goList.Count; a++)
 			{
-				for (int j = 0; j < newProc.width; j++)
-				{
-					AddTree(newProc,i,j);
-				}
+				this.AddChild(goList[a]);
 			}
+			
 
 			for (int i = 0; i < 5; i++)
 			{
@@ -132,7 +154,7 @@ class ProceduralTest : Scene
 			gab.AddChild(eye2);
 
     }
-
+/*
 		void AddTree(ProceduralGrass grass,int i,int j)
 		{
 			
@@ -178,7 +200,7 @@ class ProceduralTest : Scene
 			
 
 		}
-
+*/
 		void AddPlanet()
 		{
 			Random rand = new Random();

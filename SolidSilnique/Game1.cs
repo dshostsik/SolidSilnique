@@ -1,5 +1,5 @@
 ﻿using System;
-using GUIRESOURCES;
+using App1;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
