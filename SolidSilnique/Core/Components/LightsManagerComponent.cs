@@ -180,7 +180,7 @@ namespace SolidSilnique.Core.Components
                 throw new ArgumentException("Maximum amount of point lights reached.");
             }
             
-            _pointLights[spotlight.Index] = spotlight;
+            _spotlights[spotlight.Index] = spotlight;
             FixedUpdate();
         }
         
