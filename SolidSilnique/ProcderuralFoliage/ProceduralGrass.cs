@@ -119,7 +119,7 @@ public class ProceduralGrass
         go.transform.position = new Vector3(randX, -6, randZ);
 
         float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
-        MaximumHeight = myCeiling(MaximumHeight,0.8f + Red/255f * 1f);
+        MaximumHeight = myCeiling(MaximumHeight,0.8f + Red/255f * 1.5f);
         float scaleY = MaximumHeight;
         float scaleXZ = 0.9f + ((TransformNoise[i,j] + computedNoise[i,j]) / 510f);
         
@@ -128,12 +128,12 @@ public class ProceduralGrass
         double rotationY = TransformNoise[i,j] * Math.PI * 2;
         go.transform.rotation = new Vector3(0,(float)rotationY,0);
         
-        int randomTreeModel = (int)Math.Round(computedNoise[i, j] / 70);
-        int randomTreeTexture = (int)Math.Round(TransformNoise[i, j] / 70);
+        int randomTreeModel = (int)Math.Round(computedNoise[i, j] % loadedTrees.Count);
+        int randomTreeTexture = (int)Math.Round(TransformNoise[i, j] % loadedTexturesTrees.Count);
         
         randomTreeModel = Math.Min(randomTreeModel, loadedTrees.Count-1);
         randomTreeTexture = Math.Min(randomTreeTexture, loadedTexturesTrees.Count-1);
-        
+        // mamy x modeli , wybranie modelu bazuje na noise a w wartościach między 0 a 255,tekstura na noise b
         go.model = loadedTrees[randomTreeModel];
         go.AddLOD(loadedTrees[randomTreeModel], 0f);
         go.AddLOD(loadedTrees[randomTreeModel], 100f);
@@ -169,15 +169,15 @@ public class ProceduralGrass
             double rotationY = TransformNoise[i,j] * Math.PI * 2;
             go.transform.rotation = new Vector3(0,(float)rotationY,0);
             
-            int randomModel = (int)Math.Round(computedNoise[i, j] / 60f);
-            int randomTexture = (int)Math.Round(TransformNoise[i, j] / 60f);
+            int randomModel = (int)Math.Round(computedNoise[i, j] % loadedModels.Count);
+            int randomTexture = (int)Math.Round(TransformNoise[i, j] / loadedTextures.Count);
             
             randomModel = Math.Min(randomModel, loadedModels.Count-1);
             randomTexture = Math.Min(randomTexture, loadedTextures.Count-1);
 
-            go.model = loadedModels[3];
-            go.AddLOD(loadedModels[3], 0f);
-            go.AddLOD(loadedModels[3], 100f);
+            go.model = loadedModels[randomModel];
+            go.AddLOD(loadedModels[randomModel], 0f);
+            go.AddLOD(loadedModels[randomModel], 100f);
             go.AddLOD(null, 800f);
 
             go.texture = loadedTextures[randomTexture];

@@ -77,11 +77,11 @@ class ProceduralTest : Scene
 			Task task1 = Task.Run(() => newProc.precomputeNoise());
 			
 			GameObject go = new GameObject("Camera");
-			go.transform.position = new Vector3(250, 0.75f, 250);
+			go.transform.position = new Vector3(250, 3f, 250);
 			CameraComponent cam = new CameraComponent();
 			cam.SetMain();
 			go.AddComponent(cam);
-			go.AddComponent(new SphereColliderComponent(0.9f));
+			go.AddComponent(new SphereColliderComponent(3f));
 			this.AddChild(go);
 
 			go = new GameObject("ground");
