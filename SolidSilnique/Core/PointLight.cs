@@ -6,53 +6,47 @@ namespace SolidSilnique.Core
 {
     public class PointLight : Light
     {
-        private float linear;
-        private float quadratic;
-        private float constant;
+        private float _linear;
+        private float _quadratic;
+        private float _constant;
 
-        private static int INSTANCES = 0;
-        private int index;
+        private static int _instances = 0;
+        private readonly int _index;
 
-        public int Instances
-        {
-            get => INSTANCES;
-        }
+        public static int Instances => _instances;
 
-        public int Index
-        {
-            get => index;
-        }
+        public int Index => _index;
 
         public float Linear
         {
-            get => linear;
-            set => linear = value;
+            get => _linear;
+            set => _linear = value;
         }
 
         public float Quadratic
         {
-            get => quadratic;
-            set => quadratic = value;
+            get => _quadratic;
+            set => _quadratic = value;
         }
 
         public float Constant
         {
-            get => constant;
-            set => constant = value;
+            get => _constant;
+            set => _constant = value;
         }
 
         public PointLight(float linear, float quadratic, float constant)
         {
-            index = INSTANCES;
+            _index = _instances;
 
-            if (INSTANCES < 10) INSTANCES++;
+            if (_instances < 10) _instances++;
 
-            this.linear = linear;
-            this.quadratic = quadratic;
-            this.constant = constant;
-            AmbientColor = new Vector4(.2f, .2f, .2f, .0f);
+            _linear = linear;
+            _quadratic = quadratic;
+            _constant = constant;
+            AmbientColor = new Vector4(.1f, .1f, .1f, .0f);
             DiffuseColor = new Vector4(.8f, .8f, .8f, .0f);
-            SpecularColor = new Vector4(.8f, .8f, .8f, .0f);
+            SpecularColor = new Vector4(1.0f, 1.0f, 1.0f, .0f);
         }
 
         public override void SendToShader(Shader shader)
@@ -75,12 +69,12 @@ namespace SolidSilnique.Core
             }
         }
 
-        public override void Update()
+        public override void Start()
         {
             throw new NotImplementedException();
         }
-        
-        public override void Start()
+
+        public override void Update()
         {
             throw new NotImplementedException();
         }

@@ -2,48 +2,48 @@
 
 namespace SolidSilnique.Core
 {
-    public abstract class Light : Component
+    public abstract class Light  : Component
     {
-        private Vector4 ambientColor;
-        private Vector4 diffuseColor;
-        private Vector4 specularColor;
+        private Vector4 _ambientColor;
+        private Vector4 _diffuseColor;
+        private Vector4 _specularColor;
 
-        private bool enabled;
+        private bool _enabled;
 
         protected Light()
         {
-            enabled = true;
+            _enabled = true;
         }
 
         public Vector4 AmbientColor
         {
-            get { return ambientColor; }
-            set { ambientColor = value; }
+            get => _ambientColor;
+            set => _ambientColor = value;
         }
 
         public Vector4 DiffuseColor
         {
-            get { return diffuseColor; }
-            set { diffuseColor = value; }
+            get => _diffuseColor; 
+            set => _diffuseColor = value; 
         }
 
         public Vector4 SpecularColor
         {
-            get { return specularColor; }
-            set { specularColor = value; }
+            get => _specularColor;
+            set => _specularColor = value;
         }
 
         public bool Enabled
         {
-            get { return enabled; }
-            set { enabled = value; }
+            get => _enabled;
+            set => _enabled = value;
         }
         
         /// <summary>
         /// Send all light's data to shader.
         /// </summary>
         /// <param name="shader">Shader object that accepts uniforms</param>
-        /// <throws cref="UniformNotFoundException">if uniform was not found in shader</throws>
+        /// <exception cref="Diagnostics.UniformNotFoundException">if uniform was not found in shader</exception>
         public abstract void SendToShader(Shader shader);
     }
 }

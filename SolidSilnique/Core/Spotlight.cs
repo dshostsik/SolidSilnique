@@ -6,41 +6,41 @@ namespace SolidSilnique.Core
 {
     public class Spotlight : PointLight
     {
-        private Vector3 direction;
-        private float innerCut;
-        private float outerCut;
+        private Vector3 _direction;
+        private float _innerCut;
+        private float _outerCut;
 
-        private static int INSTANCES = 0;
-        private int index;
+        private static int _instances = 0;
+        private readonly int _index;
         
         public Vector3 Direction
         {
-            get { return direction; }
-            set { direction = value; }
+            get => _direction; 
+            set => _direction = value;
         }
 
         public float InnerCut
         {
-            get { return innerCut; }
-            set { innerCut = value; }
+            get => _innerCut; 
+            set => _innerCut = value; 
         }
 
         public float OuterCut
         {
-            get { return outerCut; }
-            set { outerCut = value; }
+            get => _outerCut; 
+            set => _outerCut = value; 
         }
 
         public Spotlight(float linear, float quadratic, float constant, Vector3 direction, float innerCut,
             float outerCut) :
             base(linear, quadratic, constant)
         {
-            index = INSTANCES;
+            _index = _instances;
 
-            if (INSTANCES < 10) INSTANCES++;
-            this.direction = direction;
-            this.innerCut = innerCut;
-            this.outerCut = outerCut;
+            if (_instances < 10) _instances++;
+            _direction = direction;
+            _innerCut = innerCut;
+            _outerCut = outerCut;
         }
 
         public override void SendToShader(Shader shader)
@@ -49,8 +49,8 @@ namespace SolidSilnique.Core
             {
                 shader.SetUniform("spotlight1Enabled", Enabled);
                 shader.SetUniform("spotlight1_direction", Direction);
-                shader.SetUniform("spotlight1_innerCut", MathHelper.ToRadians(innerCut));
-                shader.SetUniform("spotlight1_outerCut", MathHelper.ToRadians(outerCut));
+                shader.SetUniform("spotlight1_innerCut", MathHelper.ToRadians(_innerCut));
+                shader.SetUniform("spotlight1_outerCut", MathHelper.ToRadians(_outerCut));
                 shader.SetUniform("spotlight1_linearAttenuation", Linear);
                 shader.SetUniform("spotlight1_quadraticAttenuation", Quadratic);
                 shader.SetUniform("spotlight1_constant", Constant);
