@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace SolidSilnique.Core.ArtificialIntelligence
@@ -11,17 +12,22 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// <summary>
         /// Reference to self - object that should find the path to target
         /// </summary>
-        private GameObject self;
+        private readonly GameObject _self;
 
+        /// <summary>
+        /// Collection of points that self should follow to reach the target
+        /// </summary>
+        private List<Vector3> _path;
+        
         /// <summary>
         /// Reference to target - object that self should reach
         /// </summary>
-        private GameObject? target = null;
+        private GameObject? _target;
 
         /// <summary>
         /// Counted distance between self and target
         /// </summary>
-        private float distance = 0;
+        private float _distance;
 
         /// <summary>
         /// Constructor
@@ -29,17 +35,33 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// <param name="self">reference to self - object that should find the path to target</param>
         public Pathfinder(GameObject self)
         {
-            this.self = self;
+            _self = self;
+            _path = new();
+            _distance = 0;
         }
 
         /// <summary>
+        /// Collection of points that self should follow to reach the target
+        /// </summary>
+        public List<Vector3> Path => _path;
+
+        /// <summary>
+        /// Reference to target - object that self should reach
+        /// </summary>
+        public GameObject? Target
+        {
+            get => _target;
+            set => _target = value;
+        }
+        
+        /// <summary>
         /// Counts distance between self and target
         /// </summary>
-        private void CountDistance()
+        private void ComputePath()
         {
-            if (target == null) return;
+            if (_target == null) return;
 
-            distance = Vector3.Distance(self.transform.position, target.transform.position);
+            _distance = Vector3.Distance(_self.transform.position, _target.transform.position);
         }
     }
 }
