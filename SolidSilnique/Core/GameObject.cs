@@ -33,7 +33,7 @@ namespace SolidSilnique.Core
 
 
         /// <summary>
-        /// Executed in the start of the program.
+        /// Executed at the start of the program.
         /// </summary>
         public void Start()
         {
