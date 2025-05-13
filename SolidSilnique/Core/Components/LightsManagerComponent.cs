@@ -10,7 +10,7 @@ namespace SolidSilnique.Core.Components
         /// <summary>
         /// Maximum length of arrays <see cref="PointLights"/> and <see cref="Spotlights"/>
         /// </summary>
-        private static int _maximumAmountOfInstances = 10;
+        private static readonly int _maximumAmountOfInstances = 10;
 
         /// <summary>
         /// Object of class <see cref="DirectionalLight"/> representing global illumination.
@@ -90,7 +90,7 @@ namespace SolidSilnique.Core.Components
         /// Use this method to send uniforms that will not be updated in every frame but only in one frame.
         /// </summary>
         /// <exception cref="Diagnostics.UniformNotFoundException"> if requested uniform was not found</exception>
-        public void FixedUpdate()
+        public void UpdateNonConstantUniforms()
         {
             throw new System.NotImplementedException();
         }
@@ -146,7 +146,7 @@ namespace SolidSilnique.Core.Components
             }
             
             _pointLights[pointLight.Index] = pointLight;
-            FixedUpdate();
+            UpdateNonConstantUniforms();
         }
         
         /// <summary>
@@ -162,7 +162,7 @@ namespace SolidSilnique.Core.Components
             }
             
             _spotlights[spotlight.Index] = spotlight;
-            FixedUpdate();
+            UpdateNonConstantUniforms();
         }
         
         /// <summary>
@@ -181,7 +181,7 @@ namespace SolidSilnique.Core.Components
             
             PointLight newlight = new PointLight(linear, quadratic, constant);
             PointLights[newlight.Index] = newlight;
-            FixedUpdate();
+            UpdateNonConstantUniforms();
         }
         
         /// <summary>
@@ -204,7 +204,7 @@ namespace SolidSilnique.Core.Components
             
             Spotlight newlight = new Spotlight(linear, quadratic, constant, direction, cutoff, outerCutoff);
             Spotlights[newlight.Index] = newlight;
-            FixedUpdate();
+            UpdateNonConstantUniforms();
         }
     }
 }
