@@ -85,9 +85,9 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     float4 spotlight1_diffuseColor;
     float4 spotlight1_specularColor;
 
-bool dirlightEnabled;
-bool pointlight1Enabled;
-bool spotlight1Enabled;
+int dirlightEnabled;
+int pointlight1Enabled;
+int spotlight1Enabled;
 
 sampler2D texture_diffuse1;
 float3 viewPos;

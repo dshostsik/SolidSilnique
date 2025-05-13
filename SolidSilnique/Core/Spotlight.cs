@@ -43,6 +43,8 @@ namespace SolidSilnique.Core
             _outerCut = outerCut;
         }
 
+        public static int SpotlightInstances => _instances;
+        
         public override void SendToShader(Shader shader)
         {
             try

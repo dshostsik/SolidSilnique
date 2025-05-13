@@ -8,11 +8,11 @@ namespace SolidSilnique.Core
         private Vector4 _diffuseColor;
         private Vector4 _specularColor;
 
-        private bool _enabled;
+        private byte _enabled;
 
         protected Light()
         {
-            _enabled = true;
+            _enabled = 1;
         }
 
         public Vector4 AmbientColor
@@ -33,7 +33,7 @@ namespace SolidSilnique.Core
             set => _specularColor = value;
         }
 
-        public bool Enabled
+        public byte Enabled
         {
             get => _enabled;
             set => _enabled = value;

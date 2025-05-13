@@ -166,9 +166,9 @@ namespace SolidSilnique
 
             testSpotlight = new Spotlight( 0.007f, 0.0002f, 1, new Vector3(-10, 0, 0), 5.5f, 7.5f);
 
-            testDirectionalLight.Enabled = true;
-            testPointLight.Enabled = false;
-            testSpotlight.Enabled = false;
+            testDirectionalLight.Enabled = 1;
+            testPointLight.Enabled = 1;
+            testSpotlight.Enabled = 1;
             
             sunPosition = new Vector3(50.0f, 50.0f, 0.0f);
             //testSpotlight.Enabled = false;

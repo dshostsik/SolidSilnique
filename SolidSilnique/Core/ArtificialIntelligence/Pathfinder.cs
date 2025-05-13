@@ -14,6 +14,8 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// </summary>
         private readonly GameObject _self;
 
+        // private readonly ProceduralGrass _terrain
+        
         /// <summary>
         /// Collection of points that self should follow to reach the target
         /// </summary>
