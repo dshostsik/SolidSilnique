@@ -40,14 +40,14 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// <summary>
         /// Reference to a target <see cref="GameObject"/> that will be followed by <see cref="Self"/>.<p>Default value is <c>null</c>. Make sure that you set it before calling <see cref="GetFollowDirectionVector"/> method.</p>
         /// </summary>
-        public GameObject Target
+        public GameObject? Target
         {
             get => _target;
             set
             {
                 _target = value;
-                _socialDistance = value.GetComponent<SphereColliderComponent>().boundingSphere.Radius *
-                                  _socialDistanceMultiplier;
+                if (null != _target) _socialDistance = _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius *
+                                                       _socialDistanceMultiplier;
             }
         }
 
