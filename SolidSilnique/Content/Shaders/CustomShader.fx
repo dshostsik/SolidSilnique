@@ -23,8 +23,9 @@ matrix Projection;
 struct VertexShaderInput
 {
 	float4 aPos : POSITION0;
-	float4 aNormal : NORMAL0;
+	float3 aNormal : NORMAL0;
 	float2 aTexCoords : TEXCOORD0;
+    float3 aTangent : TANGENT0;
 };
 //-------------------------------------
 //           OUTPUT STRUCTURE            
@@ -35,6 +36,7 @@ struct VertexShaderOutput
 	float4 Normal : TEXCOORD0;
     float2 TexCoords : TEXCOORD1;
     float3 FragPos : TEXCOORD2;
+    float3x3 TBN : TEXCOORD3;
 };
 
 //-------------------------------------
@@ -48,8 +50,16 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     output.TexCoords = input.aTexCoords;
     //output.Normal = float3x3(transpose(inverse(World))) * input.aNormal;
     //output.Normal = transpose(inverse(input.aNormal));
-    output.Normal = mul(transpose(WorldTransInv), input.aNormal);
+    output.Normal = mul(transpose(WorldTransInv), float4(input.aNormal, 0.0f));
     output.FragPos = mul(input.aPos, World).xyz;
+    
+   
+    
+    float3 T = normalize((float3) mul(World, float4(input.aTangent, 0.0f)));
+    float3 N = normalize((float3) mul(World, float4(input.aNormal, 0.0f)));
+    float3 B = cross(N, T);
+    output.TBN = float3x3(T, B, N);
+    
     return output;
 }
 
@@ -106,6 +116,14 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     //-------------------------------------
 
 sampler2D texture_diffuse1;
+sampler2D texture_normal1;
+sampler2D texture_roughness1;
+sampler2D texture_ao1;
+//bool useNormalMap;
+
+int useRoughnessMap;
+int useAOMap;
+int useNormalMap;
 float3 viewPos;
 
 
@@ -119,16 +137,39 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
     float3 viewDir = normalize(viewPos - input.FragPos);
     
     float3 directionalLight = float3(0.f, 0.f, 0.f);
+    if (useNormalMap != 0)
+        {
+        
+        float3 nmap = tex2D(texture_normal1, input.TexCoords);
+        
+        
+        
+         // Remap from [0,1] to [-1,1]
+        nmap = normalize(nmap * 2.0f - 1.0f);
+        norm = normalize(mul(nmap,input.TBN));
+        
+        
+    }
+    // Sample roughness
+        
+    float roughness = 0.5;
+    if (useRoughnessMap != 0)
+        roughness = tex2D(texture_roughness1, input.TexCoords).r;
+    // Sample ambient occlusion
+    float ao = 1.0;
+    if (useAOMap != 0)
+        ao = tex2D(texture_ao1, input.TexCoords).r;
     if (dirlightEnabled == true)
     {
         float3 ambient = dirlight_ambientColor.rgb;
         
         float3 lightDir = normalize(-dirlight_direction);
         float diff = max(dot(norm, lightDir), 0.0);
-        float3 diffuse = dirlight_diffuseColor.rgb * diff; 
+        float3 diffuse = dirlight_diffuseColor.rgb * diff * ao;
         
         float3 reflectDir = reflect(-lightDir, norm);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+        float specPower = lerp(64.0, 2.0, roughness);
+        float spec = pow(max(dot(viewDir, reflectDir), 0.0), specPower);
         float3 specular = dirlight_specularColor.rgb * spec;
         directionalLight = ambient + diffuse + specular;
     }
@@ -257,7 +298,7 @@ VertexShaderOutput OutlineVS(in VertexShaderInput input){
 
     float inflate = -0.05f;
 
-    float4 posInflated = input.aPos + input.aNormal * inflate;
+    float4 posInflated = input.aPos + float4(input.aNormal, 0.0f) * inflate;
 
     output.Position = mul(posInflated, mul(mul(World, View), Projection));
     output.TexCoords = input.aTexCoords;

@@ -1,0 +1,216 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using SolidSilnique.Core;
+using SolidSilnique.Core.Components;
+
+namespace SolidSilnique.ProcderuralFoliage;
+using SimplexNoise;
+public class ProceduralGrass
+{
+    public int lenght;
+    public int width;
+    private string AssetName;
+    public float[,] computedNoise;
+    public float[,] DisNoise;
+    public float[,] TransformNoise;
+    private int Exseed = 0;
+    private int DisSeed = 0;
+    private int ChooseSeed = 0;
+    private Texture2D levelMap;
+    //By system działał poprawnie Textura i model muszą być na tym samym indexie w listach,w dictionary tekstur musi znajdować się tekstura level map
+    public List<Model>			loadedModels;
+    public List<Texture2D>	loadedTextures;
+    public List<Model>		loadedTrees;
+    public List<Texture2D>	loadedTexturesTrees;
+    
+    
+    public List<GameObject>	createdObjects = new List<GameObject>();
+    public ProceduralGrass(List<Model>loadedModels,List<Texture2D>loadedTextures,List<Model>loadedTrees,List<Texture2D>loadedTexturesTrees,ContentManager Content)
+    {
+        levelMap = Content.Load<Texture2D>("levelMap");
+        this.lenght = levelMap.Height;
+        this.width = levelMap.Width;
+        this.loadedModels = loadedModels;
+        this.loadedTextures = loadedTextures;
+        this.loadedTrees = loadedTrees;
+        this.loadedTexturesTrees = loadedTexturesTrees;
+    }
+
+    public void precomputeNoise()
+    {
+        var random = new Random();
+        if (Exseed != 0)
+        {
+            Noise.Seed = Exseed;
+        }
+        computedNoise = Noise.Calc2D(width, lenght, 0.8f);
+        DisSeed = random.Next();
+        if (DisSeed != 0)
+        {
+            Noise.Seed = DisSeed;
+        }
+        DisNoise = Noise.Calc2D(width, lenght, 0.8f);
+        ChooseSeed = random.Next();
+        if (ChooseSeed != 0)
+        {
+            Noise.Seed = ChooseSeed;
+        }
+        TransformNoise = Noise.Calc2D(width, lenght, 0.8f);
+        
+    }
+
+    public void SetSeed(int seed)
+    {
+        this.Exseed = seed;
+    }
+    public void SetDisSeed(int seed)
+    {
+        this.DisSeed = seed;
+    }
+    public void SetChooseSeed(int seed)
+    {
+        this.ChooseSeed = seed;
+    }
+
+    public void GenerateObjects()
+    {
+        
+        Color[] pixels = new Color[levelMap.Width * levelMap.Height];
+        levelMap.GetData(pixels);
+        
+        
+
+        for (int i = 0; i < lenght; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                Vector3 values = pixels[i * levelMap.Width + j].ToVector3();
+                int Red = (int)(values.X * 255);
+                int Green = (int)(values.Y * 255);
+                int Blue = (int)(values.Z * 255);
+                switch (Green)
+                {
+                    case 0:
+                        standardTerrain(i,j,Red,Blue);
+                        break;
+                    case 120:
+                        generatePath(i,j,Red,Blue);
+                        break;
+                    case 255:
+                        GenerateTreeWall(i,j,Red,Blue);
+                        break;
+                }
+            }
+        }
+    }
+
+    public void GenerateTreeWall(int i, int j,int Red,int Blue)
+    {
+        
+        Random random = new Random();
+        GameObject go = new GameObject("Tree");
+        float randX = i * 10, randZ = j * 10;
+
+        randX += DisNoise[i, j] / 60f;
+        randZ -= DisNoise[i, j] / 60f;
+        go.transform.position = new Vector3(randX, 0, randZ);
+
+        float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
+        MaximumHeight = myCeiling(MaximumHeight,0.8f + Red/255f * 1f);
+        float scaleY = MaximumHeight;
+        float scaleXZ = 0.9f + ((TransformNoise[i,j] + computedNoise[i,j]) / 510f);
+        
+        go.transform.scale = new Vector3(scaleXZ,scaleY, scaleXZ);
+        
+        double rotationY = TransformNoise[i,j] * Math.PI * 2;
+        go.transform.rotation = new Vector3(0,(float)rotationY,0);
+        
+        int randomTreeModel = (int)Math.Round(computedNoise[i, j] / 70);
+        int randomTreeTexture = (int)Math.Round(TransformNoise[i, j] / 70);
+        
+        randomTreeModel = Math.Min(randomTreeModel, loadedTrees.Count-1);
+        randomTreeTexture = Math.Min(randomTreeTexture, loadedTexturesTrees.Count-1);
+        
+        go.model = loadedTrees[randomTreeModel];
+        go.AddLOD(loadedTrees[randomTreeModel], 0f);
+        go.AddLOD(loadedTrees[randomTreeModel], 100f);
+        go.AddLOD(null, 1200f);
+        
+        go.texture = loadedTextures[randomTreeTexture];
+
+        createdObjects.Add(go);
+    }
+
+    public void generatePath(int i, int j, int Red, int Blue)
+    {
+    
+        
+
+        if (computedNoise[i,j] < Blue)
+        {
+            GameObject go = new GameObject("NotTree");
+            float randX = i * 7, randZ = j * 7;
+
+            randX += DisNoise[i, j] / 60f;
+            randZ -= DisNoise[i, j] / 60f;
+            go.transform.position = new Vector3(randX, -0.2f, randZ);
+
+
+            float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
+            MaximumHeight = myCeiling(MaximumHeight,0.8f+ Red/255f * 1.5f);
+            float scaleY = MaximumHeight;
+            float scaleXZ = 0.9f + ((TransformNoise[i,j] + computedNoise[i,j]) / 510f);
+
+            go.transform.scale = new Vector3(scaleXZ,scaleY,scaleXZ);
+
+            double rotationY = TransformNoise[i,j] * Math.PI * 2;
+            go.transform.rotation = new Vector3(0,(float)rotationY,0);
+            
+            int randomModel = (int)Math.Round(computedNoise[i, j] / 60f);
+            int randomTexture = (int)Math.Round(TransformNoise[i, j] / 60f);
+            
+            randomModel = Math.Min(randomModel, loadedModels.Count-1);
+            randomTexture = Math.Min(randomTexture, loadedTextures.Count-1);
+
+            go.model = loadedModels[3];
+            go.AddLOD(loadedModels[3], 0f);
+            go.AddLOD(loadedModels[3], 100f);
+            go.AddLOD(null, 800f);
+
+            go.texture = loadedTextures[randomTexture];
+
+            createdObjects.Add(go);
+        }
+    }
+
+    public void standardTerrain(int i, int j, int Red, int Blue)
+    {
+        float Choose = (computedNoise[i,j] + DisNoise[i, j] + TransformNoise[i,j]);
+        if (Choose > 450)
+        {
+            generatePath(i, j, Red, Blue);
+        }
+        else
+        {
+            GenerateTreeWall(i,j,Red,Blue);
+        }
+    }
+
+    private float myCeiling(float a, float b)
+    {
+        if (a > b)
+            return b;
+        else
+        {
+            return a;
+        }
+    }
+
+
+
+
+
+}

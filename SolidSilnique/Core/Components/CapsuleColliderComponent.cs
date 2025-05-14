@@ -10,7 +10,23 @@ namespace SolidSilnique.Core.Components
 
 	public struct BoundingCapsule
 	{
-		
+		float height;
+		float radius;
+
+		Vector3 aOffset;
+		Vector3 bOffset;
+
+
+		BoundingCapsule(float height, float radius)
+		{
+			this.height = height;
+			this.radius = radius;
+			if(this.height > this.radius*2 ) { 
+				this.height = this.radius*2;
+			}
+			this.aOffset = new Vector3( 0, this.height/2 - this.radius, 0 );
+			this.bOffset = new Vector3( 0, -this.height/2 + this.radius, 0 );
+		}
 	}
 	class CapsuleColliderComponent : Component
 	{

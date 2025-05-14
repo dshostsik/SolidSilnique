@@ -12,7 +12,5 @@
     <GuiElement positionX="50" positionY="70" scale="0,5">
         <TextInput name="pole" fontSize="15" fontStyle="Arial" placeholder="text"/>
     </GuiElement>
-    <GuiElement positionX="50" positionY="85" scale="2">
-        <Text name="text" fontSize="3" fontStyle="Arial">dodaj cus</Text>
-    </GuiElement>
+
 </Hud>

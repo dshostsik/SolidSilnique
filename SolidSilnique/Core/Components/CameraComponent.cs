@@ -23,6 +23,7 @@ namespace SolidSilnique.Core.Components
 		public override void Update()
 		{
 			gameObject.transform.position += new Vector3(0, -5, 0) * Time.deltaTime;
+			
 		}
 
 		public void SetMain() {
