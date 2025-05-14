@@ -17,6 +17,8 @@ namespace SolidSilnique
 
         private GUI _gui;
 
+        private Input _input;
+
         //FPS Counter
         private readonly FrameCounter counter;
         private Vector2 frameraterCounterPosition;
@@ -65,7 +67,7 @@ namespace SolidSilnique
         private PointLight testPointLight;
         private Spotlight testSpotlight;
 
-        bool wasPDownLastFrame = false;
+
 
         // Custom shader
         //private Effect customEffect;
@@ -75,8 +77,9 @@ namespace SolidSilnique
         private Shader shadowShader;
 
         public bool useCulling = false;
-        private bool useNormalMap = false;
-        private bool wasLDownLastFrame = false;
+
+        
+
         private Texture2D _normalMap;
        
 
@@ -87,7 +90,11 @@ namespace SolidSilnique
         private BasicEffect _debugEffect;
 
         private bool useDebugWireframe = false;
-        private bool wasBDownLastFrame = false;
+
+        private bool useNormalMap = true;
+
+        GameTime gameTime;
+
 
         /// <summary>
         /// Constructor
@@ -115,7 +122,7 @@ namespace SolidSilnique
 
             //DISPLAY SETUP
 
-            //Window.AllowUserResizing = true;
+            Window.AllowUserResizing = true;
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
             //_graphics.IsFullScreen = true;
             _graphics.HardwareModeSwitch = true;
@@ -192,7 +199,7 @@ namespace SolidSilnique
             _skybox = new Skybox();
             _skybox.Setup(Content, _graphics, GraphicsDevice, _projection);
 
-
+            _input = new Input(this);
             base.Initialize();
         }
 
@@ -229,94 +236,7 @@ namespace SolidSilnique
         /// Function defining mouse behaviour
         /// </summary>
         /// <param name="gameTime">Object containing time values</param>
-        private void processMouse(GameTime gameTime)
-        {
-            int w = Window.ClientBounds.Center.X;
-            int h = Window.ClientBounds.Center.Y;
-            float mouseX, mouseY;
-
-
-            Console.WriteLine("Mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
-            Console.WriteLine("Mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " +
-                              Mouse.GetState().Position.Y);
-            mouseX = w - Mouse.GetState().X;
-            mouseY = Mouse.GetState().Y - h;
-
-            float xOffset = (mouseX);
-            float yOffset = (mouseY);
-
-            EngineManager.scene.mainCamera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
-            Mouse.SetPosition(w, h);
-        }
-
-        /// <summary>
-        /// Function for defining key bindings
-        /// </summary>
-        /// <param name="gameTime">Object containing time values</param>
-        private void processKeyboard(GameTime gameTime)
-        {
-
-            Camera cam = EngineManager.scene.mainCamera;
-            if (Keyboard.GetState().IsKeyDown(Keys.W))
-            {
-                cam.move(Camera.directions.FORWARD, Time.deltaTime);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.S))
-            {
-                cam.move(Camera.directions.BACKWARD, Time.deltaTime);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.A))
-            {
-                cam.move(Camera.directions.LEFT, Time.deltaTime);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.D))
-            {
-                cam.move(Camera.directions.RIGHT, Time.deltaTime);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.LeftShift))
-            {
-                cam.move(Camera.directions.DOWN, Time.deltaTime);
-            }
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
-                cam.move(Camera.directions.UP, Time.deltaTime);
-            }
-
-            var kb = Keyboard.GetState();
-            bool isPDown = kb.IsKeyDown(Keys.P);
-
-            if (isPDown && !wasPDownLastFrame)
-                EngineManager.useCulling = !EngineManager.useCulling;
-
-            wasPDownLastFrame = isPDown;
-
-            bool isBDown = kb.IsKeyDown(Keys.B);
-            if (isBDown && !wasBDownLastFrame)
-                EngineManager.useWireframe = !EngineManager.useWireframe;
-            wasBDownLastFrame = isBDown;
-
-            bool isLDown = kb.IsKeyDown(Keys.L);
-                        if (isLDown && !wasLDownLastFrame)
-               useNormalMap = !useNormalMap;
-            wasLDownLastFrame = isLDown;
-
-			
-
-			if (Keyboard.GetState().IsKeyDown(Keys.F1))
-			{
-                EngineManager.celShadingEnabled = false;
-			}
-			if (Keyboard.GetState().IsKeyDown(Keys.F2))
-			{
-				EngineManager.celShadingEnabled = true;
-			}
-            
-        }
+        
 
         /// <summary>
         /// Add your update logic here
@@ -356,8 +276,7 @@ namespace SolidSilnique
 			testDirectionalLight.Direction = Vector3.Transform(originalVector, rotation);
 
 
-			processKeyboard(gameTime);
-            processMouse(gameTime);
+            _input.Process(gameTime);
             counter.Update(gameTime);
 
             EngineManager.Update(gameTime);
