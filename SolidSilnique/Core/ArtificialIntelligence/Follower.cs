@@ -112,7 +112,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             if (direction.LengthSquared() <= (_socialDistance * _socialDistance)) return Vector3.Zero;
             direction.Normalize();
 
-            return direction;
+            return new Vector3(direction.X, 0, direction.Z);
         }
 
         public override void Start()
