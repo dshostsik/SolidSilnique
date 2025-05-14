@@ -112,21 +112,21 @@ public class ProceduralGrass
         
         Random random = new Random();
         GameObject go = new GameObject("Tree");
-        float randX = i * 10, randZ = j * 10;
+        float randX = i * 5, randZ = j * 5;
 
         randX += DisNoise[i, j] / 60f;
         randZ -= DisNoise[i, j] / 60f;
-        go.transform.position = new Vector3(randX, -6, randZ);
+        go.transform.position = new Vector3(randX, -0.3f, randZ);
 
         float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
         MaximumHeight = myCeiling(MaximumHeight,0.8f + Red/255f * 1.5f);
         float scaleY = MaximumHeight;
         float scaleXZ = 0.9f + ((TransformNoise[i,j] + computedNoise[i,j]) / 510f);
         
-        go.transform.scale = new Vector3(scaleXZ,scaleY, scaleXZ);
+        go.transform.scale = new Vector3(scaleXZ/2f,scaleY, scaleXZ/2f);
         
         double rotationY = TransformNoise[i,j] * Math.PI * 2;
-        go.transform.rotation = new Vector3(0,(float)rotationY,0);
+        go.transform.rotation = new Vector3((float)rotationY * 0.01f,(float)rotationY,-(float)rotationY * 0.01f);
         
         int randomTreeModel = (int)Math.Round(computedNoise[i, j] % loadedTrees.Count);
         int randomTreeTexture = (int)Math.Round(TransformNoise[i, j] % loadedTexturesTrees.Count);
@@ -139,7 +139,7 @@ public class ProceduralGrass
         go.AddLOD(loadedTrees[randomTreeModel], 100f);
         go.AddLOD(null, 1200f);
         
-        go.texture = loadedTextures[randomTreeTexture];
+        go.texture = loadedTexturesTrees[randomTreeTexture];
 
         createdObjects.Add(go);
     }
@@ -152,11 +152,11 @@ public class ProceduralGrass
         if (computedNoise[i,j] < Blue)
         {
             GameObject go = new GameObject("NotTree");
-            float randX = i * 7, randZ = j * 7;
+            float randX = i * 5, randZ = j * 5;
 
             randX += DisNoise[i, j] / 60f;
             randZ -= DisNoise[i, j] / 60f;
-            go.transform.position = new Vector3(randX, -0.2f, randZ);
+            go.transform.position = new Vector3(randX, -0.3f, randZ);
 
 
             float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
@@ -167,7 +167,7 @@ public class ProceduralGrass
             go.transform.scale = new Vector3(scaleXZ,scaleY,scaleXZ);
 
             double rotationY = TransformNoise[i,j] * Math.PI * 2;
-            go.transform.rotation = new Vector3(0,(float)rotationY,0);
+            go.transform.rotation = new Vector3((float)rotationY * 0.01f,(float)rotationY,-(float)rotationY * 0.01f);
             
             int randomModel = (int)Math.Round(computedNoise[i, j] % loadedModels.Count);
             int randomTexture = (int)Math.Round(TransformNoise[i, j] / loadedTextures.Count);
@@ -189,7 +189,7 @@ public class ProceduralGrass
     public void standardTerrain(int i, int j, int Red, int Blue)
     {
         float Choose = (computedNoise[i,j] + DisNoise[i, j] + TransformNoise[i,j]);
-        if (Choose > 450)
+        if (Choose > 250)
         {
             generatePath(i, j, Red, Blue);
         }

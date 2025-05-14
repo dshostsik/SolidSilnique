@@ -49,17 +49,23 @@ class ProceduralTest : Scene
 			loadedTextures.Add("eye", Content.Load<Texture2D>("Textures/eye_tex"));
 			
 			
-			models.Add(Content.Load<Model>("pModels/stone"));
-			models.Add(Content.Load<Model>("pModels/stone1"));
-			models.Add(Content.Load<Model>("pModels/stone2"));
-			models.Add(Content.Load<Model>("pModels/grass"));
-			models.Add(Content.Load<Model>("pModels/grass1"));
+			models.Add(Content.Load<Model>("pModels/Rock1"));
+			models.Add(Content.Load<Model>("pModels/Branch"));
+			models.Add(Content.Load<Model>("pModels/BushBig"));
+			models.Add(Content.Load<Model>("pModels/BushBig"));
+			models.Add(Content.Load<Model>("pModels/BushBig"));
+			models.Add(Content.Load<Model>("pModels/BushBig"));
+			models.Add(Content.Load<Model>("pModels/BushSmall"));
+			models.Add(Content.Load<Model>("pModels/BushSmall"));
+			models.Add(Content.Load<Model>("pModels/BushSmall"));
+			//models.Add(Content.Load<Model>("pModels/Log"));
+			models.Add(Content.Load<Model>("pModels/Stump"));
 			textures.Add(Content.Load<Texture2D>("deimos_texture"));
 			
-			treeModels.Add(Content.Load<Model>("pModels/klon"));
 			treeModels.Add(Content.Load<Model>("pModels/tree1"));
-			
-			treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
+			treeModels.Add(Content.Load<Model>("pModels/Tree2"));
+			treeTextures.Add(Content.Load<Texture2D>("deimos_texture"));
+			//treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
 
 			content = Content;
 
@@ -131,9 +137,9 @@ class ProceduralTest : Scene
 			gab.transform.scale = new Vector3(1f);
 			gab.model = loadedModels["cube"];
 			gab.texture = loadedTextures["gabTex"];
-			gab.normalMap = loadedTextures["gabNo"];
-			gab.roughnessMap = loadedTextures["gabRo"];
-			gab.aoMap = loadedTextures["gabAo"];
+			//gab.normalMap = loadedTextures["gabNo"];
+			//gab.roughnessMap = loadedTextures["gabRo"];
+			//gab.aoMap = loadedTextures["gabAo"];
 			gab.AddComponent(new DebugMoveComponent());
 			gab.AddComponent(new SphereColliderComponent(1));
 			this.AddChild(gab);
