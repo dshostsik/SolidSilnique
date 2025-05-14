@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core;
+using SolidSilnique.Core.Components;
 using SolidSilnique.GameContent;
 // Use this to prevent conflicts with System.Numerics.Vector3
 using Vector3 = Microsoft.Xna.Framework.Vector3;
@@ -65,13 +66,17 @@ namespace SolidSilnique
         private DirectionalLight testDirectionalLight;
         private Vector3 sunPosition;
 
+        private LightsManagerComponent manager;
+
         private PointLight testPointLight;
+        private GameObject testPointLightGameObject;
         private Spotlight testSpotlight;
+        private GameObject testSpotlightGameObject;
 
         // Custom shader
         //private Effect customEffect;
 
-
+		
         private Shader shader;
         private Shader shadowShader;
 
@@ -139,6 +144,8 @@ namespace SolidSilnique
                 DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
 
 
+            manager = new LightsManagerComponent(shader);
+            
             dirlight_ambient = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
             dirlight_diffuse = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
             dirlight_specular = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -164,15 +171,32 @@ namespace SolidSilnique
             testPointLight.DiffuseColor = dirlight_diffuse;
             testPointLight.SpecularColor = dirlight_specular;
 
+            testPointLightGameObject = new GameObject("Pointlight0");
+            testPointLight.gameObject = testPointLightGameObject;
+            testPointLightGameObject.AddComponent(testPointLight);
+            
+            
             testSpotlight = new Spotlight( 0.007f, 0.0002f, 1, new Vector3(-10, 0, 0), 5.5f, 7.5f);
+            testSpotlightGameObject = new GameObject("Spotlight0");
+            testSpotlight.gameObject = testSpotlightGameObject;
+            testSpotlightGameObject.AddComponent(testSpotlight);
 
+            
             testDirectionalLight.Enabled = 1;
             testPointLight.Enabled = 1;
             testSpotlight.Enabled = 1;
             
             sunPosition = new Vector3(50.0f, 50.0f, 0.0f);
             //testSpotlight.Enabled = false;
-
+            
+            manager.AddPointLight(testPointLight);
+            manager.AddSpotLight(testSpotlight);
+            manager.DirectionalLightPosition = sunPosition;
+            testPointLightGameObject.transform.position = pointlight_position;
+            testSpotlightGameObject.transform.position = spotlight_position;
+            
+            manager.Start();
+            
             EngineManager.scene = new TestScene();
 
             _skybox = new Skybox();
@@ -360,13 +384,13 @@ namespace SolidSilnique
             shader.SetUniform("View", _view);
             shader.SetUniform("Projection", _projection);
             shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
-            testDirectionalLight.SendToShader(shader);
+            //testDirectionalLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
-            shader.SetUniform("pointlight1_position", pointlight_position);
-            testPointLight.SendToShader(shader);
+            //shader.SetUniform("pointlight1_position", pointlight_position);
+            //testPointLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
-            shader.SetUniform("spotlight1_position", spotlight_position);
-            testSpotlight.SendToShader(shader);
+            //shader.SetUniform("spotlight1_position", spotlight_position);
+            //testSpotlight.SendToShader(shader);
 			
 
 

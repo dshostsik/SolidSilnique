@@ -35,6 +35,7 @@ namespace SolidSilnique.Core
             float outerCut) :
             base(linear, quadratic, constant)
         {
+            PointLight.PointLightInstances = PointLight.PointLightInstances - 1;
             _index = _instances;
 
             if (_instances < 10) _instances++;
@@ -44,6 +45,8 @@ namespace SolidSilnique.Core
         }
 
         public static int SpotlightInstances => _instances;
+        
+        public int SpotlightIndex => _index;
         
         public override void SendToShader(Shader shader)
         {

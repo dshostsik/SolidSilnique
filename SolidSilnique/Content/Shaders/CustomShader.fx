@@ -6,6 +6,9 @@
 	#define VS_SHADERMODEL vs_5_0
 	#define PS_SHADERMODEL ps_5_0
 #endif
+
+#define defaultLength 10
+
 //-------------------------------------
 //              UNIFORMS            
 //-------------------------------------
@@ -55,39 +58,52 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 //-------------------------------------
 
 // Stupid shit looks like doesn't support structures
+
+    //-------DIRECTIONAL-LIGHT-----
+    int dirlightEnabled;
+
     float3 dirlight_direction;
 
     float4 dirlight_ambientColor;
     float4 dirlight_diffuseColor;
     float4 dirlight_specularColor;
-
-    float3 pointlight1_position;
+    //-----------------------------
+    
+    //-----------POINT-LIGHT-ARRAY---------
+    // use this to avoid useless computing of zeroes
+    int realPointlightArrayLength;
+    int pointlightEnabled[defaultLength];
+    float3 pointlight_position[defaultLength];
     // linear in HLSL is a key word, so linear -> linearAttenuation
-    float pointlight1_linearAttenuation;
-    float pointlight1_quadraticAttenuation;
-    float pointlight1_constant;
+    float pointlight_linearAttenuation[defaultLength];
+    float pointlight_quadraticAttenuation[defaultLength];
+    float pointlight_constant[defaultLength];
     
-    float4 pointlight1_ambientColor;
-    float4 pointlight1_diffuseColor;
-    float4 pointlight1_specularColor;
+    float4 pointlight_ambientColor[defaultLength];
+    float4 pointlight_diffuseColor[defaultLength];
+    float4 pointlight_specularColor[defaultLength];
+    //-------------------------------------
+    
+    //----------SPOTLIGHT-ARRAY------------
+    // use this to avoid useless computing of zeroes
+    int realSpotlightArrayLength;
 
-    float3 spotlight1_position;
-    float3 spotlight1_direction;
-    
-    float spotlight1_linearAttenuation;
-    float spotlight1_quadraticAttenuation;
-    float spotlight1_constant;
-    
-    float spotlight1_innerCut;
-    float spotlight1_outerCut;
-    
-    float4 spotlight1_ambientColor;
-    float4 spotlight1_diffuseColor;
-    float4 spotlight1_specularColor;
+    int spotlightEnabled[defaultLength];
 
-int dirlightEnabled;
-int pointlight1Enabled;
-int spotlight1Enabled;
+    float3 spotlight_position[defaultLength];
+    float3 spotlight_direction[defaultLength];
+    
+    float spotlight_linearAttenuation[defaultLength];
+    float spotlight_quadraticAttenuation[defaultLength];
+    float spotlight_constant[defaultLength];
+
+    float spotlight_innerCut[defaultLength];
+    float spotlight_outerCut[defaultLength];
+    
+    float4 spotlight_ambientColor[defaultLength];
+    float4 spotlight_diffuseColor[defaultLength];
+    float4 spotlight_specularColor[defaultLength];
+    //-------------------------------------
 
 sampler2D texture_diffuse1;
 float3 viewPos;
@@ -117,68 +133,76 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
         directionalLight = ambient + diffuse + specular;
     }
         
-    float3 pointlight = float3(0.f, 0.f, 0.f);
-    if (pointlight1Enabled == true)
-    {
-        float3 pointAmbient = float3(1.f, 1.f, 1.f);
-        float3 pointDiffuse = float3(1.f, 1.f, 1.f);
-        float3 pointSpecular = float3(1.f, 1.f, 1.f);
-        
-        pointAmbient = pointlight1_ambientColor.rgb;
-        
-        float3 lightDirPointLight = normalize(pointlight1_position - input.FragPos.xyz);
-        float pointDiff = max(dot(norm, lightDirPointLight), 0.0);
-        pointDiffuse = pointlight1_diffuseColor.rgb * pointDiff;
-        
-        float3 reflectDirPoint = reflect(-lightDirPointLight, norm);
-        float specPoint = pow(max(dot(viewDir, reflectDirPoint), 0.0), 32);
-        pointSpecular = pointlight1_specularColor.rgb * specPoint;
-        
-        float distance = length(pointlight1_position - input.FragPos);
-        float attenuation = 1.0f / (pointlight1_constant + pointlight1_linearAttenuation * distance + pointlight1_quadraticAttenuation * (distance * distance));
-        
-        pointAmbient *= attenuation;
-        pointDiffuse *= attenuation;
-        pointSpecular *= attenuation;
-        
-        pointlight = pointAmbient + pointDiffuse + pointSpecular; 
+    float3 totalPointLight = float3(0.f, 0.f, 0.f);  
+    for (int i = 0; i < realPointlightArrayLength; i++) {
+        float3 pointlight = float3(0.f, 0.f, 0.f);
+        if (pointlightEnabled[i] == true)
+        {
+            float3 pointAmbient = float3(1.f, 1.f, 1.f);
+            float3 pointDiffuse = float3(1.f, 1.f, 1.f);
+            float3 pointSpecular = float3(1.f, 1.f, 1.f);
+            
+            pointAmbient = pointlight_ambientColor[i].rgb;
+            
+            float3 lightDirPointLight = normalize(pointlight_position[i] - input.FragPos.xyz);
+            float pointDiff = max(dot(norm, lightDirPointLight), 0.0);
+            pointDiffuse = pointlight_diffuseColor[i].rgb * pointDiff;
+            
+            float3 reflectDirPoint = reflect(-lightDirPointLight, norm);
+            float specPoint = pow(max(dot(viewDir, reflectDirPoint), 0.0), 32);
+            pointSpecular = pointlight_specularColor[i].rgb * specPoint;
+            
+            float distance = length(pointlight_position[i] - input.FragPos);
+            float attenuation = 1.0f / (pointlight_constant[i] + pointlight_linearAttenuation[i] * distance + pointlight_quadraticAttenuation[i] * (distance * distance));
+            
+            pointAmbient *= attenuation;
+            pointDiffuse *= attenuation;
+            pointSpecular *= attenuation;
+            
+            pointlight = pointAmbient + pointDiffuse + pointSpecular; 
+        }
+        totalPointLight += pointlight;
     }
     
-    float3 spotlight = float3(0.f, 0.f, 0.f);
-    if (spotlight1Enabled == true)
-    {
-        float3 spotAmbient = float3(1.f, 1.f, 1.f);
-        float3 spotDiffuse = float3(1.f, 1.f, 1.f);
-        float3 spotSpecular = float3(1.f, 1.f, 1.f);
-        
-        spotAmbient = spotlight1_ambientColor.rgb;
-        
-        float3 lightDirSpot = normalize(spotlight1_position - input.FragPos);
-        float spotDiff = max(dot(norm, lightDirSpot), 0.0f);
-        spotDiffuse = spotlight1_diffuseColor.rgb * spotDiff;
-        
-        float3 reflectSpot = reflect(-lightDirSpot, norm);
-        float specSpot = pow(max(dot(viewDir, reflectSpot), 0.0f), 32);
-        spotSpecular = spotlight1_specularColor.rgb * specSpot;
-        
-        float theta = dot(lightDirSpot, normalize(-spotlight1_direction));
-        float epsilon = spotlight1_innerCut - spotlight1_outerCut;
-        float intensity = clamp((theta - spotlight1_outerCut) / epsilon, 0.f, 1.f);
-        
-        spotDiffuse *= intensity;
-        spotSpecular *= intensity;
-        
-        float spotDistance = length(spotlight1_position - input.FragPos);
-        float spotAttenuation = 1.0f / (spotlight1_constant + spotlight1_linearAttenuation * spotDistance + spotlight1_quadraticAttenuation * (spotDistance * spotDistance));
-        
-         spotAmbient *= spotAttenuation;
-         spotDiffuse *= spotAttenuation;
-         spotSpecular *= spotAttenuation;
-         
-         spotlight = spotAmbient + spotDiffuse + spotSpecular;
-    }
+    float3 totalSpotlight = float3(0.f, 0.f, 0.f);
+    for (int i = 0; i < realSpotlightArrayLength; i++) {
+        float3 spotlight = float3(0.f, 0.f, 0.f);
+        if (spotlightEnabled[i] == true)
+        {
+            float3 spotAmbient = float3(1.f, 1.f, 1.f);
+            float3 spotDiffuse = float3(1.f, 1.f, 1.f);
+            float3 spotSpecular = float3(1.f, 1.f, 1.f);
+            
+            spotAmbient = spotlight_ambientColor[i].rgb;
+            
+            float3 lightDirSpot = normalize(spotlight_position[i] - input.FragPos);
+            float spotDiff = max(dot(norm, lightDirSpot), 0.0f);
+            spotDiffuse = spotlight_diffuseColor[i].rgb * spotDiff;
+            
+            float3 reflectSpot = reflect(-lightDirSpot, norm);
+            float specSpot = pow(max(dot(viewDir, reflectSpot), 0.0f), 32);
+            spotSpecular = spotlight_specularColor[i].rgb * specSpot;
+            
+            float theta = dot(lightDirSpot, normalize(-spotlight_direction[i]));
+            float epsilon = spotlight_innerCut[i] - spotlight_outerCut[i];
+            float intensity = clamp((theta - spotlight_outerCut[i]) / epsilon, 0.f, 1.f);
+            
+            spotDiffuse *= intensity;
+            spotSpecular *= intensity;
+            
+            float spotDistance = length(spotlight_position[i] - input.FragPos);
+            float spotAttenuation = 1.0f / (spotlight_constant[i] + spotlight_linearAttenuation[i] * spotDistance + spotlight_quadraticAttenuation[i] * (spotDistance * spotDistance));
+            
+             spotAmbient *= spotAttenuation;
+             spotDiffuse *= spotAttenuation;
+             spotSpecular *= spotAttenuation;
+             
+             spotlight = spotAmbient + spotDiffuse + spotSpecular;
+        }
+        totalSpotlight += spotlight;
+    }    
     
-	return float4(directionalLight + pointlight + spotlight, 1.0) * textureVector;
+	return float4(directionalLight + totalPointLight + totalSpotlight, 1.0) * textureVector;
 }
 
 //-------------------------------------

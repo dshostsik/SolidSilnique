@@ -13,9 +13,14 @@ namespace SolidSilnique.Core
         private static int _instances = 0;
         private readonly int _index;
 
-        public static int Instances => _instances;
+        public static int PointLightInstances
+        {
+            get => _instances;
+            // For inheritating class Spotlight
+            protected set => _instances = value;
+        }
 
-        public int Index => _index;
+        public int PointLightIndex => _index;
 
         public float Linear
         {

@@ -2,6 +2,7 @@
 
 using System;
 using Microsoft.Xna.Framework;
+using SolidSilnique.Core.Diagnostics;
 
 namespace SolidSilnique.Core.Components
 {
@@ -42,6 +43,11 @@ namespace SolidSilnique.Core.Components
         }
 
         /// <summary>
+        /// Object of <see cref="Shader"/> class used for rendering. Cannot be null and must be injected.
+        /// </summary>
+        private Shader _shader;
+
+        /// <summary>
         /// Position of the directional light. Used for computing shadows.
         /// </summary>
         public Vector3 DirectionalLightPosition
@@ -60,12 +66,29 @@ namespace SolidSilnique.Core.Components
         /// </summary>
         public Spotlight[] Spotlights => _spotlights;
 
-        public LightsManagerComponent()
+
+        /// <summary>
+        /// Object of <see cref="Shader"/> class used for rendering. Cannot be null and must be injected.
+        /// </summary>
+        /// <exception cref="ArgumentException"> if <c>null</c> is passed. Shader cannot be null</exception>
+        public Shader Shader
+        {
+            get => _shader;
+            set => _shader = value ?? throw new ArgumentException("Shader cannot be null.");
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="shader">Object of <see cref="Shader"/> class that will be used for rendering</param>
+        public LightsManagerComponent(Shader shader)
         {
             _directionalLight = new DirectionalLight(new Vector3(1, -1, 0));
 
             _pointLights = new PointLight[_maximumAmountOfInstances];
             _spotlights = new Spotlight[_maximumAmountOfInstances];
+
+            _shader = shader;
         }
 
         /// <summary>
@@ -74,7 +97,93 @@ namespace SolidSilnique.Core.Components
         /// <exception cref="Diagnostics.UniformNotFoundException"> if requested uniform was not found</exception>
         public override void Start()
         {
-            throw new System.NotImplementedException();
+            //throw new System.NotImplementedException();
+            try
+            {
+                _shader.SetUniform("dirlightEnabled", _directionalLight.Enabled);
+                _shader.SetUniform("dirlight_direction", _directionalLight.Direction);
+                _shader.SetUniform("dirlight_ambientColor", _directionalLight.AmbientColor);
+                _shader.SetUniform("dirlight_diffuseColor", _directionalLight.DiffuseColor);
+                _shader.SetUniform("dirlight_specularColor", _directionalLight.SpecularColor);
+
+                int[] pointLightEnabled = new int[PointLight.PointLightInstances];
+                Vector3[] pointLightPosition = new Vector3[PointLight.PointLightInstances];
+                Vector4[] pointLightAmbientColor = new Vector4[PointLight.PointLightInstances];
+                Vector4[] pointLightDiffuseColor = new Vector4[PointLight.PointLightInstances];
+                Vector4[] pointLightSpecularColor = new Vector4[PointLight.PointLightInstances];
+                float[] pointLightLinearAttenuation = new float[PointLight.PointLightInstances];
+                float[] pointLightQuadraticAttenuation = new float[PointLight.PointLightInstances];
+                float[] pointLightConstant = new float[PointLight.PointLightInstances];
+
+                if (null != _pointLights[0])
+                {
+                    for (int i = 0; i < PointLight.PointLightInstances; i++)
+                    {
+                        if (_pointLights[i] == null) continue;
+                        pointLightEnabled[i] = _pointLights[i].Enabled;
+                        pointLightAmbientColor[i] = _pointLights[i].AmbientColor;
+                        pointLightDiffuseColor[i] = _pointLights[i].DiffuseColor;
+                        pointLightSpecularColor[i] = _pointLights[i].SpecularColor;
+                        pointLightPosition[i] = _pointLights[i].gameObject.transform.position;
+                        pointLightLinearAttenuation[i] = _pointLights[i].Linear;
+                        pointLightQuadraticAttenuation[i] = _pointLights[i].Quadratic;
+                        pointLightConstant[i] = _pointLights[i].Constant;
+                    }
+                }
+
+                _shader.SetUniform("pointlightEnabled", pointLightEnabled);
+                _shader.SetUniform("pointlight_position", pointLightPosition);
+                _shader.SetUniform("pointlight_ambientColor", pointLightAmbientColor);
+                _shader.SetUniform("pointlight_diffuseColor", pointLightDiffuseColor);
+                _shader.SetUniform("pointlight_specularColor", pointLightSpecularColor);
+                _shader.SetUniform("pointlight_linearAttenuation", pointLightLinearAttenuation);
+                _shader.SetUniform("pointlight_quadraticAttenuation", pointLightQuadraticAttenuation);
+                _shader.SetUniform("pointlight_constant", pointLightConstant);
+
+
+                int[] spotlightEnabled = new int[Spotlight.SpotlightInstances];
+                Vector3[] spotlightPosition = new Vector3[Spotlight.SpotlightInstances];
+                Vector4[] spotlightAmbientColor = new Vector4[Spotlight.SpotlightInstances];
+                Vector4[] spotlightDiffuseColor = new Vector4[Spotlight.SpotlightInstances];
+                Vector4[] spotlightSpecularColor = new Vector4[Spotlight.SpotlightInstances];
+                float[] spotlightLinearAttenuation = new float[Spotlight.SpotlightInstances];
+                float[] spotlightQuadraticAttenuation = new float[Spotlight.SpotlightInstances];
+                float[] spotlightConstant = new float[Spotlight.SpotlightInstances];
+                float[] spotlightInnerCut = new float[Spotlight.SpotlightInstances];
+                float[] spotlightOuterCut = new float[Spotlight.SpotlightInstances];
+
+                if (null != _spotlights[0])
+                {
+                    for (int i = 0; i < Spotlight.SpotlightInstances; i++)
+                    {
+                        spotlightEnabled[i] = _spotlights[i].Enabled;
+                        spotlightAmbientColor[i] = _spotlights[i].AmbientColor;
+                        spotlightDiffuseColor[i] = _spotlights[i].DiffuseColor;
+                        spotlightSpecularColor[i] = _spotlights[i].SpecularColor;
+                        spotlightPosition[i] = _spotlights[i].gameObject.transform.position;
+                        spotlightLinearAttenuation[i] = _spotlights[i].Linear;
+                        spotlightQuadraticAttenuation[i] = _spotlights[i].Quadratic;
+                        spotlightConstant[i] = _spotlights[i].Constant;
+                        spotlightInnerCut[i] = _spotlights[i].InnerCut;
+                        spotlightOuterCut[i] = _spotlights[i].OuterCut;
+                    }
+                }
+
+                _shader.SetUniform("spotlightEnabled", spotlightEnabled);
+                _shader.SetUniform("spotlight_position", spotlightPosition);
+                _shader.SetUniform("spotlight_ambientColor", spotlightAmbientColor);
+                _shader.SetUniform("spotlight_diffuseColor", spotlightDiffuseColor);
+                _shader.SetUniform("spotlight_specularColor", spotlightSpecularColor);
+                _shader.SetUniform("spotlight_linearAttenuation", spotlightLinearAttenuation);
+                _shader.SetUniform("spotlight_quadraticAttenuation", spotlightQuadraticAttenuation);
+                _shader.SetUniform("spotlight_constant", spotlightConstant);
+                _shader.SetUniform("spotlight_innerCut", spotlightInnerCut);
+                _shader.SetUniform("spotlight_outerCut", spotlightOuterCut);
+            }
+            catch (UniformNotFoundException e)
+            {
+                throw new UniformNotFoundException(e.Message, " error source: LightsManagerComponent.Start()");
+            }
         }
 
         /// <summary>
@@ -140,15 +249,15 @@ namespace SolidSilnique.Core.Components
         /// <exception cref="ArgumentException"> if there are already 10 objects of that type</exception>
         public void AddPointLight(PointLight pointLight)
         {
-            if (PointLight.Instances >= 10)
+            if (PointLight.PointLightInstances >= 10)
             {
                 throw new ArgumentException("Maximum amount of point lights reached.");
             }
-            
-            _pointLights[pointLight.Index] = pointLight;
-            UpdateNonConstantUniforms();
+
+            _pointLights[pointLight.PointLightIndex] = pointLight;
+            //UpdateNonConstantUniforms();
         }
-        
+
         /// <summary>
         /// Add your own spotlight source to the array.
         /// </summary>
@@ -160,11 +269,11 @@ namespace SolidSilnique.Core.Components
             {
                 throw new ArgumentException("Maximum amount of point lights reached.");
             }
-            
-            _spotlights[spotlight.Index] = spotlight;
-            UpdateNonConstantUniforms();
+
+            _spotlights[spotlight.SpotlightIndex] = spotlight;
+            //UpdateNonConstantUniforms();
         }
-        
+
         /// <summary>
         /// Create a new point light source with default values.
         /// </summary>
@@ -174,16 +283,16 @@ namespace SolidSilnique.Core.Components
         /// <exception cref="ArgumentException"> if there are already 10 objects of that type</exception>
         public void CreateNewPointLight(float linear = 0.022f, float quadratic = 0.0019f, float constant = 1)
         {
-            if (PointLight.Instances >= 10)
+            if (PointLight.PointLightInstances >= 10)
             {
                 throw new ArgumentException("Maximum amount of point lights reached.");
             }
-            
+
             PointLight newlight = new PointLight(linear, quadratic, constant);
-            PointLights[newlight.Index] = newlight;
-            UpdateNonConstantUniforms();
+            PointLights[newlight.PointLightIndex] = newlight;
+            //UpdateNonConstantUniforms();
         }
-        
+
         /// <summary>
         /// Create a new spotlight source with default values.
         /// </summary>
@@ -201,10 +310,10 @@ namespace SolidSilnique.Core.Components
             {
                 throw new ArgumentException("Maximum amount of point lights reached.");
             }
-            
+
             Spotlight newlight = new Spotlight(linear, quadratic, constant, direction, cutoff, outerCutoff);
-            Spotlights[newlight.Index] = newlight;
-            UpdateNonConstantUniforms();
+            Spotlights[newlight.SpotlightIndex] = newlight;
+            //UpdateNonConstantUniforms();
         }
     }
 }
