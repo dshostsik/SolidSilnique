@@ -18,7 +18,7 @@ namespace SolidSilnique.Core
         public static bool celShadingEnabled = false;
 
         //Debug flags
-        public static bool useCulling = false;
+        public static bool useCulling = true;
         public static bool useWireframe = false;
 
         //Default maps

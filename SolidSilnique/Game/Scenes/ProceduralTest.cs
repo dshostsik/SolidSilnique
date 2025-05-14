@@ -47,19 +47,29 @@ class ProceduralTest : Scene
 			loadedTextures.Add("gabAo", Content.Load<Texture2D>("Textures/gab_ao"));
 
 			loadedTextures.Add("eye", Content.Load<Texture2D>("Textures/eye_tex"));
+
+			loadedTextures.Add("leafTex", Content.Load<Texture2D>("Textures/leaf_diffuse"));
 			
 			
-			models.Add(Content.Load<Model>("pModels/stone"));
-			models.Add(Content.Load<Model>("pModels/stone1"));
-			models.Add(Content.Load<Model>("pModels/stone2"));
-			models.Add(Content.Load<Model>("pModels/grass"));
-			models.Add(Content.Load<Model>("pModels/grass1"));
-			textures.Add(Content.Load<Texture2D>("deimos_texture"));
-			
-			treeModels.Add(Content.Load<Model>("pModels/klon"));
-			treeModels.Add(Content.Load<Model>("pModels/tree1"));
-			
-			treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
+			models.Add(Content.Load<Model>("pModels/Rock1"));
+			models.Add(Content.Load<Model>("pModels/Branch"));
+			models.Add(Content.Load<Model>("pModels/BushBig"));
+			models.Add(Content.Load<Model>("pModels/BushBig"));
+			models.Add(Content.Load<Model>("pModels/BushBig"));
+			models.Add(Content.Load<Model>("pModels/BushBig"));
+			models.Add(Content.Load<Model>("pModels/BushSmall"));
+			models.Add(Content.Load<Model>("pModels/BushSmall"));
+			models.Add(Content.Load<Model>("pModels/BushSmall"));
+			//models.Add(Content.Load<Model>("pModels/Log"));
+			models.Add(Content.Load<Model>("pModels/Stump"));
+		textures.Add(loadedTextures["leafTex"]);
+        textures.Add(loadedTextures["deimos"]);
+
+        treeModels.Add(Content.Load<Model>("pModels/tree1"));
+			treeModels.Add(Content.Load<Model>("pModels/Tree2"));
+			treeTextures.Add(Content.Load<Texture2D>("Textures/tree1_diffuse"));
+			treeTextures.Add(Content.Load<Texture2D>("Textures/tree2_diffuse"));
+			//treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
 
 			content = Content;
 
@@ -77,11 +87,11 @@ class ProceduralTest : Scene
 			Task task1 = Task.Run(() => newProc.precomputeNoise());
 			
 			GameObject go = new GameObject("Camera");
-			go.transform.position = new Vector3(250, 0.75f, 250);
+			go.transform.position = new Vector3(250, 3f, 250);
 			CameraComponent cam = new CameraComponent();
 			cam.SetMain();
 			go.AddComponent(cam);
-			go.AddComponent(new SphereColliderComponent(0.9f));
+			go.AddComponent(new SphereColliderComponent(3f));
 			this.AddChild(go);
 
 			go = new GameObject("ground");
@@ -131,9 +141,9 @@ class ProceduralTest : Scene
 			gab.transform.scale = new Vector3(1f);
 			gab.model = loadedModels["cube"];
 			gab.texture = loadedTextures["gabTex"];
-			gab.normalMap = loadedTextures["gabNo"];
-			gab.roughnessMap = loadedTextures["gabRo"];
-			gab.aoMap = loadedTextures["gabAo"];
+			//gab.normalMap = loadedTextures["gabNo"];
+			//gab.roughnessMap = loadedTextures["gabRo"];
+			//gab.aoMap = loadedTextures["gabAo"];
 			gab.AddComponent(new DebugMoveComponent());
 			gab.AddComponent(new SphereColliderComponent(1));
 			this.AddChild(gab);

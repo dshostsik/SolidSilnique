@@ -314,7 +314,7 @@
 /processorParam:TextureFormat=Compressed
 /build:plane.fbx
 
-#begin pModels/grass.obj
+#begin pModels/Branch.obj
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -331,9 +331,9 @@
 /processorParam:Scale=1
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:pModels/grass.obj
+/build:pModels/Branch.obj
 
-#begin pModels/grass1.obj
+#begin pModels/BushBig.obj
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -350,9 +350,9 @@
 /processorParam:Scale=1
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:pModels/grass1.obj
+/build:pModels/BushBig.obj
 
-#begin pModels/kloda.obj
+#begin pModels/BushSmall.obj
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -369,9 +369,9 @@
 /processorParam:Scale=1
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:pModels/kloda.obj
+/build:pModels/BushSmall.obj
 
-#begin pModels/klon.obj
+#begin pModels/Log.obj
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -388,9 +388,9 @@
 /processorParam:Scale=1
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:pModels/klon.obj
+/build:pModels/Log.obj
 
-#begin pModels/stone.obj
+#begin pModels/Rock1.obj
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -407,9 +407,9 @@
 /processorParam:Scale=1
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:pModels/stone.obj
+/build:pModels/Rock1.obj
 
-#begin pModels/stone1.obj
+#begin pModels/Stump.obj
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -426,9 +426,9 @@
 /processorParam:Scale=1
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:pModels/stone1.obj
+/build:pModels/Stump.obj
 
-#begin pModels/stone2.obj
+#begin pModels/Tree1.obj
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -445,9 +445,9 @@
 /processorParam:Scale=1
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:pModels/stone2.obj
+/build:pModels/Tree1.obj
 
-#begin pModels/tree1.obj
+#begin pModels/Tree2.obj
 /importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
@@ -464,7 +464,7 @@
 /processorParam:Scale=1
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=Compressed
-/build:pModels/tree1.obj
+/build:pModels/Tree2.obj
 
 #begin Shaders/CustomShader.fx
 /importer:EffectImporter
@@ -707,6 +707,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/gun_texture.png
 
+#begin Textures/leaf_diffuse.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/leaf_diffuse.png
+
 #begin Textures/normal_map.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -766,6 +778,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/test_tex.png
+
+#begin Textures/tree1_diffuse.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/tree1_diffuse.png
+
+#begin Textures/tree2_diffuse.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/tree2_diffuse.png
 
 #begin Textures/wood_ao.png
 /importer:TextureImporter
