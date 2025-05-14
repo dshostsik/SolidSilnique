@@ -116,7 +116,7 @@ public class ProceduralGrass
 
         randX += DisNoise[i, j] / 60f;
         randZ -= DisNoise[i, j] / 60f;
-        go.transform.position = new Vector3(randX, -6, randZ);
+        go.transform.position = new Vector3(randX, 0, randZ);
 
         float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
         MaximumHeight = myCeiling(MaximumHeight,0.8f + Red/255f * 1f);
