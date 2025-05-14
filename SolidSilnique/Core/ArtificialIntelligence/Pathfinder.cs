@@ -7,7 +7,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
     /// <summary>
     /// Class made for finding a path between two objects.
     /// </summary>
-    public class Pathfinder
+    public class Pathfinder : Component
     {
         /// <summary>
         /// Reference to self - object that should find the path to target
@@ -64,6 +64,16 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             if (_target == null) return;
 
             _distance = Vector3.Distance(_self.transform.position, _target.transform.position);
+        }
+
+        public override void Start()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Update()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

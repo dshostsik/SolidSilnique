@@ -10,7 +10,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
     /// <summary>
     /// Class that allows <see cref="GameObject"/> to follow a specified target.
     /// </summary>
-    public class Follower
+    public class Follower : Component
     {
         /// <summary>
         /// Reference to the self-<see cref="GameObject"/>
@@ -45,6 +45,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             get => _target;
             set
             {
+                if (value.Equals(_target)) throw new ArgumentException("Target is cannot be set to itself.\nSet another object instead!");
                 _target = value;
                 if (null != _target) _socialDistance = _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius *
                                                        _socialDistanceMultiplier;
@@ -112,6 +113,16 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             direction.Normalize();
 
             return direction;
+        }
+
+        public override void Start()
+        {
+            
+        }
+        
+        public override void Update()
+        {
+            gameObject.transform.position += GetFollowDirectionVector() * Time.deltaTime * 10;
         }
     }
 }

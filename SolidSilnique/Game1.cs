@@ -221,7 +221,7 @@ namespace SolidSilnique
             
             manager.Start();
             
-            EngineManager.scene = new TestScene();
+            //EngineManager.scene = new TestScene();
 
             EngineManager.scene = new ProceduralTest();
 
