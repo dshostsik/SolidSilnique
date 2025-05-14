@@ -178,7 +178,7 @@ public class ProceduralGrass
             go.model = loadedModels[randomModel];
             go.AddLOD(loadedModels[randomModel], 0f);
             go.AddLOD(loadedModels[randomModel], 100f);
-            go.AddLOD(null, 800f);
+            go.AddLOD(null, 200f);
             if(randomModel == 2 || randomModel == 3 || randomModel == 4 || randomModel == 5)
             {
                 go.texture = loadedTextures[0];
