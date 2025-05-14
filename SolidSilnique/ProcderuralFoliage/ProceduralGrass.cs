@@ -121,12 +121,12 @@ public class ProceduralGrass
         float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
         MaximumHeight = myCeiling(MaximumHeight,0.8f + Red/255f * 1.5f);
         float scaleY = MaximumHeight;
-        float scaleXZ = 0.9f + ((TransformNoise[i,j] + computedNoise[i,j]) / 510f);
+        float scaleXZ = 1.2f + ((TransformNoise[i,j] + computedNoise[i,j]) / 510f);
         
         go.transform.scale = new Vector3(scaleXZ/2f,scaleY, scaleXZ/2f);
         
         double rotationY = TransformNoise[i,j] * Math.PI * 2;
-        go.transform.rotation = new Vector3((float)rotationY * 0.01f,(float)rotationY,-(float)rotationY * 0.01f);
+        go.transform.rotation = new Vector3((float)rotationY * 0.0f,(float)rotationY,-(float)rotationY * 0.0f);
         
         int randomTreeModel = (int)Math.Round(computedNoise[i, j] % loadedTrees.Count);
         int randomTreeTexture = (int)Math.Round(TransformNoise[i, j] % loadedTexturesTrees.Count);
@@ -140,7 +140,7 @@ public class ProceduralGrass
         go.AddLOD(null, 1200f);
         
         go.texture = loadedTexturesTrees[randomTreeTexture];
-
+        go.AddComponent(new TreeCollider(0.6f*scaleXZ,10));
         createdObjects.Add(go);
     }
 

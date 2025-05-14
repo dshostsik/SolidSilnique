@@ -33,6 +33,7 @@ namespace SolidSilnique.Core.Components
 			if(isStatic) return;
 			CheckCollisionWithSphere();
 			CheckCollisionWithPlane();
+			CheckCollisionWithTree();
 		}
 
 		public void CheckCollisionWithSphere()
@@ -67,6 +68,30 @@ namespace SolidSilnique.Core.Components
 						float distance = Vector3.Dot(other.Normal, boundingSphere.Center) - other.D;
 						float sepDist = (boundingSphere.Radius) - distance;
 						Vector3 sepVector = other.Normal * sepDist;
+						gameObject.transform.position += sepVector;
+						boundingSphere.Center = gameObject.transform.position;
+					}
+				}
+			}
+		}
+		
+		public void CheckCollisionWithTree()
+		{
+			foreach (var instance in TreeCollider.instances)
+			{
+
+				if (instance != gameObject) {
+					TreeCollider other = instance.GetComponent<TreeCollider>();
+					Vector3 otherCenter = new Vector3(other.gameObject.transform.position.X,MathF.Min(boundingSphere.Center.Y,other.HeightLimit),other.gameObject.transform.position.Z);
+					float distance = Vector3.Distance(boundingSphere.Center, otherCenter);
+					if (distance < boundingSphere.Radius + other.Radius){ 
+						//Separate
+						
+						Vector3 distVector = boundingSphere.Center - otherCenter;
+						float dist = distVector.Length();
+						distVector.Normalize();
+						float sepDist = (boundingSphere.Radius + other.Radius) - dist;
+						Vector3 sepVector = distVector * sepDist;
 						gameObject.transform.position += sepVector;
 						boundingSphere.Center = gameObject.transform.position;
 					}
