@@ -139,7 +139,7 @@ public class ProceduralGrass
         go.AddLOD(loadedTrees[randomTreeModel], 100f);
         go.AddLOD(null, 1200f);
         
-        go.texture = loadedTexturesTrees[randomTreeTexture];
+        go.texture = loadedTexturesTrees[randomTreeModel];
         go.AddComponent(new TreeCollider(0.6f*scaleXZ,10));
         createdObjects.Add(go);
     }
@@ -179,8 +179,16 @@ public class ProceduralGrass
             go.AddLOD(loadedModels[randomModel], 0f);
             go.AddLOD(loadedModels[randomModel], 100f);
             go.AddLOD(null, 800f);
-
-            go.texture = loadedTextures[randomTexture];
+            if(randomModel == 2 || randomModel == 3 || randomModel == 4 || randomModel == 5)
+            {
+                go.texture = loadedTextures[0];
+                Console.WriteLine("piwko");
+            }
+            else
+            {
+                go.texture = loadedTextures[1];
+            }
+            
 
             createdObjects.Add(go);
         }

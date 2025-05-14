@@ -47,6 +47,8 @@ class ProceduralTest : Scene
 			loadedTextures.Add("gabAo", Content.Load<Texture2D>("Textures/gab_ao"));
 
 			loadedTextures.Add("eye", Content.Load<Texture2D>("Textures/eye_tex"));
+
+			loadedTextures.Add("leafTex", Content.Load<Texture2D>("Textures/leaf_diffuse"));
 			
 			
 			models.Add(Content.Load<Model>("pModels/Rock1"));
@@ -60,11 +62,13 @@ class ProceduralTest : Scene
 			models.Add(Content.Load<Model>("pModels/BushSmall"));
 			//models.Add(Content.Load<Model>("pModels/Log"));
 			models.Add(Content.Load<Model>("pModels/Stump"));
-			textures.Add(Content.Load<Texture2D>("deimos_texture"));
-			
-			treeModels.Add(Content.Load<Model>("pModels/tree1"));
+		textures.Add(loadedTextures["leafTex"]);
+        textures.Add(loadedTextures["deimos"]);
+
+        treeModels.Add(Content.Load<Model>("pModels/tree1"));
 			treeModels.Add(Content.Load<Model>("pModels/Tree2"));
-			treeTextures.Add(Content.Load<Texture2D>("deimos_texture"));
+			treeTextures.Add(Content.Load<Texture2D>("Textures/tree1_diffuse"));
+			treeTextures.Add(Content.Load<Texture2D>("Textures/tree2_diffuse"));
 			//treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
 
 			content = Content;
