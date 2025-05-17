@@ -212,15 +212,10 @@ namespace SolidSilnique.Core.Components
         /// <exception cref="ArgumentException"> if the index is out of range</exception>
         public PointLight? GetPointLight(int index)
         {
-            try
-            {
-                return _pointLights[index];
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                Console.WriteLine(e);
-                throw new ArgumentException("Index out of range.");
-            }
+            return
+                index < 0 || index >= _pointLights.Length
+                    ? throw new ArgumentException($"Index {index} is out of range (0..{_pointLights.Length - 1}).")
+                    : _pointLights[index];
         }
 
         /// <summary>
@@ -231,15 +226,10 @@ namespace SolidSilnique.Core.Components
         /// <exception cref="ArgumentException"> if the index is out of range</exception>
         public Spotlight? GetSpotlight(int index)
         {
-            try
-            {
-                return _spotlights[index];
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                Console.WriteLine(e);
-                throw new ArgumentException("Index out of range.");
-            }
+            return
+                index < 0 || index >= _spotlights.Length
+                    ? throw new ArgumentException($"Index {index} is out of range (0..{_spotlights.Length - 1}).")
+                    : _spotlights[index];
         }
 
         /// <summary>
@@ -249,7 +239,7 @@ namespace SolidSilnique.Core.Components
         /// <exception cref="ArgumentException"> if there are already 10 objects of that type</exception>
         public void AddPointLight(PointLight pointLight)
         {
-            if (PointLight.PointLightInstances >= 10)
+            if (PointLight.PointLightInstances >= _maximumAmountOfInstances)
             {
                 throw new ArgumentException("Maximum amount of point lights reached.");
             }
@@ -265,7 +255,7 @@ namespace SolidSilnique.Core.Components
         /// <exception cref="ArgumentException"> if there are already 10 objects of that type</exception>
         public void AddSpotLight(Spotlight spotlight)
         {
-            if (Spotlight.SpotlightInstances >= 10)
+            if (Spotlight.SpotlightInstances >= _maximumAmountOfInstances)
             {
                 throw new ArgumentException("Maximum amount of point lights reached.");
             }
@@ -283,12 +273,17 @@ namespace SolidSilnique.Core.Components
         /// <exception cref="ArgumentException"> if there are already 10 objects of that type</exception>
         public void CreateNewPointLight(float linear = 0.022f, float quadratic = 0.0019f, float constant = 1)
         {
-            if (PointLight.PointLightInstances >= 10)
+            if (PointLight.PointLightInstances >= _maximumAmountOfInstances)
             {
                 throw new ArgumentException("Maximum amount of point lights reached.");
             }
 
             PointLight newlight = new PointLight(linear, quadratic, constant);
+            GameObject newObject = new GameObject("PointLight" + newlight.PointLightIndex);
+
+            newlight.gameObject = newObject;
+            newObject.AddComponent(newlight);
+
             PointLights[newlight.PointLightIndex] = newlight;
             //UpdateNonConstantUniforms();
         }
@@ -306,12 +301,17 @@ namespace SolidSilnique.Core.Components
         public void CreateNewSpotLight(float linear = 0.022f, float quadratic = 0.0019f, float constant = 1,
             Vector3 direction = default, float cutoff = 5.5f, float outerCutoff = 7.5f)
         {
-            if (Spotlight.SpotlightInstances >= 10)
+            if (Spotlight.SpotlightInstances >= _maximumAmountOfInstances)
             {
                 throw new ArgumentException("Maximum amount of point lights reached.");
             }
 
             Spotlight newlight = new Spotlight(linear, quadratic, constant, direction, cutoff, outerCutoff);
+            GameObject newObject = new GameObject("SpotLight" + newlight.SpotlightIndex);
+
+            newlight.gameObject = newObject;
+            newObject.AddComponent(newlight);
+
             Spotlights[newlight.SpotlightIndex] = newlight;
             //UpdateNonConstantUniforms();
         }

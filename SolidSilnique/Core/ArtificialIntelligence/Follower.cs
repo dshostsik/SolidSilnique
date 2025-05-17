@@ -15,7 +15,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// <summary>
         /// Reference to the self-<see cref="GameObject"/>
         /// </summary>
-        private GameObject _self;
+        private readonly GameObject _self;
 
         /// <summary>
         /// Reference to a target <see cref="GameObject"/> that will be followed by <see cref="Self"/>
@@ -28,15 +28,29 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         private float _socialDistanceMultiplier;
 
         /// <summary>
-        /// The distance between <see cref="Self"/> and <see cref="Target"/>. The default value is calculated based on <see cref="_socialDistanceMultiplier"/>
+        /// The distance between <see cref="Self"/> and <see cref="Target"/> in power of two. The default value is calculated based on <see cref="_socialDistanceMultiplier"/>
         /// </summary>
-        private float _socialDistance;
+        private float _socialDistanceSquared;
 
         /// <summary>
         /// Reference to the self-<see cref="GameObject"/>
         /// </summary>
         public GameObject Self => _self;
 
+
+        /// <summary>
+        /// Calculates <see cref="SocialDistanceSquared"/> depending on <see cref="SocialDistanceMultiplier"/> and <see cref="Target"/>'s radius.
+        /// </summary>
+        /// <returns>Calculated length of radius in power of two defining private zone of target</returns>
+        private float ComputeSocialDistanceSquared()
+        {
+            if (null == _target) return 0.0f;
+            float output = _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius;
+            output *= output;
+            output *= _socialDistanceMultiplier;
+            return output;
+        }
+        
         /// <summary>
         /// Reference to a target <see cref="GameObject"/> that will be followed by <see cref="Self"/>.<p>Default value is <c>null</c>. Make sure that you set it before calling <see cref="GetFollowDirectionVector"/> method.</p>
         /// </summary>
@@ -45,10 +59,9 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             get => _target;
             set
             {
-                if (value.Equals(_target)) throw new ArgumentException("Target is cannot be set to itself.\nSet another object instead!");
+                if (null != value && _self.Equals(value)) throw new ArgumentException("Target cannot be set to itself.\nSet another object instead!");
                 _target = value;
-                if (null != _target) _socialDistance = _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius *
-                                                       _socialDistanceMultiplier;
+                if (null != _target) _socialDistanceSquared = ComputeSocialDistanceSquared();
             }
         }
 
@@ -66,25 +79,25 @@ namespace SolidSilnique.Core.ArtificialIntelligence
                         "Invalid argument!\nMultiplier must be at least 1.0f\nOtherwise you'd have caused a bug of infinite following interrupted by collisions");
                 _socialDistanceMultiplier = value;
                 if (null == _target) return;
-                _socialDistance = _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius *
-                                  _socialDistanceMultiplier;
+                _socialDistanceSquared = ComputeSocialDistanceSquared();
             }
         }
 
         /// <summary>
-        /// The distance between <see cref="Self"/> and <see cref="Target"/>. The default value is calculated based on <see cref="SocialDistanceMultiplier"/>
+        /// The distance between <see cref="Self"/> and <see cref="Target"/> in power of two. The default value is calculated based on <see cref="SocialDistanceMultiplier"/>
         /// <p>Pay attention that if <see cref="Target"/> is not <c>null</c> then you'll not be able to set that distance shorter that radius of its <see cref="SphereColliderComponent"/></p>
         /// </summary>
-        public float SocialDistance
+        public float SocialDistanceSquared
         {
-            get => _socialDistance;
+            get => _socialDistanceSquared;
             set
             {
                 if (null == _target) throw new TargetNotSetException("Target is null.\nMaybe you forgot to set it?");
-                if (value < _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius)
+                float colliderRadius = _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius;
+                if (value < colliderRadius * colliderRadius)
                     throw new ArgumentException(
                         "Invalid argument!\nSocial distance must be greater or equal to radius, try again!\nOtherwise you'd have caused a bug of infinite following interrupted by collisions");
-                _socialDistance = value;
+                _socialDistanceSquared = value;
             }
         }
 
@@ -109,10 +122,12 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             if (null == _target) throw new TargetNotSetException("Target is null.\nMaybe you forgot to set it?");
 
             Vector3 direction = _target.transform.position - _self.transform.position;
-            if (direction.LengthSquared() <= (_socialDistance * _socialDistance)) return Vector3.Zero;
+            if (direction.LengthSquared() <= _socialDistanceSquared) return Vector3.Zero;
             direction.Normalize();
 
-            return new Vector3(direction.X, 0, direction.Z);
+            direction.Y = 0.0f;
+            
+            return direction;
         }
 
         public override void Start()

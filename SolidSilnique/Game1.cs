@@ -209,6 +209,7 @@ namespace SolidSilnique
             manager.AddSpotLight(testSpotlight);
             manager.DirectionalLight = testDirectionalLight;
             manager.DirectionalLightPosition = sunPosition;
+            manager.CreateNewPointLight();
             testPointLightGameObject.transform.position = pointlight_position;
             testSpotlightGameObject.transform.position = spotlight_position;
 
