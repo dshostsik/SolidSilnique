@@ -252,11 +252,7 @@ namespace SolidSilnique
 
             EngineManager.Start();
         }
-
-        /// <summary>
-        /// Function defining mouse behaviour
-        /// </summary>
-        /// <param name="gameTime">Object containing time values</param>
+        
         /// <summary>
         /// Add your update logic here
         /// </summary>
