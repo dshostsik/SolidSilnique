@@ -41,7 +41,7 @@ namespace SolidSilnique.Game
         /// <summary>
         /// Bounding boxes that are generated according to the pattern.
         /// </summary>
-        private BoundingBox[][] _damageBoxes;
+        private readonly BoundingBox[][] _damageBoxes;
         
         /// <summary>
         /// <see cref="GameObject"/> representing player./>
@@ -62,7 +62,7 @@ namespace SolidSilnique.Game
             
             _damageBoxes = new BoundingBox[3][];
             
-            // Demonstrative values so far. Idk what values should be here and how to rotate those fucking boxes
+            // Demonstrative values so far. IDK what values should be here and how to rotate those fucking boxes
             _damageBoxes[0] = new BoundingBox[1];
             _damageBoxes[0][0] = new BoundingBox(new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
             

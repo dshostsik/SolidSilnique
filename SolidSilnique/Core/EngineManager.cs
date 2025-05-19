@@ -26,6 +26,8 @@ namespace SolidSilnique.Core
         public static Texture2D defaultRoughnessMap;
         public static Texture2D defaultAOMap;
 
+        private static BoundingFrustum frustum = new BoundingFrustum(Matrix.Identity);
+        
         public static BasicEffect wireframeEffect;
 
 
@@ -52,10 +54,7 @@ namespace SolidSilnique.Core
                 GameObject go = renderQueue.Dequeue();
 
                 //FRUSTUM CULLING
-                var viewProjection = view * projection;
-                // TODO: 1127,7 MB  allocated in SOH; AVOID allocation in EVERY FRAME
-                // https://www.jetbrains.com/help/rider/Fixing_Issues_Found_by_DPA.html
-                var frustum = new BoundingFrustum(viewProjection);
+                frustum.Matrix = view * projection;
 
                 var position = go.transform.position;
 

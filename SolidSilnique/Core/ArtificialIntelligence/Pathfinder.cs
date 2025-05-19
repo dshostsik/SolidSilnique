@@ -53,7 +53,11 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         public GameObject? Target
         {
             get => _target;
-            set => _target = value;
+            set
+            {
+                if (null != value && _self.Equals(value)) throw new System.ArgumentException("Target cannot be set to itself.\nSet another object instead!");
+                _target = value;
+            }
         }
         
         /// <summary>
