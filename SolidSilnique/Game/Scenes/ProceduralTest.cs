@@ -39,6 +39,7 @@ class ProceduralTest : Scene
 			loadedModels.Add("cube", Content.Load<Model>("cube"));
 			loadedModels.Add("cone", Content.Load<Model>("cone"));
 			loadedModels.Add("sphere", Content.Load<Model>("sphere"));
+			loadedModels.Add("levelTest", Content.Load<Model>("level_ground"));
 
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 			loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
@@ -120,7 +121,18 @@ class ProceduralTest : Scene
 
 			}
 
-			go = new GameObject("Testak");
+			GameObject goTest = new GameObject("Deimos");
+
+
+			goTest.transform.position = new Vector3(150, 2.5f, 150);
+			goTest.model = loadedModels["levelTest"];
+			goTest.texture = loadedTextures["deimos"];
+			goTest.AddComponent(new SphereColliderComponent(3.5f, true));
+
+
+			this.AddChild(goTest);
+
+		go = new GameObject("Testak");
 			go.transform.position = new Vector3(5, 2.5f, -5);
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];
