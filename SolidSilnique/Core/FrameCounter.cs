@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
 
-namespace SolidSilnique
+namespace SolidSilnique.Core
 {
     /// <summary>
     /// Class counting current framerate

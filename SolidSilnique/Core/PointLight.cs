@@ -1,39 +1,57 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
+using SolidSilnique.Core.Diagnostics;
 
-namespace SolidSilnique
+namespace SolidSilnique.Core
 {
     public class PointLight : Light
     {
-        private float linear;
-        private float quadratic;
-        private float constant;
+        private float _linear;
+        private float _quadratic;
+        private float _constant;
+
+        private static int _instances = 0;
+        private readonly int _index;
+
+        public static int PointLightInstances
+        {
+            get => _instances;
+            // For inheritating class Spotlight
+            protected set => _instances = value;
+        }
+
+        public int PointLightIndex => _index;
 
         public float Linear
         {
-            get => linear;
-            set => linear = value;
+            get => _linear;
+            set => _linear = value;
         }
 
         public float Quadratic
         {
-            get => quadratic;
-            set => quadratic = value;
+            get => _quadratic;
+            set => _quadratic = value;
         }
 
         public float Constant
         {
-            get => constant;
-            set => constant = value;
+            get => _constant;
+            set => _constant = value;
         }
 
         public PointLight(float linear, float quadratic, float constant)
         {
-            this.linear = linear;
-            this.quadratic = quadratic;
-            this.constant = constant;
-            AmbientColor = new Vector4(.2f, .2f, .2f, .0f);
+            _index = _instances;
+
+            if (_instances < 10) _instances++;
+
+            _linear = linear;
+            _quadratic = quadratic;
+            _constant = constant;
+            AmbientColor = new Vector4(.1f, .1f, .1f, .0f);
             DiffuseColor = new Vector4(.8f, .8f, .8f, .0f);
-            SpecularColor = new Vector4(.8f, .8f, .8f, .0f);
+            SpecularColor = new Vector4(1.0f, 1.0f, 1.0f, .0f);
         }
 
         public override void SendToShader(Shader shader)
@@ -54,6 +72,16 @@ namespace SolidSilnique
             {
                 throw new UniformNotFoundException(e.Message, " error source: PointLight.cs");
             }
+        }
+
+        public override void Start()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Update()
+        {
+            throw new NotImplementedException();
         }
     }
 }

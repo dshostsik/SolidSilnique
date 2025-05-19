@@ -17,6 +17,7 @@ namespace SolidSilnique.Core
 		TextureCube textureCube;
 		Effect skyboxEffect;
 		VertexBuffer vertexBuffer;
+		private SamplerState samplerState;
 
 		public void Setup(ContentManager content, GraphicsDeviceManager graphics, GraphicsDevice graphicsDevice, Matrix projection)
 		{
@@ -35,37 +36,39 @@ namespace SolidSilnique.Core
 			SetCubeFaceData(textureCube, CubeMapFace.PositiveZ, posZ);
 			SetCubeFaceData(textureCube, CubeMapFace.NegativeZ, negZ);
 
-			SamplerState samplerState = new SamplerState
+			samplerState = new SamplerState
 			{
 				Filter = TextureFilter.Linear,
-				AddressU = TextureAddressMode.Mirror,
-				AddressV = TextureAddressMode.Mirror,
-				AddressW = TextureAddressMode.Mirror,
+				AddressU = TextureAddressMode.Clamp,
+				AddressV = TextureAddressMode.Clamp,
+				AddressW = TextureAddressMode.Clamp,
 
 			};
 
-			skyboxEffect = content.Load<Effect>("SkyBoxShader");
+			float size = 10;
+			
+			skyboxEffect = content.Load<Effect>("Shaders/SkyBoxShader");
 			if (skyboxEffect == null)
 				throw new Exception("SkyBoxShader effect failed to load.");
 			
 			Matrix world = Matrix.Identity;
 			skyboxEffect.Parameters["Projection"].SetValue(projection);
 
-			skyboxEffect.Parameters["CubeSampler+CubeTexture"].SetValue(textureCube);
-			graphics.GraphicsDevice.SamplerStates[0] = samplerState;
+			//skyboxEffect.Parameters["CubeSampler+CubeTexture"].SetValue(textureCube);
+			
 
 			var cubeVertices = new VertexPositionTexture[36];
 
 			// Define the size and texture coordinates
-			Vector3 topLeftFront = new Vector3(-2, 2, -2);
-			Vector3 topRightFront = new Vector3(2, 2, -2);
-			Vector3 bottomLeftFront = new Vector3(-2, -2, -2);
-			Vector3 bottomRightFront = new Vector3(2, -2, -2);
+			Vector3 topLeftFront = new Vector3(-2, 2, -2) * size;
+			Vector3 topRightFront = new Vector3(2, 2, -2) * size;
+			Vector3 bottomLeftFront = new Vector3(-2, -2, -2) * size;
+			Vector3 bottomRightFront = new Vector3(2, -2, -2) * size;
 
-			Vector3 topLeftBack = new Vector3(-2, 2, 2);
-			Vector3 topRightBack = new Vector3(2, 2, 2);
-			Vector3 bottomLeftBack = new Vector3(-2, -2, 2);
-			Vector3 bottomRightBack = new Vector3(2, -2, 2);
+			Vector3 topLeftBack = new Vector3(-2, 2, 2) * size;
+			Vector3 topRightBack = new Vector3(2, 2, 2) * size;
+			Vector3 bottomLeftBack = new Vector3(-2, -2, 2) * size;
+			Vector3 bottomRightBack = new Vector3(2, -2, 2) * size;
 
 			Vector2 textureTopLeft = new Vector2(0, 0);
 			Vector2 textureTopRight = new Vector2(1, 0);
@@ -141,9 +144,10 @@ namespace SolidSilnique.Core
 
 		public void Draw(GraphicsDeviceManager graphics, Matrix view)
 		{
-			
+			graphics.GraphicsDevice.SamplerStates[0] = samplerState;
 			graphics.GraphicsDevice.SetVertexBuffer(vertexBuffer);
-
+			
+			
 			Matrix viewNoTranslation = view;
 			viewNoTranslation.Translation = Vector3.Zero;
 

@@ -8,8 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using System.Threading.Tasks;
+using SolidSilnique.Core.ArtificialIntelligence;
 using SolidSilnique.ProcderuralFoliage;
 
 
@@ -37,6 +39,7 @@ class ProceduralTest : Scene
 			loadedModels.Add("cube", Content.Load<Model>("cube"));
 			loadedModels.Add("cone", Content.Load<Model>("cone"));
 			loadedModels.Add("sphere", Content.Load<Model>("sphere"));
+			loadedModels.Add("levelTest", Content.Load<Model>("level_ground"));
 
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 			loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
@@ -118,7 +121,18 @@ class ProceduralTest : Scene
 
 			}
 
-			go = new GameObject("Testak");
+			GameObject goTest = new GameObject("Deimos");
+
+
+			goTest.transform.position = new Vector3(150, 2.5f, 150);
+			goTest.model = loadedModels["levelTest"];
+			goTest.texture = loadedTextures["deimos"];
+			goTest.AddComponent(new SphereColliderComponent(3.5f, true));
+
+
+			this.AddChild(goTest);
+
+		go = new GameObject("Testak");
 			go.transform.position = new Vector3(5, 2.5f, -5);
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];
@@ -173,54 +187,21 @@ class ProceduralTest : Scene
 			eye2.texture = loadedTextures["eye"];
 			gab.AddChild(eye2);
 
-    }
-/*
-		void AddTree(ProceduralGrass grass,int i,int j)
-		{
-			
-			float radius = 80.0f;
-			Vector2 awooga = new Vector2(i*5, j*5);
-			Vector2 center = new Vector2(250, 250);
-			float len = Vector2.Distance(awooga, center);
-			if (grass.computedNoise[i, j] > 180.5f && len > radius)
+			GameObject prevGeb = gab;
+			for (int i = 0; i < 10; i++)
 			{
-				GameObject go = new GameObject("Tree");
-				float randX = i*5, randZ = j*5;
-				
-				randX += grass.DisNoise[i,j] / 60f;
-				randZ -= grass.DisNoise[i,j] / 60f;
-				Random rand = new Random();
-				go.transform.position = new Vector3(randX, 0, randZ);
-			
-
-            if (Math.Round(grass.ChooseNoise[i, j] / 100) == 2)
-				{
-					go.model = loadedModels["drzewo"];
-                go.AddLOD(loadedModels["drzewo"], 0f);
-                go.AddLOD(loadedModels["deimos"], 100f);
-                go.AddLOD(null, 200f);
-            }
-				else if (Math.Round(grass.ChooseNoise[i, j] / 100) == 1)
-				{
-					go.model = loadedModels["sphere"];
-					go.AddComponent(new SphereColliderComponent(1,true));
-				}
-				else if (Math.Round(grass.ChooseNoise[i, j] / 100) == 0)
-				{
-					go.model = loadedModels["cone"];
-				}
-				else
-				{
-					go.model = loadedModels["cube"];
-				}
-				go.texture = loadedTextures["deimos"];
-
-				this.AddChild(go);
+				GameObject gogus = CreateGebus(new Vector3(150 + i*2, 2, 150 + i*2));
+				gogus.GetComponent<Follower>().Target = prevGeb;
+				if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
+				this.AddChild(gogus);
+				prevGeb = gogus;
 			}
 			
 
+			
+
 		}
-*/
+
 		void AddPlanet()
 		{
 			Random rand = new Random();
@@ -237,9 +218,26 @@ class ProceduralTest : Scene
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];
 			go.AddComponent(new SphereColliderComponent(3.5f,true));
-
+			
 
 			this.AddChild(go);
+
+		}
+		
+		GameObject CreateGebus(Vector3 pos)
+		{
+			GameObject go = new GameObject("Gebus");
+
+			go.transform.position = pos;
+			go.transform.scale = new Vector3(0.75f);
+			go.model = loadedModels["sphere"];
+			go.texture = loadedTextures["gabTex"];
+			go.AddComponent(new SphereColliderComponent(0.75f,false));
+			go.AddComponent(new DebugMoveComponent());
+			go.GetComponent<DebugMoveComponent>().move = false;
+			go.AddComponent(new Follower(go, 2f));
+
+			return go;
 
 		}
 	

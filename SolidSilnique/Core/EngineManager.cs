@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SolidSilnique.Core.Diagnostics;
 
 namespace SolidSilnique.Core
 {
@@ -30,7 +31,6 @@ namespace SolidSilnique.Core
 
         public static void Start()
         {
-
             scene.Start();
         }
 
@@ -49,11 +49,12 @@ namespace SolidSilnique.Core
 
             while (renderQueue.Count > 0)
             {
-
                 GameObject go = renderQueue.Dequeue();
 
                 //FRUSTUM CULLING
                 var viewProjection = view * projection;
+                // TODO: 1127,7 MB  allocated in SOH; AVOID allocation in EVERY FRAME
+                // https://www.jetbrains.com/help/rider/Fixing_Issues_Found_by_DPA.html
                 var frustum = new BoundingFrustum(viewProjection);
 
                 var position = go.transform.position;
@@ -68,17 +69,14 @@ namespace SolidSilnique.Core
                 if (go.LODModels != null && go.LODModels.Count > 0)
                 {
                     go.model = go.GetLODModel(distance);
-
                 }
-
-
-
 
 
                 if (go.model == null)
                 {
                     continue;
                 }
+
                 try
                 {
                     Matrix model = go.transform.getModelMatrix();
@@ -96,11 +94,8 @@ namespace SolidSilnique.Core
                     shader.SetUniform("WorldTransInv", modelTransInv);
 
 
-                    
-
                     foreach (ModelMesh mesh in go.model.Meshes)
                     {
-
                         if (useCulling)
                         {
                             var sphere = mesh.BoundingSphere.Transform(go.transform.getModelMatrix());
@@ -108,25 +103,25 @@ namespace SolidSilnique.Core
 
                             if (useWireframe)
                             {
-
                                 var prevRasterizer = graphics.RasterizerState;
 
-                                
+
                                 wireframeEffect.View = view;
                                 wireframeEffect.Projection = projection;
                                 wireframeEffect.World = Matrix.Identity;
                                 graphics.RasterizerState = new RasterizerState { FillMode = FillMode.WireFrame };
-                                
+
 
                                 var box = BoundingBox.CreateFromSphere(sphere);
                                 var corners = box.GetCorners();
                                 var lines = new VertexPositionColor[24];
                                 Color wireColor = visible ? Color.Green : Color.Red;
                                 int idx = 0;
-                                int[,] edges = {
-                                    {0,1},{1,2},{2,3},{3,0},
-                                    {4,5},{5,6},{6,7},{7,4},
-                                    {0,4},{1,5},{2,6},{3,7}
+                                int[,] edges =
+                                {
+                                    { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
+                                    { 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 4 },
+                                    { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 }
                                 };
                                 for (int e = 0; e < edges.GetLength(0); e++)
                                 {
@@ -135,6 +130,7 @@ namespace SolidSilnique.Core
                                     lines[idx++] = new VertexPositionColor(a, wireColor);
                                     lines[idx++] = new VertexPositionColor(b, wireColor);
                                 }
+
                                 foreach (var pass in wireframeEffect.CurrentTechnique.Passes)
                                 {
                                     pass.Apply();
@@ -150,12 +146,11 @@ namespace SolidSilnique.Core
 
                             if (!visible)
                                 continue;
-
-                            
                         }
 
-                        foreach (ModelMeshPart part in mesh.MeshParts)
+                        for (int i = 0; i < mesh.MeshParts.Count; i++)
                         {
+                            var part = mesh.MeshParts[i];
                             part.Effect = shader.Effect;
                             if (celShadingEnabled)
                             {
@@ -166,24 +161,16 @@ namespace SolidSilnique.Core
                                 part.Effect.CurrentTechnique = shader.Effect.Techniques["CelShading"];
                                 graphics.RasterizerState = RasterizerState.CullCounterClockwise;
                                 mesh.Draw();
-
-
                             }
                             else
                             {
                                 part.Effect.CurrentTechnique = shader.Effect.Techniques["BasicColorDrawingWithLights"];
                                 mesh.Draw();
                             }
-
-
                         }
-
-                        
                     }
-                    
                 }
 
-                
 
                 catch (NullReferenceException e)
                 {
@@ -196,9 +183,6 @@ namespace SolidSilnique.Core
                     Console.WriteLine(u.Message);
                     throw;
                 }
-
-
-
             }
         }
     }

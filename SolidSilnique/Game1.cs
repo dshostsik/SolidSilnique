@@ -4,12 +4,16 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core;
+using SolidSilnique.Core.Components;
 using SolidSilnique.GameContent;
+// Use this to prevent conflicts with System.Numerics.Vector3
 using Vector3 = Microsoft.Xna.Framework.Vector3;
+// Use this to prevent conflicts with Microsoft.Xna.Framework.Graphics.DirectionalLight
+using DirectionalLight = SolidSilnique.Core.DirectionalLight;
 
 namespace SolidSilnique
 {
-    public class Game1 : Game
+    public class Game1 : Microsoft.Xna.Framework.Game
     {
         private readonly GraphicsDeviceManager _graphics;
 
@@ -64,9 +68,12 @@ namespace SolidSilnique
         private DirectionalLight testDirectionalLight;
         private Vector3 sunPosition;
 
-        private PointLight testPointLight;
-        private Spotlight testSpotlight;
+        private LightsManagerComponent manager;
 
+        private PointLight testPointLight;
+        private GameObject testPointLightGameObject;
+        private Spotlight testSpotlight;
+        private GameObject testSpotlightGameObject;
 
 
         // Custom shader
@@ -78,10 +85,8 @@ namespace SolidSilnique
 
         public bool useCulling = false;
 
-        
 
         private Texture2D _normalMap;
-       
 
 
         private Texture2D _defaultRoughnessMap;
@@ -118,16 +123,12 @@ namespace SolidSilnique
         /// </summary>
         protected override void Initialize()
         {
-
-
-
-
             //DISPLAY SETUP
 
             Window.AllowUserResizing = true;
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            //_graphics.IsFullScreen = true;
-            _graphics.HardwareModeSwitch = true;
+            _graphics.IsFullScreen = true;
+            // _graphics.HardwareModeSwitch = true;
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
             _graphics.SynchronizeWithVerticalRetrace = true; //VSync
@@ -140,7 +141,7 @@ namespace SolidSilnique
             //TODO delete
             //TODO delete
             // matrices initialisations
-            _world = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.Up);           //TODO delete
+            _world = Matrix.CreateWorld(Vector3.Zero, Vector3.UnitZ, Vector3.Up); //TODO delete
 
             // Resize world matrix
             _world = Matrix.CreateScale(1.0f) * _world;
@@ -163,21 +164,22 @@ namespace SolidSilnique
                 DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
 
 
-            dirlight_ambient = new Vector4(0.1f, 0.1f, 0.1f, 1.0f);
-            dirlight_diffuse = new Vector4(0.8f, 0.8f, 0.8f, 1.0f);
+            manager = new LightsManagerComponent(shader);
+
+            dirlight_ambient = new Vector4(0.6f, 0.6f, 0.6f, 1.0f);
+            dirlight_diffuse = new Vector4(0.8f, 0.8f, 0f, 1.0f);
             dirlight_specular = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
             spotlight_position = new Vector3(-15.0f, 0.0f, 0.0f);
             pointlight_position = new Vector3(10.0f, 0.0f, 0.0f);
 
-			_projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
-				GraphicsDevice.Viewport.AspectRatio,
-				0.1f,
-				500f);
+            _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
+                GraphicsDevice.Viewport.AspectRatio,
+                0.1f,
+                500f);
 
 
-			
-            testDirectionalLight = new DirectionalLight(new Vector3(1,-1,0));
+            testDirectionalLight = new DirectionalLight(new Vector3(1, -1, 0));
             testDirectionalLight.AmbientColor = dirlight_ambient;
             testDirectionalLight.DiffuseColor = dirlight_diffuse;
             testDirectionalLight.SpecularColor = dirlight_specular;
@@ -187,14 +189,35 @@ namespace SolidSilnique
             testPointLight.DiffuseColor = dirlight_diffuse;
             testPointLight.SpecularColor = dirlight_specular;
 
-            testSpotlight = new Spotlight(0.007f, 0.0002f, 1, new Vector3(-10, 0, 0), 5.5f, 7.5f);
+            testPointLightGameObject = new GameObject("Pointlight0");
+            testPointLight.gameObject = testPointLightGameObject;
+            testPointLightGameObject.AddComponent(testPointLight);
 
-            testDirectionalLight.Enabled = true;
-            testPointLight.Enabled = false;
-            testSpotlight.Enabled = false;
-            
+
+            testSpotlight = new Spotlight(0.007f, 0.0002f, 1, new Vector3(-10, 0, 0), 5.5f, 7.5f);
+            testSpotlightGameObject = new GameObject("Spotlight0");
+            testSpotlight.gameObject = testSpotlightGameObject;
+            testSpotlightGameObject.AddComponent(testSpotlight);
+
+
+            testDirectionalLight.Enabled = 1;
+            testPointLight.Enabled = 1;
+            testSpotlight.Enabled = 1;
+
             sunPosition = new Vector3(50.0f, 50.0f, 0.0f);
             //testSpotlight.Enabled = false;
+
+            manager.AddPointLight(testPointLight);
+            manager.AddSpotLight(testSpotlight);
+            manager.DirectionalLight = testDirectionalLight;
+            manager.DirectionalLightPosition = sunPosition;
+            manager.CreateNewPointLight();
+            testPointLightGameObject.transform.position = pointlight_position;
+            testSpotlightGameObject.transform.position = spotlight_position;
+
+            manager.Start();
+
+            //EngineManager.scene = new TestScene();
 
             EngineManager.scene = new ProceduralTest();
 
@@ -213,18 +236,17 @@ namespace SolidSilnique
             // Load the model
 
 
-
             _font = Content.Load<SpriteFont>("Megafont");
             _text = new SpriteBatch(GraphicsDevice);
 
-            
+
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             EngineManager.wireframeEffect = new BasicEffect(GraphicsDevice) { VertexColorEnabled = true };
             EngineManager.normalMap = Content.Load<Texture2D>("Textures/normal_map");
             EngineManager.defaultRoughnessMap = Content.Load<Texture2D>("Textures/default_roughness");
             EngineManager.defaultAOMap = Content.Load<Texture2D>("Textures/default_ao");
-            
+
 
             EngineManager.scene.LoadContent(Content);
             EngineManager.scene.Setup();
@@ -289,11 +311,11 @@ namespace SolidSilnique
             }
 
             Vector3 originalVector = testDirectionalLight.Direction; // vector to rotate
-			Vector3 axis = Vector3.Up; // e.g., Y-axis (0, 1, 0)
-			float angleRadians = MathHelper.ToRadians(10*Time.deltaTime); // 90 degrees
+            Vector3 axis = Vector3.Up; // e.g., Y-axis (0, 1, 0)
+            float angleRadians = MathHelper.ToRadians(10 * Time.deltaTime); // 90 degrees
 
-			Matrix rotation = Matrix.CreateFromAxisAngle(axis, angleRadians);
-			testDirectionalLight.Direction = Vector3.Transform(originalVector, rotation);
+            Matrix rotation = Matrix.CreateFromAxisAngle(axis, angleRadians);
+            testDirectionalLight.Direction = Vector3.Transform(originalVector, rotation);
 
 
             _input.Process(gameTime);
@@ -321,23 +343,19 @@ namespace SolidSilnique
             shader.SetUniform("View", _view);
             shader.SetUniform("Projection", _projection);
             shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
-            
-
-            //shader.SetUniform("useNormalMap", useNormalMap ? 1 : 0);
-            //shader.SetTexture("texture_normal1", _normalMap);
-            testDirectionalLight.SendToShader(shader);
+            //testDirectionalLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
-            shader.SetUniform("pointlight1_position", pointlight_position);
-            testPointLight.SendToShader(shader);
+            //shader.SetUniform("pointlight1_position", pointlight_position);
+            //testPointLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
-            shader.SetUniform("spotlight1_position", spotlight_position);
-            testSpotlight.SendToShader(shader);
+            //shader.SetUniform("spotlight1_position", spotlight_position);
+            //testSpotlight.SendToShader(shader);
 
-            
+
             //if (useCulling)
-                //PerformCulledDraw();
+            //PerformCulledDraw();
             //else
-                EngineManager.Draw(shader, GraphicsDevice, _view, _projection);
+            EngineManager.Draw(shader, GraphicsDevice, _view, _projection);
             //PerformCulledDraw();
             //EngineManager.Draw(shader);
             //Frustum Culling Setup
@@ -363,7 +381,7 @@ namespace SolidSilnique
             _text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Aqua);
             _text.End();
 
-           
+
             base.Draw(gameTime);
         }
 
@@ -392,7 +410,7 @@ namespace SolidSilnique
                 var world = go.transform.getModelMatrix();
                 var position = go.transform.position;
 
-                
+
                 bool objectNormal = useNormalMap && go.normalMap != null;
 
                 //shader.SetTexture("texture_diffuse1", go.texture);
@@ -404,8 +422,8 @@ namespace SolidSilnique
                 shader.SetTexture("texture_normal1", go.normalMap ?? _normalMap);
                 shader.SetTexture("texture_roughness1", go.roughnessMap ?? _defaultRoughnessMap);
                 shader.SetTexture("texture_ao1", go.aoMap ?? _defaultAOMap);
-                
-                            // toggles (as ints) for the HLSL if-tests
+
+                // toggles (as ints) for the HLSL if-tests
                 shader.SetUniform("useNormalMap", (go.normalMap != null && useNormalMap) ? 1 : 0);
                 shader.SetUniform("useRoughnessMap", (go.roughnessMap != null) ? 1 : 0);
                 shader.SetUniform("useAOMap", (go.aoMap != null) ? 1 : 0);
@@ -426,11 +444,12 @@ namespace SolidSilnique
                         var lines = new VertexPositionColor[24];
                         Color wireColor = visible ? Color.Green : Color.Red;
                         int idx = 0;
-                        int[,] edges = {
-                    {0,1},{1,2},{2,3},{3,0},
-                    {4,5},{5,6},{6,7},{7,4},
-                    {0,4},{1,5},{2,6},{3,7}
-                };
+                        int[,] edges =
+                        {
+                            { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
+                            { 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 4 },
+                            { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 }
+                        };
                         for (int e = 0; e < edges.GetLength(0); e++)
                         {
                             var a = corners[edges[e, 0]];
@@ -438,6 +457,7 @@ namespace SolidSilnique
                             lines[idx++] = new VertexPositionColor(a, wireColor);
                             lines[idx++] = new VertexPositionColor(b, wireColor);
                         }
+
                         foreach (var pass in _debugEffect.CurrentTechnique.Passes)
                         {
                             pass.Apply();
@@ -459,11 +479,10 @@ namespace SolidSilnique
                         position);
 
                     // Select appropriate LOD model based on distance
-                   
+
                     if (go.LODModels != null && go.LODModels.Count > 0)
                     {
                         modelToDraw = go.GetLODModel(distance);
-
                     }
 
                     // Configure effects and draw mesh
@@ -483,6 +502,7 @@ namespace SolidSilnique
                             shader.SetUniform("World", world);
                         }
                     }
+
                     mesh.Draw();
                 }
             }

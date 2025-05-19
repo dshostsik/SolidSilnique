@@ -1,7 +1,8 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using SolidSilnique.Core.Diagnostics;
 
-namespace SolidSilnique
+namespace SolidSilnique.Core
 {
     public class DirectionalLight : Light
     {
@@ -10,9 +11,9 @@ namespace SolidSilnique
         public DirectionalLight(Vector3 direction)
         {
             _direction = direction;
-            AmbientColor = new Vector4(.2f, .2f, .2f, .0f);
+            AmbientColor = new Vector4(.1f, .1f, .1f, .0f);
             DiffuseColor = new Vector4(.8f, .8f, .8f, .0f);
-            SpecularColor = new Vector4(.8f, .8f, .8f, .0f);
+            SpecularColor = new Vector4(1.0f, 1.0f, 1.0f, .0f);
         }
 
         public Vector3 Direction
@@ -35,6 +36,16 @@ namespace SolidSilnique
             {
                 throw new UniformNotFoundException(e.Message, " error source: DirectionalLight.cs");
             }
+        }
+
+        public override void Start()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Update()
+        {
+            throw new NotImplementedException();
         }
     }
 }

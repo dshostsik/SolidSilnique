@@ -31,8 +31,8 @@ namespace SolidSilnique.Core
 		public Dictionary<string, Texture2D> loadedTextures = new Dictionary<string, Texture2D>();
 
 
-		abstract public void Setup();
-		abstract public void LoadContent(ContentManager Content);
+		public abstract void Setup();
+		public abstract void LoadContent(ContentManager Content);
 
 
 		/// <summary>

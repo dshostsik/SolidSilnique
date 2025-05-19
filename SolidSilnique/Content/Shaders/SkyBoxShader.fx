@@ -8,7 +8,7 @@
 
 
 TextureCube CubeTexture : register(t0); // The cube map bound to texture register t0
-SamplerState CubeSampler : register(s0); // The sampler bound to sampler register s0
+SamplerState CubeSampler : register(s1); // The sampler bound to sampler register s0
 
 matrix View;
 matrix Projection;
