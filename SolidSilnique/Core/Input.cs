@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace SolidSilnique.Core
 {
@@ -17,6 +18,7 @@ namespace SolidSilnique.Core
         private MouseState _msState;
         private bool wasBDownLastFrame;
         private bool wasPDownLastFrame;
+        private bool wasF5DownLastFrame = false;
 
         public Input(Game1 game)
         {
@@ -73,6 +75,20 @@ namespace SolidSilnique.Core
             {
                 EngineManager.celShadingEnabled = true;
             }
+
+            bool isF5Down = kb.IsKeyDown(Keys.F5);
+                    if (isF5Down && !wasF5DownLastFrame)
+                        {
+                var scene = EngineManager.scene;
+                            // only swap if a TPCamera has been set
+                            if (scene.TPCamera != null)
+                                {
+                    var tmp = scene.mainCamera;
+                    scene.mainCamera = scene.TPCamera;
+                    scene.TPCamera = tmp;
+                                }
+                        }
+            wasF5DownLastFrame = isF5Down;
 
         }
         private void ProcessMouse(GameTime gameTime)

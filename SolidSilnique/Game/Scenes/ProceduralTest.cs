@@ -123,8 +123,9 @@ class ProceduralTest : Scene
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];
 			
-			//go.AddComponent(new DebugMoveComponent()); //<-- Dodawanie componentów
-			go.AddComponent(new SphereColliderComponent(3.5f));
+
+        //go.AddComponent(new DebugMoveComponent()); //<-- Dodawanie componentów
+        go.AddComponent(new SphereColliderComponent(3.5f));
 
 			this.AddChild(go);
 
@@ -138,7 +139,8 @@ class ProceduralTest : Scene
 
 			GameObject gab = new GameObject("gab");
 			gab.transform.position = new Vector3(250, 15, 220);
-			gab.transform.scale = new Vector3(1f);
+
+            gab.transform.scale = new Vector3(1f);
 			gab.model = loadedModels["cube"];
 			gab.texture = loadedTextures["gabTex"];
 			//gab.normalMap = loadedTextures["gabNo"];
@@ -146,8 +148,16 @@ class ProceduralTest : Scene
 			//gab.aoMap = loadedTextures["gabAo"];
 			gab.AddComponent(new DebugMoveComponent());
 			gab.AddComponent(new SphereColliderComponent(1));
-			this.AddChild(gab);
+			
 
+			this.AddChild(gab);
+			GameObject TPcam = new GameObject("cam");
+			var tpcCamComp = new CameraComponent();
+			TPcam.AddComponent(tpcCamComp);
+			TPcam.transform.position = new Vector3(gab.transform.position.X + 0, gab.transform.position.Y + 5, gab.transform.position.Z + -10);
+			this.TPCamera = new Camera(tpcCamComp);
+			
+			gab.AddChild(TPcam);
 
 			GameObject eye1 = new GameObject("eye1");
 			eye1.transform.position = new Vector3(-0.25f*2, 0.209f, 0.427f * 2);

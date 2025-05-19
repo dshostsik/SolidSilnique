@@ -96,6 +96,8 @@ namespace SolidSilnique
         GameTime gameTime;
 
 
+
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -228,6 +230,7 @@ namespace SolidSilnique
             EngineManager.scene.Setup();
 
             EngineManager.scene.mainCamera.mouseMovement(0, 0, 0);
+            
 
             EngineManager.Start();
         }
@@ -236,7 +239,10 @@ namespace SolidSilnique
         /// Function defining mouse behaviour
         /// </summary>
         /// <param name="gameTime">Object containing time values</param>
-        
+
+
+        private readonly Vector3 _tpcOffset = new Vector3(0, 5, -10);
+        private readonly Vector3 _tpcLookOffset = new Vector3(0, 2, 0);
 
         /// <summary>
         /// Add your update logic here
@@ -249,8 +255,22 @@ namespace SolidSilnique
                 Exit();
 
             // Get current camera view
-            _view = EngineManager.scene.mainCamera.getViewMatrix(); //TODO Delete
-
+            //_view = EngineManager.scene.mainCamera.getViewMatrix(); //TODO Delete
+            if (EngineManager.scene.mainCamera == EngineManager.scene.TPCamera)
+            {
+                // Monster’s world position
+                Vector3 monsterPos = EngineManager.scene.TPCamera.CameraPosition;
+                // Place camera behind & above
+                Vector3 camPos = monsterPos + _tpcOffset;
+                // Aim slightly down at the monster
+                Vector3 lookAt = monsterPos + _tpcLookOffset;
+                _view = Matrix.CreateLookAt(camPos, lookAt, Vector3.Up);
+            }
+            else
+            {
+                // Free-cam’s usual view
+                _view = EngineManager.scene.mainCamera.getViewMatrix();
+            }
 
             _lightView = Matrix.CreateLookAt(sunPosition, sunPosition + testDirectionalLight.Direction, Vector3.Up);
             _lightProjection = Matrix.CreateOrthographic(200, 200, 0.1f, 100f);
