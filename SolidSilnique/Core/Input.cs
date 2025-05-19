@@ -13,14 +13,14 @@ namespace SolidSilnique.Core
     internal class Input
     {
 
-        private readonly Game1 _game;
+        private readonly Microsoft.Xna.Framework.Game _game;
         private KeyboardState _kbState;
         private MouseState _msState;
         private bool wasBDownLastFrame;
         private bool wasPDownLastFrame;
         private bool wasF5DownLastFrame = false;
 
-        public Input(Game1 game)
+        public Input(Microsoft.Xna.Framework.Game game)
         {
             _game = game;
         }

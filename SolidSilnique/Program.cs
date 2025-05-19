@@ -1,7 +1,7 @@
 ﻿
 
 #if SCENEEDITOR
-    using var game = new SolidSilnique.Game1();
+    using var game = new SolidSilnique.ForgeSceneEditor();
     game.Run();
 #else
     using var game = new SolidSilnique.Game1();
