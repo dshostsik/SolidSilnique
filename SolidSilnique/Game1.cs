@@ -209,6 +209,7 @@ namespace SolidSilnique
             manager.AddSpotLight(testSpotlight);
             manager.DirectionalLight = testDirectionalLight;
             manager.DirectionalLightPosition = sunPosition;
+            manager.CreateNewPointLight();
             testPointLightGameObject.transform.position = pointlight_position;
             testSpotlightGameObject.transform.position = spotlight_position;
 
@@ -252,11 +253,7 @@ namespace SolidSilnique
 
             EngineManager.Start();
         }
-
-        /// <summary>
-        /// Function defining mouse behaviour
-        /// </summary>
-        /// <param name="gameTime">Object containing time values</param>
+        
         /// <summary>
         /// Add your update logic here
         /// </summary>
