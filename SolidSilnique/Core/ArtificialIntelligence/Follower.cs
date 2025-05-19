@@ -37,19 +37,6 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// </summary>
         public GameObject Self => _self;
 
-
-        /// <summary>
-        /// Calculates <see cref="SocialDistance"/> depending on <see cref="SocialDistanceMultiplier"/> and <see cref="Target"/>'s radius.
-        /// </summary>
-        /// <returns>Calculated length of radius  defining private zone of target</returns>
-        private float ComputeSocialDistance()
-        {
-            if (null == _target) return 0.0f;
-            var collider = _target.GetComponent<SphereColliderComponent>() ??
-                           throw new ArgumentException("Game object must contain SphereColliderComponent");
-            return collider.boundingSphere.Radius * _socialDistanceMultiplier;
-        }
-
         /// <summary>
         /// Reference to a target <see cref="GameObject"/> that will be followed by <see cref="Self"/>.<p>Default value is <c>null</c>. Make sure that you set it before calling <see cref="GetFollowDirectionVector"/> method.</p>
         /// </summary>
@@ -61,7 +48,14 @@ namespace SolidSilnique.Core.ArtificialIntelligence
                 if (null != value && _self.Equals(value))
                     throw new ArgumentException("Target cannot be set to itself.\nSet another object instead!");
                 _target = value;
-                if (null != _target) _socialDistance = ComputeSocialDistance();
+                if (null == _target)
+                {
+                    _socialDistance = 0.0f; 
+                    return;
+                }
+                var collider = _target.GetComponent<SphereColliderComponent>() ?? throw new ArgumentException("Game object must contain SphereColliderComponent");
+                _socialDistance = collider.boundingSphere.Radius *
+                                  _socialDistanceMultiplier;
             }
         }
 
@@ -79,7 +73,9 @@ namespace SolidSilnique.Core.ArtificialIntelligence
                         "Invalid argument!\nMultiplier must be at least 1.0f\nOtherwise you'd have caused a bug of infinite following interrupted by collisions");
                 _socialDistanceMultiplier = value;
                 if (null == _target) return;
-                _socialDistance = ComputeSocialDistance();
+                var collider = _target.GetComponent<SphereColliderComponent>() ?? throw new ArgumentException("Game object must contain SphereColliderComponent");
+                _socialDistance = collider.boundingSphere.Radius *
+                                  _socialDistanceMultiplier;
             }
         }
 
@@ -93,8 +89,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             set
             {
                 if (null == _target) throw new TargetNotSetException("Target is null.\nMaybe you forgot to set it?");
-                float colliderRadius = _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius;
-                if (value < colliderRadius)
+                if (value < _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius)
                     throw new ArgumentException(
                         "Invalid argument!\nSocial distance must be greater or equal to radius, try again!\nOtherwise you'd have caused a bug of infinite following interrupted by collisions");
                 _socialDistance = value;
@@ -122,10 +117,10 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             if (null == _target) throw new TargetNotSetException("Target is null.\nMaybe you forgot to set it?");
 
             Vector3 direction = _target.transform.position - _self.transform.position;
-            if (direction.LengthSquared() <= (_socialDistance * _socialDistance)) return Vector3.Zero;
-            direction.Normalize();
-
             direction.Y = 0.0f;
+            if (direction.LengthSquared() <= (_socialDistance * _socialDistance)) return Vector3.Zero;
+
+            direction.Normalize();
 
             return direction;
         }
@@ -134,6 +129,9 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         {
         }
 
+        /// <summary>
+        /// Moves <see cref="Self"/> towards <see cref="Target"/> with a direction from <see cref="GetFollowDirectionVector"/>
+        /// </summary>
         public override void Update()
         {
             gameObject.transform.position += GetFollowDirectionVector() * Time.deltaTime * 10;
