@@ -1,30 +1,29 @@
-﻿using SolidSilnique.Core;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SolidSilnique.Core;
+using SolidSilnique.Core.ArtificialIntelligence;
 using SolidSilnique.Core.Components;
+using SolidSilnique.ProcderuralFoliage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices.JavaScript;
-using System.Text;
 using System.Threading.Tasks;
-using SolidSilnique.Core.ArtificialIntelligence;
-using SolidSilnique.ProcderuralFoliage;
 
 
 namespace SolidSilnique.GameContent;
 
 class ProceduralTest : Scene
 {
-    public Dictionary<string, Model>		loadedModels = new Dictionary<string, Model>();
-		public Dictionary<string, Texture2D>	loadedTextures = new Dictionary<string, Texture2D>();
+		
+		//PROCEDURAL HELPERS
 		List<Model>models = new List<Model>();
 		List<Texture2D>textures = new List<Texture2D>();
 		List<Model> treeModels = new List<Model>();
 		List<Texture2D> treeTextures = new List<Texture2D>();
+
+
+
+		
 		ContentManager content;
 		public ProceduralTest() {
 
@@ -65,10 +64,10 @@ class ProceduralTest : Scene
 			models.Add(Content.Load<Model>("pModels/BushSmall"));
 			//models.Add(Content.Load<Model>("pModels/Log"));
 			models.Add(Content.Load<Model>("pModels/Stump"));
-		textures.Add(loadedTextures["leafTex"]);
-        textures.Add(loadedTextures["deimos"]);
+			textures.Add(loadedTextures["leafTex"]);
+			textures.Add(loadedTextures["deimos"]);
 
-        treeModels.Add(Content.Load<Model>("pModels/tree1"));
+			treeModels.Add(Content.Load<Model>("pModels/tree1"));
 			treeModels.Add(Content.Load<Model>("pModels/Tree2"));
 			treeTextures.Add(Content.Load<Texture2D>("Textures/tree1_diffuse"));
 			treeTextures.Add(Content.Load<Texture2D>("Textures/tree2_diffuse"));
@@ -137,8 +136,9 @@ class ProceduralTest : Scene
 			go.model = loadedModels["deimos"];
 			go.texture = loadedTextures["deimos"];
 			
-			//go.AddComponent(new DebugMoveComponent()); //<-- Dodawanie componentów
-			go.AddComponent(new SphereColliderComponent(3.5f));
+
+        //go.AddComponent(new DebugMoveComponent()); //<-- Dodawanie componentów
+        go.AddComponent(new SphereColliderComponent(3.5f));
 
 			this.AddChild(go);
 
@@ -152,7 +152,8 @@ class ProceduralTest : Scene
 
 			GameObject gab = new GameObject("gab");
 			gab.transform.position = new Vector3(250, 15, 220);
-			gab.transform.scale = new Vector3(1f);
+
+            gab.transform.scale = new Vector3(1f);
 			gab.model = loadedModels["cube"];
 			gab.texture = loadedTextures["gabTex"];
 			//gab.normalMap = loadedTextures["gabNo"];
@@ -161,9 +162,15 @@ class ProceduralTest : Scene
 			gab.AddComponent(new DebugMoveComponent());
 			gab.AddComponent(new SphereColliderComponent(1));
 			
-			
-			this.AddChild(gab);
 
+			this.AddChild(gab);
+			GameObject TPcam = new GameObject("cam");
+			var tpcCamComp = new CameraComponent();
+			TPcam.AddComponent(tpcCamComp);
+			TPcam.transform.position = new Vector3(0,5, -10);
+			this.TPCamera = new Camera(tpcCamComp);
+			
+			gab.AddChild(TPcam);
 
 			GameObject eye1 = new GameObject("eye1");
 			eye1.transform.position = new Vector3(-0.25f*2, 0.209f, 0.427f * 2);

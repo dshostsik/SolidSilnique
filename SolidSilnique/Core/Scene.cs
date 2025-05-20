@@ -22,6 +22,9 @@ namespace SolidSilnique.Core
 		public Camera mainCamera;
 
 		[JsonIgnore]
+		public Camera TPCamera;
+
+		[JsonIgnore]
 		public Dictionary<string, Model> loadedModels = new Dictionary<string, Model>();
 
 		[JsonIgnore]

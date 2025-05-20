@@ -32,7 +32,7 @@ namespace SolidSilnique.Core
         Vector3 Right;
         Vector3 WorldUp;
 
-        public Vector3 CameraPosition { get { return cameraComponent.gameObject.transform.position; } }
+        public Vector3 CameraPosition { get { return cameraComponent.gameObject.transform.globalPosition; } }
         
         float Yaw;
         float Pitch;
@@ -69,13 +69,13 @@ namespace SolidSilnique.Core
 
         public Matrix getViewMatrix()
         {
-            return Matrix.CreateLookAt(cameraComponent.gameObject.transform.position, cameraComponent.gameObject.transform.position + Front, Up);
+            return Matrix.CreateLookAt(CameraPosition, CameraPosition + Front, Up);
         }
 
         public void move(directions direction, float deltaTime)
         {
             float speed = MovementSpeed * deltaTime;
-            Vector3 pos = cameraComponent.gameObject.transform.position;
+            Vector3 pos = CameraPosition;
 
 			if (direction == directions.FORWARD) pos += Front * speed;
             if (direction == directions.BACKWARD) pos -= Front * speed;

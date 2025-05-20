@@ -13,7 +13,7 @@ using DirectionalLight = SolidSilnique.Core.DirectionalLight;
 
 namespace SolidSilnique
 {
-    public class Game1 : Microsoft.Xna.Framework.Game
+    public class ForgeSceneEditor : Microsoft.Xna.Framework.Game
     {
         private readonly GraphicsDeviceManager _graphics;
 
@@ -106,7 +106,7 @@ namespace SolidSilnique
         /// <summary>
         /// Constructor
         /// </summary>
-        public Game1()
+        public ForgeSceneEditor()
         {
             _graphics = new GraphicsDeviceManager(this);
 
@@ -339,7 +339,7 @@ namespace SolidSilnique
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
-
+            
             shader.SetUniform("View", _view);
             shader.SetUniform("Projection", _projection);
             shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
