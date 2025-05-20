@@ -167,7 +167,7 @@ class ProceduralTest : Scene
 			GameObject TPcam = new GameObject("cam");
 			var tpcCamComp = new CameraComponent();
 			TPcam.AddComponent(tpcCamComp);
-			TPcam.transform.position = new Vector3(gab.transform.position.X + 0, gab.transform.position.Y + 5, gab.transform.position.Z + -10);
+			TPcam.transform.position = new Vector3(0,5, -10);
 			this.TPCamera = new Camera(tpcCamComp);
 			
 			gab.AddChild(TPcam);

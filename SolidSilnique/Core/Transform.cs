@@ -32,6 +32,11 @@ namespace SolidSilnique.Core
 			set { _scale = value; dirtyFlag = true; }
 		}
 
+		public Vector3 globalPosition {
+			get { return _position + ((gameObject.parent != null) ? gameObject.parent.transform.globalPosition : Vector3.Zero); }
+		}
+
+
 		//Model Matrix
 		[JsonIgnore]
 		public Matrix modelMatrix = new Matrix();
