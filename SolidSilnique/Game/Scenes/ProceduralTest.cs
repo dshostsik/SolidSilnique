@@ -39,6 +39,8 @@ class ProceduralTest : Scene
 			loadedModels.Add("cone", Content.Load<Model>("cone"));
 			loadedModels.Add("sphere", Content.Load<Model>("sphere"));
 			loadedModels.Add("levelTest", Content.Load<Model>("level_ground"));
+			loadedModels.Add("brzewno1/brzewno", Content.Load<Model>("brzewno1/brzewno"));
+			loadedModels.Add("brzewno3/brzewno", Content.Load<Model>("brzewno3/brzewno3"));
 
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 			loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
@@ -52,6 +54,15 @@ class ProceduralTest : Scene
 
 			loadedTextures.Add("leafTex", Content.Load<Texture2D>("Textures/leaf_diffuse"));
 			
+			loadedTextures.Add("brzewno1/diffuse", Content.Load<Texture2D>("brzewno1/diffuse"));
+			loadedTextures.Add("brzewno1/normal", Content.Load<Texture2D>("brzewno1/normal"));
+			loadedTextures.Add("brzewno1/ao", Content.Load<Texture2D>("brzewno1/ao"));
+			loadedTextures.Add("brzewno1/glossy", Content.Load<Texture2D>("brzewno1/glossy"));
+			
+			loadedTextures.Add("brzewno3/diffuse", Content.Load<Texture2D>("brzewno3/diffuse"));
+			loadedTextures.Add("brzewno3/normal", Content.Load<Texture2D>("brzewno3/normal"));
+			loadedTextures.Add("brzewno3/ao", Content.Load<Texture2D>("brzewno3/ao"));
+			loadedTextures.Add("brzewno3/glossy", Content.Load<Texture2D>("brzewno3/glossy"));
 			
 			models.Add(Content.Load<Model>("pModels/Rock1"));
 			models.Add(Content.Load<Model>("pModels/Branch"));
@@ -64,6 +75,9 @@ class ProceduralTest : Scene
 			models.Add(Content.Load<Model>("pModels/BushSmall"));
 			//models.Add(Content.Load<Model>("pModels/Log"));
 			models.Add(Content.Load<Model>("pModels/Stump"));
+			
+			models.Add(Content.Load<Model>("brzewno1/brzewno"));
+			models.Add(Content.Load<Model>("brzewno3/brzewno3"));
 			textures.Add(loadedTextures["leafTex"]);
 			textures.Add(loadedTextures["deimos"]);
 
