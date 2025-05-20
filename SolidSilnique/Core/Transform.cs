@@ -36,6 +36,14 @@ namespace SolidSilnique.Core
 			get { return _position + ((gameObject.parent != null) ? gameObject.parent.transform.globalPosition : Vector3.Zero); }
 		}
 
+		public Vector3 globalRotation
+		{
+			get { return _rotation + ((gameObject.parent != null) ? gameObject.parent.transform.globalRotation : Vector3.Zero); }
+		}
+
+		public Vector3 Forward { 
+			get { return modelMatrix.Forward; }
+		}
 
 		//Model Matrix
 		[JsonIgnore]
@@ -69,16 +77,16 @@ namespace SolidSilnique.Core
 		public Matrix getModelMatrix() {
 			if (_dirtyFlag) {
 
-				modelMatrix =
+				modelMatrix = Matrix.CreateScale(_scale) *
 								Matrix.CreateRotationX(MathHelper.ToRadians(_rotation.X)) *
 								Matrix.CreateRotationY(MathHelper.ToRadians(_rotation.Y)) *
 								Matrix.CreateRotationZ(MathHelper.ToRadians(_rotation.Z)) *
 								Matrix.CreateTranslation(_position);
 				if(gameObject.parent != null)
 				{
-					modelMatrix = gameObject.parent.transform.getModelMatrix() * modelMatrix;
+					modelMatrix = modelMatrix * gameObject.parent.transform.getModelMatrix();
 				}
-				modelMatrix = Matrix.CreateScale(_scale) * modelMatrix;
+				//modelMatrix =  * modelMatrix;
 
 				_dirtyFlag = false;
 			}
