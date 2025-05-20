@@ -10,12 +10,26 @@ namespace SolidSilnique.Core.Components
     public class InteractionComponent : Component
     {
         /// <summary>
+        /// Flag defining if the object will ever follow the player or another <see cref="GameObject"/>.
+        /// </summary>
+        private bool _shouldFollow;
+
+        /// <summary>
         /// Flag defining if the object is following the player or another <see cref="GameObject"/>.
+        /// </summary>
+        public bool ShouldFollow
+        {
+            get => _shouldFollow;
+            set => _shouldFollow = value;
+        }
+
+        /// <summary>
+        /// Flag defining if the object <see cref="Self"/> is currently following <see cref="Target"/> <see cref="GameObject"/>
         /// </summary>
         private bool _isFollowing;
 
         /// <summary>
-        /// Flag defining if the object is following the player or another <see cref="GameObject"/>. Is set once and forever
+        /// Flag defining if the object <see cref="Self"/> is currently following <see cref="Target"/> <see cref="GameObject"/>
         /// </summary>
         public bool IsFollowing => _isFollowing;
 
@@ -37,12 +51,12 @@ namespace SolidSilnique.Core.Components
         /// Flag defining if the object is currently interactive.
         /// </summary>
         private bool _currentlyInteractive;
-        
+
         /// <summary>
         /// Flag defining if the object is currently interactive.
         /// </summary>
         public bool CurrentlyInteractive => _currentlyInteractive;
-        
+
         /// <summary>
         /// Flag defining if the object was interacted with. A bit pointless if <c>_multiplyInteractive == true</c>
         /// </summary>
@@ -103,16 +117,18 @@ namespace SolidSilnique.Core.Components
                 if (value < 0)
                     throw new System.ArgumentException(
                         "Invalid argument!\nInteraction distance must be greater or equal to 0.0f\nOtherwise you'd have caused a bug of infinite following interrupted by collisions");
-                var collider = _self.GetComponent<SphereColliderComponent>() ?? throw new System.ArgumentException("Game object must contain SphereColliderComponent");
+                var collider = _self.GetComponent<SphereColliderComponent>() ??
+                               throw new System.ArgumentException("Game object must contain SphereColliderComponent");
                 if (value < collider.boundingSphere.Radius)
                 {
                     throw new System.ArgumentException(
                         "Invalid argument!\nInteraction distance must be greater or equal to radius, try again!\nOtherwise you'd have caused a bug of infinite following interrupted by collisions");
                 }
+
                 _interactionDistance = value;
             }
         }
-        
+
         /// <summary>
         /// Multiplier to count <see cref="InteractionDistance"/>
         /// </summary>
@@ -130,7 +146,7 @@ namespace SolidSilnique.Core.Components
                 _distanceMultiplier = value;
             }
         }
-        
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -138,19 +154,27 @@ namespace SolidSilnique.Core.Components
         /// <param name="target">Reference to a <see cref="GameObject"/> that can interact with <see cref="Self"/></param>
         /// <param name="distanceMultiplier">Multiplier used to compute <see cref="InteractionDistance"/></param>
         /// <param name="multiplyInteractive">Flag that enables multiple interaction</param>
-        /// <param name="isFollowing">Flag that enables following for <see cref="Self"/> towards <see cref="Target"/></param>
+        /// <param name="shouldFollow">Flag that enables following for <see cref="Self"/> towards <see cref="Target"/></param>
         /// <param name="wasInteracted">Flag which shows that the object was already in use. A bit pointless if <c>_multiplyInteractive == true</c></param>
-        public InteractionComponent(GameObject self, GameObject target, float distanceMultiplier = 2.5f, bool multiplyInteractive = true, bool isFollowing = false,
-            bool wasInteracted = false)
+        public InteractionComponent(GameObject self, GameObject target, float distanceMultiplier = 1.5f,
+            bool multiplyInteractive = true, bool shouldFollow = false)
         {
             _self = self;
             _target = target;
             _distanceMultiplier = distanceMultiplier;
-            var collider = _self.GetComponent<SphereColliderComponent>() ?? throw new System.ArgumentException("Game object must contain SphereColliderComponent");
+            var collider = _self.GetComponent<SphereColliderComponent>() ??
+                           throw new System.ArgumentException("Game object must contain SphereColliderComponent");
             _interactionDistance = collider.boundingSphere.Radius * _distanceMultiplier;
             _isMultiplyInteractive = multiplyInteractive;
-            _isFollowing = isFollowing;
-            _wasInteracted = wasInteracted;
+            _shouldFollow = shouldFollow;
+
+            _wasInteracted = false;
+            _currentlyInteractive = false;
+            _isFollowing = false;
+            if (!_shouldFollow) return;
+
+            _self.AddComponent(new Follower(_self, DistanceMultiplier));
+            _self.GetComponent<Follower>().Target = _target;
         }
 
         /// <summary>
@@ -158,11 +182,31 @@ namespace SolidSilnique.Core.Components
         /// </summary>
         public override void Start()
         {
-            _currentlyInteractive = false;
         }
 
         /// <summary>
-        /// Executed every frame
+        /// Function that enables <see cref="Self"/> to follow <see cref="Target"/> if <see cref="ShouldFollow"/> is set to <c>true</c>.
+        /// </summary>
+        private void Pick()
+        {
+            _isFollowing = true;
+            _currentlyInteractive = false;
+            _self.GetComponent<Follower>().Target = _target;
+        }
+
+        /// <summary>
+        /// Function that disables <see cref="Self"/> from following <see cref="Target"/> if <see cref="ShouldFollow"/> is set to <c>true</c>.
+        /// </summary>
+        private void Release()
+        {
+            _isFollowing = false;
+            _currentlyInteractive = true;
+            _self.GetComponent<Follower>().Target = null;
+            _wasInteracted = true;
+        }
+
+        /// <summary>
+        /// Executed every frame. DO NOT ALLOCATE MEMORY HERE!
         /// </summary>
         /// <exception cref="System.NullReferenceException">if <see cref="Component.gameObject"/> is <c>null</c></exception>
         public override void Update()
@@ -170,19 +214,24 @@ namespace SolidSilnique.Core.Components
             Vector3 distance = _self.transform.position - _target.transform.position;
             distance.Y = 0.0f;
             if (distance.LengthSquared() > (_interactionDistance * _interactionDistance)) return;
-            if (_isFollowing)
+
+            _wasInteracted = true;
+
+            // Behavior for following if the object needs to be picked up and/or released
+            if (_shouldFollow && !_isFollowing)
             {
-                var follower = new Follower(_self, DistanceMultiplier)
-                {
-                    Target = _target,
-                    gameObject = gameObject
-                };
-                _self.AddComponent(follower);
-                _isFollowing = false;
+                Pick();
+                return;
             }
 
-            _currentlyInteractive = !_wasInteracted && _isMultiplyInteractive;
-            if (!_isMultiplyInteractive) _wasInteracted = true;
+            if (_isFollowing && !_shouldFollow)
+            {
+                Release();
+                return;
+            }
+
+            // Otherwise, availability of interaction depends on whether the object was interacted with before AND if it can be interacted with multiple times
+            _currentlyInteractive = _isMultiplyInteractive || !_wasInteracted;
         }
     }
 }
