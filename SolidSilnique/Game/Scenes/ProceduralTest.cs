@@ -280,13 +280,13 @@ class ProceduralTest : Scene
 
 			go.transform.position = pos;
 			go.transform.scale = new Vector3(0.75f);
-			// go.model = loadedModels["sphere"];
-			// go.texture = loadedTextures["gabTex"];
-			go.model = loadedModels["drzewo/drzewo"];
-			go.texture = loadedTextures["drzewo/diffuse"];
-			go.normalMap = loadedTextures["drzewo/normal"];
-			go.aoMap = loadedTextures["drzewo/ao"];
-			go.roughnessMap = loadedTextures["drzewo/glossy"];
+			go.model = loadedModels["sphere"];
+			go.texture = loadedTextures["gabTex"];
+			// go.model = loadedModels["drzewo/drzewo"];
+			// go.texture = loadedTextures["drzewo/diffuse"];
+			// go.normalMap = loadedTextures["drzewo/normal"];
+			// go.aoMap = loadedTextures["drzewo/ao"];
+			// go.roughnessMap = loadedTextures["drzewo/glossy"];
 			go.AddComponent(new SphereColliderComponent(0.75f,false));
 			go.AddComponent(new DebugMoveComponent());
 			go.GetComponent<DebugMoveComponent>().move = false;
