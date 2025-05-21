@@ -13,39 +13,29 @@ namespace SolidSilnique.Core.ArtificialIntelligence
     public class Follower : Component
     {
         /// <summary>
-        /// Reference to the self-<see cref="GameObject"/>
-        /// </summary>
-        private readonly GameObject _self;
-
-        /// <summary>
-        /// Reference to a target <see cref="GameObject"/> that will be followed by <see cref="Self"/>
+        /// Reference to a target <see cref="GameObject"/> that will be followed by Self
         /// </summary>
         private GameObject? _target;
 
         /// <summary>
-        /// Multiplier for the distance between <see cref="Self"/> and <see cref="Target"/>. The default value is 1.5f
+        /// Multiplier for the distance between Self and <see cref="Target"/>. The default value is 1.5f
         /// </summary>
         private float _socialDistanceMultiplier;
 
         /// <summary>
-        /// The distance between <see cref="Self"/> and <see cref="Target"/> . The default value is calculated based on <see cref="_socialDistanceMultiplier"/>
+        /// The distance between Self and <see cref="Target"/> . The default value is calculated based on <see cref="_socialDistanceMultiplier"/>
         /// </summary>
         private float _socialDistance;
 
         /// <summary>
-        /// Reference to the self-<see cref="GameObject"/>
-        /// </summary>
-        public GameObject Self => _self;
-
-        /// <summary>
-        /// Reference to a target <see cref="GameObject"/> that will be followed by <see cref="Self"/>.<p>Default value is <c>null</c>. Make sure that you set it before calling <see cref="GetFollowDirectionVector"/> method.</p>
+        /// Reference to a target <see cref="GameObject"/> that will be followed by Self.<p>Default value is <c>null</c>. Make sure that you set it before calling <see cref="GetFollowDirectionVector"/> method.</p>
         /// </summary>
         public GameObject? Target
         {
             get => _target;
             set
             {
-                if (null != value && _self.Equals(value))
+                if (null != value && this.gameObject.Equals(value))
                     throw new ArgumentException("Target cannot be set to itself.\nSet another object instead!");
                 _target = value;
                 if (null == _target)
@@ -80,7 +70,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         }
 
         /// <summary>
-        /// The distance between <see cref="Self"/> and <see cref="Target"/> . The default value is calculated based on <see cref="SocialDistanceMultiplier"/>
+        /// The distance between Self and <see cref="Target"/> . The default value is calculated based on <see cref="SocialDistanceMultiplier"/>
         /// <p>Pay attention that if <see cref="Target"/> is not <c>null</c> then you'll not be able to set that distance shorter that radius of its <see cref="SphereColliderComponent"/></p>
         /// </summary>
         public float SocialDistance
@@ -103,7 +93,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// <param name="socialDistanceMultiplier">Multiplier for the distance between <see cref="Self"/> and <see cref="Target"/>. The default value is 1.5f</param>
         public Follower(GameObject self, float socialDistanceMultiplier = 1.5f)
         {
-            _self = self;
+            gameObject = self;
             _socialDistanceMultiplier = socialDistanceMultiplier;
         }
 
@@ -116,7 +106,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         {
             if (null == _target) throw new TargetNotSetException("Target is null.\nMaybe you forgot to set it?");
 
-            Vector3 direction = _target.transform.position - _self.transform.position;
+            Vector3 direction = _target.transform.position - this.gameObject.transform.position;
             direction.Y = 0.0f;
             if (direction.LengthSquared() <= (_socialDistance * _socialDistance)) return Vector3.Zero;
 
@@ -130,7 +120,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         }
 
         /// <summary>
-        /// Moves <see cref="Self"/> towards <see cref="Target"/> with a direction from <see cref="GetFollowDirectionVector"/>
+        /// Moves <see cref="GameObject"/> towards <see cref="Target"/> with a direction from <see cref="GetFollowDirectionVector"/>
         /// </summary>
         public override void Update()
         {
