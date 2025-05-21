@@ -127,8 +127,8 @@ namespace SolidSilnique
 
             Window.AllowUserResizing = true;
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            _graphics.IsFullScreen = true;
-            // _graphics.HardwareModeSwitch = true;
+            _graphics.IsFullScreen = false;
+            // _graphics.HardwareModeSwitch = true;aw
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
             _graphics.SynchronizeWithVerticalRetrace = true; //VSync

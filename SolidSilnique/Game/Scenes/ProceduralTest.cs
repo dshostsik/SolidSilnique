@@ -43,6 +43,7 @@ class ProceduralTest : Scene
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 			loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
 			loadedTextures.Add("simpleGreen", Content.Load<Texture2D>("simpleGreen"));
+			loadedTextures.Add("simpleBlack", Content.Load<Texture2D>("simpleBlack"));
 			loadedTextures.Add("gabTex", Content.Load<Texture2D>("Textures/gab_tex"));
 			loadedTextures.Add("gabNo", Content.Load<Texture2D>("Textures/gab_no"));
 			loadedTextures.Add("gabRo", Content.Load<Texture2D>("Textures/gab_ro"));
@@ -179,14 +180,44 @@ class ProceduralTest : Scene
 			eye1.texture = loadedTextures["eye"];
 			gab.AddChild(eye1);
 
-			GameObject eye2 = new GameObject("eye2");
+			GameObject pupil1 = new GameObject("pupil1");
+				pupil1.transform.position = new Vector3(0, 0, 0.427f * 2);
+				pupil1.transform.scale = new Vector3(0.4f,0.4f,0.2f);
+				pupil1.model = loadedModels["sphere"];
+				pupil1.texture = loadedTextures["simpleBlack"];
+				eye1.AddChild(pupil1);
+
+		GameObject brow1 = new GameObject("brow1");
+		brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, 0.427f * 2);
+		brow1.transform.scale = new Vector3(0.45f, 0.2f,0.4f);
+		brow1.transform.rotation = new Vector3(0f,0,-20f);
+		brow1.model = loadedModels["cube"];
+		brow1.texture = loadedTextures["simpleBlack"];
+		gab.AddChild(brow1);
+
+		GameObject eye2 = new GameObject("eye2");
 			eye2.transform.position = new Vector3(0.25f*2, 0.209f, 0.427f*2);
 			eye2.transform.scale = new Vector3(0.4f);
 			eye2.model = loadedModels["sphere"];
 			eye2.texture = loadedTextures["eye"];
 			gab.AddChild(eye2);
 
-			GameObject prevGeb = gab;
+		GameObject pupil2 = new GameObject("pupil1");
+		pupil2.transform.position = new Vector3(0, 0, 0.427f * 2);
+		pupil2.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
+		pupil2.model = loadedModels["sphere"];
+		pupil2.texture = loadedTextures["simpleBlack"];
+		eye2.AddChild(pupil2);
+
+		GameObject brow2 = new GameObject("brow1");
+		brow2.transform.position = new Vector3(0.25f * 2, 0.5f, 0.427f * 2);
+		brow2.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
+		brow2.transform.rotation = new Vector3(0f, 0, 20f);
+		brow2.model = loadedModels["cube"];
+		brow2.texture = loadedTextures["simpleBlack"];
+		gab.AddChild(brow2);
+
+		GameObject prevGeb = gab;
 			for (int i = 0; i < 10; i++)
 			{
 				GameObject gogus = CreateGebus(new Vector3(150 + i*2, 2, 150 + i*2));
