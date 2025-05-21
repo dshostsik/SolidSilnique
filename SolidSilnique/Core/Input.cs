@@ -145,6 +145,8 @@ namespace SolidSilnique.Core
             //A for up
             if (_gpState.Buttons.A == ButtonState.Pressed)
                 cam.move(Camera.directions.UP, dt);
+
+            if (_gpState.Triggers.Right > 0.1f) cam.cameraComponent.Shoot();
         }
     }
 }

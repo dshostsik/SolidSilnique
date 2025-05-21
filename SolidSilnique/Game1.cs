@@ -259,7 +259,7 @@ namespace SolidSilnique
             EngineManager.Start();
 
             // Initialize GPU leaf particles
-            _leafSystem = new LeafParticle(maxParticles: (int)2e+4)
+            _leafSystem = new LeafParticle(maxParticles: (int)2e+3)
             {
                 _game = this
             };
