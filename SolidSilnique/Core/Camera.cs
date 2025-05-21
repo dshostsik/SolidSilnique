@@ -27,7 +27,7 @@ namespace SolidSilnique.Core
         }
 
         
-        Vector3 Front;
+        public Vector3 Front;
         Vector3 Up;
         Vector3 Right;
         Vector3 WorldUp;
@@ -40,7 +40,7 @@ namespace SolidSilnique.Core
         float MovementSpeed;
         float MouseSensitivity;
         public float Zoom;
-        CameraComponent cameraComponent;
+        public CameraComponent cameraComponent;
 
         public Camera(CameraComponent camComponent, float yaw = YAW, float pitch = PITCH)
         {

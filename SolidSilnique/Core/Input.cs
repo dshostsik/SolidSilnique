@@ -53,6 +53,8 @@ namespace SolidSilnique.Core
             if (_kbState.IsKeyDown(Keys.D)) cam.move(Camera.directions.RIGHT, dt);
             if (_kbState.IsKeyDown(Keys.Space)) cam.move(Camera.directions.UP, dt);
 
+            if (_kbState.IsKeyDown(Keys.F)) cam.cameraComponent.Shoot();
+
             var kb = Keyboard.GetState();
             bool isPDown = kb.IsKeyDown(Keys.P);
 

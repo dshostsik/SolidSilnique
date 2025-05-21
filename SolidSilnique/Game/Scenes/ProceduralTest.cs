@@ -94,7 +94,7 @@ class ProceduralTest : Scene
 			CameraComponent cam = new CameraComponent();
 			cam.SetMain();
 			go.AddComponent(cam);
-			go.AddComponent(new SphereColliderComponent(3f));
+			//go.AddComponent(new SphereColliderComponent(3f));
 			this.AddChild(go);
 
 			go = new GameObject("ground");

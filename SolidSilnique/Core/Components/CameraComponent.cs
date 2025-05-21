@@ -30,5 +30,15 @@ namespace SolidSilnique.Core.Components
 			EngineManager.scene.mainCamera = camera;
 		
 		}
+
+		public void Shoot()
+		{
+			GameObject toChange = Physics.PhysicsManager.Raycast(gameObject.transform.globalPosition, camera.Front, 10);
+			if(toChange != null)
+			{
+				toChange.texture = EngineManager.scene.loadedTextures["deimos"];
+			}
+
+		}
 	}
 }

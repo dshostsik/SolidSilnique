@@ -2,12 +2,12 @@
 
 namespace SolidSilnique.Core.Components;
 
-public class TreeCollider : Component
+public class TreeColliderComponent : Component
 {
     public static List<GameObject> instances = [];
     public float Radius;
     public float HeightLimit;
-    public TreeCollider(float radius, float heightLimit)
+    public TreeColliderComponent(float radius, float heightLimit)
     {
         this.Radius = radius;
         this.HeightLimit = heightLimit;
