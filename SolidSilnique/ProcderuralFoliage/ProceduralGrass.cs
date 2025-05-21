@@ -140,7 +140,7 @@ public class ProceduralGrass
         go.AddLOD(null, 1200f);
         
         go.texture = loadedTexturesTrees[randomTreeModel];
-        go.AddComponent(new TreeCollider(0.6f*scaleXZ,10));
+        go.AddComponent(new TreeColliderComponent(0.6f*scaleXZ,10));
         createdObjects.Add(go);
     }
 

@@ -99,6 +99,7 @@ namespace SolidSilnique
         private bool useNormalMap = true;
 
         GameTime gameTime;
+        //private LeafParticle _leafSystem;
 
 
 
@@ -127,7 +128,8 @@ namespace SolidSilnique
 
             Window.AllowUserResizing = true;
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
+            Window.IsBorderless = true;
             // _graphics.HardwareModeSwitch = true;
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
@@ -255,6 +257,10 @@ namespace SolidSilnique
             
 
             EngineManager.Start();
+
+            // Initialize GPU leaf particles
+           // _leafSystem = new LeafParticle(maxParticles: 200);
+           // _leafSystem.LoadContent(GraphicsDevice, Content);
         }
 
         /// <summary>
@@ -356,6 +362,9 @@ namespace SolidSilnique
             //PerformCulledDraw();
             //else
             EngineManager.Draw(shader, GraphicsDevice, _view, _projection);
+
+            float t = (float)gameTime.TotalGameTime.TotalSeconds;
+            //_leafSystem.Draw(GraphicsDevice, _view, _projection, t);
             //PerformCulledDraw();
             //EngineManager.Draw(shader);
             //Frustum Culling Setup

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using static System.Formats.Asn1.AsnWriter;
+using System.Net.NetworkInformation;
 
 namespace SolidSilnique.Core
 {
@@ -16,6 +17,7 @@ namespace SolidSilnique.Core
         private readonly Microsoft.Xna.Framework.Game _game;
         private KeyboardState _kbState;
         private MouseState _msState;
+        private GamePadState _gpState;
         private bool wasBDownLastFrame;
         private bool wasPDownLastFrame;
         private bool wasF5DownLastFrame = false;
@@ -32,10 +34,12 @@ namespace SolidSilnique.Core
         {
             // 1) Poll keyboard & mouse exactly once
             _kbState = Keyboard.GetState();
+            _gpState = GamePad.GetState(PlayerIndex.One);
 
             float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             ProcessKeyboard(dt);
+            ProcessGamePad(dt);
             ProcessMouse(gameTime);
         }
 
@@ -52,6 +56,8 @@ namespace SolidSilnique.Core
             if (_kbState.IsKeyDown(Keys.A)) cam.move(Camera.directions.LEFT, dt);
             if (_kbState.IsKeyDown(Keys.D)) cam.move(Camera.directions.RIGHT, dt);
             if (_kbState.IsKeyDown(Keys.Space)) cam.move(Camera.directions.UP, dt);
+
+            if (_kbState.IsKeyDown(Keys.F)) cam.cameraComponent.Shoot();
 
             var kb = Keyboard.GetState();
             bool isPDown = kb.IsKeyDown(Keys.P);
@@ -93,6 +99,10 @@ namespace SolidSilnique.Core
         }
         private void ProcessMouse(GameTime gameTime)
         {
+
+            if (!_game.IsActive)
+                return; // Skip mouse processing if window is not active
+
             int w = _game.Window.ClientBounds.Center.X;
             int h = _game.Window.ClientBounds.Center.Y;
             float mouseX, mouseY;
@@ -109,6 +119,32 @@ namespace SolidSilnique.Core
 
             EngineManager.scene.mainCamera.mouseMovement(xOffset, yOffset, gameTime.ElapsedGameTime.Milliseconds);
             Mouse.SetPosition(w, h);
+        }
+
+        private void ProcessGamePad(float dt)
+        {
+            var cam = EngineManager.scene.mainCamera;
+
+            if (!_gpState.IsConnected)
+                return;
+
+            Vector2 leftThumb = _gpState.ThumbSticks.Left;
+            Vector2 rightThumb = _gpState.ThumbSticks.Right;
+
+            // Left stick
+            if (Math.Abs(leftThumb.Y) > 0.1f)
+                cam.move(leftThumb.Y > 0 ? Camera.directions.FORWARD : Camera.directions.BACKWARD, dt);
+
+            if (Math.Abs(leftThumb.X) > 0.1f)
+                cam.move(leftThumb.X > 0 ? Camera.directions.RIGHT : Camera.directions.LEFT, dt);
+
+            // Right stick
+            if (Math.Abs(rightThumb.X) > 0.1f || Math.Abs(rightThumb.Y) > 0.1f)
+                cam.mouseMovement(-rightThumb.X * 50f, -rightThumb.Y * 50f, (int)(dt * 1000));
+
+            //A for up
+            if (_gpState.Buttons.A == ButtonState.Pressed)
+                cam.move(Camera.directions.UP, dt);
         }
     }
 }
