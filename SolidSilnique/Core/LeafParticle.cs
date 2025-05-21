@@ -11,82 +11,102 @@ namespace SolidSilnique.Core
 {
     internal class LeafParticle
     {
-        /*
         struct ParticleVertex
         {
             public Vector3 InitialPos;
             public Vector3 Velocity;
             public float SpawnTime;
-            // 4-component for 16-byte alignment if needed
+            public Vector2 Corner;
+
+            public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration(
+                new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
+                new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
+                new VertexElement(24, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 0),
+                new VertexElement(28, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 1)
+            );
         }
 
         private VertexBuffer _vb;
-        private ParticleVertex[] _particles;
-        private int _count;
+        private ParticleVertex[] _vertices;
+        private int _particleCount;
         private Shader _shader;
         private Texture2D _leafTex;
+        public Game1 _game;
 
-        private float _lifeTime = 5f;
-        private Vector3 _gravity = new Vector3(0, -9.8f, 0);
+        private float _lifeTime = 20f;
+        private Vector3 _gravity = new Vector3(0, -0.1f, 0);
 
         public LeafParticle(int maxParticles)
         {
-            _count = maxParticles;
-            _particles = new ParticleVertex[_count];
+            _particleCount = maxParticles;
+            _vertices = new ParticleVertex[_particleCount * 6]; // 4 vertices per particle
         }
 
         public void LoadContent(GraphicsDevice gd, ContentManager content)
         {
-            
             Random rnd = new Random();
-            for (int i = 0; i < _count; i++)
+
+            // Quad corners in local space
+            Vector2[] quadCorners = new[]
+            {
+                new Vector2(-1, -1), // 0
+                new Vector2( 1, -1), // 1
+                new Vector2(-1,  1), // 2
+                new Vector2(-1,  1), // 3
+                new Vector2( 1, -1), // 4
+                new Vector2( 1,  1), // 5
+            };
+
+            int vi = 0;
+            for (int i = 0; i < _particleCount; i++)
             {
                 float angle = MathHelper.TwoPi * (float)rnd.NextDouble();
-                float radius = 1 + (float)rnd.NextDouble() * 2f;
+                float radius = 1 + (float)rnd.NextDouble() * 200f;
+
                 Vector3 pos = new Vector3(
                     250 + radius * (float)Math.Cos(angle),
-                    15 + (float)rnd.NextDouble() * 2f,
+                    30 + (float)rnd.NextDouble() * 100f,
                     220 + radius * (float)Math.Sin(angle)
                 );
+
                 Vector3 vel = new Vector3(
                     (float)(rnd.NextDouble() - 0.5) * 0.5f,
                     -(2 + (float)rnd.NextDouble() * 1f),
                     (float)(rnd.NextDouble() - 0.5) * 0.5f
                 );
-                _particles[i] = new ParticleVertex
+
+                float spawnTime = 0f;
+
+                // Add 6 vertices per particle (2 triangles)
+                for (int j = 0; j < 6; j++)
                 {
-                    InitialPos = pos,
-                    Velocity = vel,
-                    SpawnTime = 0f
-                };
+                    _vertices[vi++] = new ParticleVertex
+                    {
+                        InitialPos = pos,
+                        Velocity = vel,
+                        SpawnTime = spawnTime,
+                        Corner = quadCorners[j]
+                    };
+                }
             }
 
-            // Upload to a GPU-only buffer
-            var decl = new VertexDeclaration(
-    new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
-    new VertexElement(12, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0),
-    new VertexElement(24, VertexElementFormat.Single, VertexElementUsage.TextureCoordinate, 0)
-    );
             _vb = new VertexBuffer(
-            gd,
-            decl,
-            _count,
-            BufferUsage.None
-                );
-            _vb.SetData(_particles);
+                gd,
+                ParticleVertex.VertexDeclaration,
+                _vertices.Length,
+                BufferUsage.WriteOnly
+            );
+            _vb.SetData(_vertices);
 
-            //Load effect and tex
-            _shader = new Shader("Shaders/LeafParticle", gd, /*game=*//*null, "DrawLeafParticles");
+            _shader = new Shader("Shaders/LeafParticle", gd, _game, "DrawLeafParticles");
             _leafTex = content.Load<Texture2D>("Textures/leaf_diffuse");
         }
 
         public void Draw(GraphicsDevice gd, Matrix view, Matrix proj, float totalTime)
         {
-            // Set up states
             gd.RasterizerState = RasterizerState.CullNone;
             gd.DepthStencilState = DepthStencilState.Default;
-
-            // Set buffers + effect parameters
+            gd.BlendState = BlendState.AlphaBlend;
             gd.SetVertexBuffer(_vb);
 
             _shader.SetUniform("currentTime", totalTime);
@@ -94,14 +114,14 @@ namespace SolidSilnique.Core
             _shader.SetUniform("gravity", _gravity);
             _shader.SetUniform("View", view);
             _shader.SetUniform("Projection", proj);
-            _shader.SetTexture("LeafTexture", _leafTex);
+            _shader.SetTexture("LeafSampler", _leafTex);
 
             foreach (var pass in _shader.Effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
-                gd.DrawPrimitives(PrimitiveType.PointList, 0, _count);
+                gd.DrawPrimitives(PrimitiveType.TriangleList, 0, _particleCount * 2); // 2 triangles per quad
             }
         }
-        */
     }
+
 }

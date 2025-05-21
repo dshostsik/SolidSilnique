@@ -503,6 +503,12 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/CustomShader.fx
 
+#begin Shaders/LeafParticle.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/LeafParticle.fx
+
 #begin Shaders/ShadowMapShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor
