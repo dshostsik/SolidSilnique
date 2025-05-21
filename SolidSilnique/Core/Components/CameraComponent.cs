@@ -39,6 +39,10 @@ namespace SolidSilnique.Core.Components
 				toChange.texture = EngineManager.scene.loadedTextures["deimos"];
 			}
 
+
+			
+
+
 		}
 	}
 }

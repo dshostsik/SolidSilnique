@@ -139,12 +139,14 @@ namespace SolidSilnique.Core
                 cam.move(leftThumb.X > 0 ? Camera.directions.RIGHT : Camera.directions.LEFT, dt);
 
             // Right stick
-            if (Math.Abs(rightThumb.X) > 0.1f || Math.Abs(rightThumb.Y) > 0.1f)
-                cam.mouseMovement(-rightThumb.X * 50f, -rightThumb.Y * 50f, (int)(dt * 1000));
+            if (Math.Abs(rightThumb.X) > 0.01f || Math.Abs(rightThumb.Y) > 0.01f)
+                cam.mouseMovement(-rightThumb.X * 10f, -rightThumb.Y * 8f, (int)(dt * 1000));
 
             //A for up
             if (_gpState.Buttons.A == ButtonState.Pressed)
                 cam.move(Camera.directions.UP, dt);
+
+            if (_gpState.Triggers.Right > 0.1f) cam.cameraComponent.Shoot();
         }
     }
 }
