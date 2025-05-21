@@ -32,7 +32,7 @@ class ProceduralTest : Scene
 
 		public override void LoadContent(ContentManager Content)
 		{
-			loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
+			//loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
 			loadedModels.Add("deimos", Content.Load<Model>("deimos"));
 			loadedModels.Add("plane", Content.Load<Model>("plane"));
 			loadedModels.Add("cube", Content.Load<Model>("cube"));
@@ -41,6 +41,7 @@ class ProceduralTest : Scene
 			loadedModels.Add("levelTest", Content.Load<Model>("level_ground"));
 			loadedModels.Add("brzewno1/brzewno", Content.Load<Model>("brzewno1/brzewno"));
 			loadedModels.Add("brzewno3/brzewno", Content.Load<Model>("brzewno3/brzewno3"));
+			loadedModels.Add("drzewo/drzewo", Content.Load<Model>("drzewo/drzewo"));
 
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 			loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
@@ -64,6 +65,11 @@ class ProceduralTest : Scene
 			loadedTextures.Add("brzewno3/normal", Content.Load<Texture2D>("brzewno3/normal"));
 			loadedTextures.Add("brzewno3/ao", Content.Load<Texture2D>("brzewno3/ao"));
 			loadedTextures.Add("brzewno3/glossy", Content.Load<Texture2D>("brzewno3/glossy"));
+			
+			loadedTextures.Add("drzewo/diffuse", Content.Load<Texture2D>("drzewo/diffuse"));
+			loadedTextures.Add("drzewo/normal", Content.Load<Texture2D>("drzewo/normal"));
+			loadedTextures.Add("drzewo/ao", Content.Load<Texture2D>("drzewo/ao"));
+			loadedTextures.Add("drzewo/glossy", Content.Load<Texture2D>("drzewo/glossy"));
 			
 			models.Add(Content.Load<Model>("pModels/Rock1"));
 			models.Add(Content.Load<Model>("pModels/Branch"));
@@ -274,8 +280,13 @@ class ProceduralTest : Scene
 
 			go.transform.position = pos;
 			go.transform.scale = new Vector3(0.75f);
-			go.model = loadedModels["sphere"];
-			go.texture = loadedTextures["gabTex"];
+			// go.model = loadedModels["sphere"];
+			// go.texture = loadedTextures["gabTex"];
+			go.model = loadedModels["drzewo/drzewo"];
+			go.texture = loadedTextures["drzewo/diffuse"];
+			go.normalMap = loadedTextures["drzewo/normal"];
+			go.aoMap = loadedTextures["drzewo/ao"];
+			go.roughnessMap = loadedTextures["drzewo/glossy"];
 			go.AddComponent(new SphereColliderComponent(0.75f,false));
 			go.AddComponent(new DebugMoveComponent());
 			go.GetComponent<DebugMoveComponent>().move = false;
