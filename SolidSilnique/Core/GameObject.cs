@@ -174,9 +174,9 @@ namespace SolidSilnique.Core
 
         //COMPONENTS
         /// <summary>
-        /// COMPONENTY DODAWAĆ TYLKO TĄ METODĄ
+        /// ADD COMPONENTS ONLY WITH THAT FUNCTION!
         /// </summary>
-        /// <param name="component"></param>
+        /// <param name="component">component to de added</param>
         public void AddComponent(Component component)
         {
             component.gameObject = this;
@@ -185,9 +185,8 @@ namespace SolidSilnique.Core
 
 		
 		/// <summary>
-		/// SZUKA COMPONENTU PO TYPIE
+		/// LOOKS FOR COMPONENT ACCORDING TO THE TYPE
 		/// </summary>
-		/// <param name="component"></param>
 		public T GetComponent<T>() where T : Component
 		{
 			foreach (var component in components)

@@ -220,7 +220,7 @@ namespace SolidSilnique
             manager.Start();
 
             //EngineManager.scene = new TestScene();
-
+            EngineManager.graphics = GraphicsDevice;
             EngineManager.scene = new ProceduralTest();
 
             _skybox = new Skybox();
@@ -352,19 +352,12 @@ namespace SolidSilnique
             shader.SetUniform("View", _view);
             shader.SetUniform("Projection", _projection);
             shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
-            //testDirectionalLight.SendToShader(shader);
-            // TODO: Integrate light objects inheritance from GameObject class
-            //shader.SetUniform("pointlight1_position", pointlight_position);
-            //testPointLight.SendToShader(shader);
-            // TODO: Integrate light objects inheritance from GameObject class
-            //shader.SetUniform("spotlight1_position", spotlight_position);
-            //testSpotlight.SendToShader(shader);
 
 
             //if (useCulling)
             //PerformCulledDraw();
             //else
-            EngineManager.Draw(shader, GraphicsDevice, _view, _projection);
+            EngineManager.Draw(shader, shadowShader, _view, _projection, manager);
 
             float t = (float)gameTime.TotalGameTime.TotalSeconds;
             _leafSystem.Draw(GraphicsDevice, _view, _projection, t);

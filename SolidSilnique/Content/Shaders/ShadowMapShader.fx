@@ -20,7 +20,7 @@ VertexShaderOutput MainVS(float4 Position : SV_POSITION)
 	VertexShaderOutput output = (VertexShaderOutput)0;
 
 	output.Position = mul(Position, LightViewProj);
-	output.Depth = output.Position.z / output.Position.w;
+	output.Depth = output.Position.xyz / output.Position.w;
 
 	return output;
 }

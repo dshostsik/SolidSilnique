@@ -7,10 +7,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SolidSilnique.Core.Components;
 using SolidSilnique.Core.Diagnostics;
 
 namespace SolidSilnique.Core
 {
+    internal enum ShadowResolution
+    {
+        Low = 512,
+        Medium = 1024,
+        High = 2048,
+        Ultra = 4096
+    }
+
     static class EngineManager
     {
         public static Scene scene = null;
@@ -26,13 +35,21 @@ namespace SolidSilnique.Core
         public static Texture2D defaultRoughnessMap;
         public static Texture2D defaultAOMap;
 
-        private static BoundingFrustum frustum = new BoundingFrustum(Matrix.Identity);
-        
+        private static BoundingFrustum _frustum = new BoundingFrustum(Matrix.Identity);
+
+        private static int _testSettings = (int)ShadowResolution.Ultra;
+
         public static BasicEffect wireframeEffect;
 
+        internal static GraphicsDevice graphics;
+
+        private static RenderTarget2D _shadowMapRenderTarget;
 
         public static void Start()
         {
+            _shadowMapRenderTarget  = new RenderTarget2D(graphics, _testSettings,
+                _testSettings, false,
+                SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
             scene.Start();
         }
 
@@ -44,7 +61,8 @@ namespace SolidSilnique.Core
             scene.Update();
         }
 
-        public static void Draw(Shader shader, GraphicsDevice graphics, Matrix view, Matrix projection)
+        public static void Draw(Shader shader, Shader shadowShader, Matrix view,
+            Matrix projection, LightsManagerComponent manager)
         {
             scene.Draw();
 
@@ -54,7 +72,7 @@ namespace SolidSilnique.Core
                 GameObject go = renderQueue.Dequeue();
 
                 //FRUSTUM CULLING
-                frustum.Matrix = view * projection;
+                _frustum.Matrix = view * projection;
 
                 var position = go.transform.position;
 
@@ -93,12 +111,13 @@ namespace SolidSilnique.Core
                     shader.SetUniform("WorldTransInv", modelTransInv);
 
 
-                    foreach (ModelMesh mesh in go.model.Meshes)
+                    for (int i = 0; i < go.model.Meshes.Count; i++)
                     {
+                        ModelMesh mesh = go.model.Meshes[i];
                         if (useCulling)
                         {
                             var sphere = mesh.BoundingSphere.Transform(go.transform.getModelMatrix());
-                            bool visible = frustum.Intersects(sphere);
+                            bool visible = _frustum.Intersects(sphere);
 
                             if (useWireframe)
                             {
@@ -108,14 +127,17 @@ namespace SolidSilnique.Core
                                 wireframeEffect.View = view;
                                 wireframeEffect.Projection = projection;
                                 wireframeEffect.World = Matrix.Identity;
+                                // TODO: may be we can get rid of this somehow
                                 graphics.RasterizerState = new RasterizerState { FillMode = FillMode.WireFrame };
 
 
                                 var box = BoundingBox.CreateFromSphere(sphere);
                                 var corners = box.GetCorners();
+                                // TODO: and this
                                 var lines = new VertexPositionColor[24];
                                 Color wireColor = visible ? Color.Green : Color.Red;
                                 int idx = 0;
+                                // TODO: and this
                                 int[,] edges =
                                 {
                                     { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
@@ -146,10 +168,38 @@ namespace SolidSilnique.Core
                             if (!visible)
                                 continue;
                         }
-
-                        for (int i = 0; i < mesh.MeshParts.Count; i++)
+                        // Drawing shadows
+                        /*var currentRenderState = graphics.GetRenderTargets();
+                        graphics.SetRenderTargets(_shadowMapRenderTarget);
+                        for (int k = 0; k < mesh.MeshParts.Count; k++)
                         {
-                            var part = mesh.MeshParts[i];
+                            var part = mesh.MeshParts[k];
+                            part.Effect = shadowShader.Effect;
+                            Matrix lightViewProjection = Matrix.CreateLookAt(
+                                                             manager.DirectionalLightPosition,
+                                                             manager.DirectionalLightPosition +
+                                                             manager.DirectionalLight.Direction,
+                                                             Vector3.Up)
+                                                         * Matrix.CreateOrthographic(_testSettings, _testSettings, 0.1f,
+                                                             1000.0f);
+                            shadowShader.SetUniform("LightViewProj", go.transform.modelMatrix * lightViewProjection);
+
+                            shadowShader.Effect.CurrentTechnique.Passes[0].Apply();
+
+                            graphics.SetVertexBuffer(part.VertexBuffer);
+                            graphics.Indices = part.IndexBuffer;
+                            int primitiveCount = part.PrimitiveCount;
+                            int vertexOffset = part.VertexOffset;
+                            int startIndex = part.StartIndex;
+
+                            graphics.DrawIndexedPrimitives(PrimitiveType.TriangleList, vertexOffset, startIndex,
+                                primitiveCount);
+                        }
+                        graphics.SetRenderTargets(currentRenderState);*/
+                        
+                        for (int j = 0; j < mesh.MeshParts.Count; j++)
+                        {
+                            var part = mesh.MeshParts[j];
                             part.Effect = shader.Effect;
                             if (celShadingEnabled)
                             {
@@ -167,14 +217,14 @@ namespace SolidSilnique.Core
                                 mesh.Draw();
                             }
                         }
+                        
                     }
                 }
 
 
                 catch (NullReferenceException e)
                 {
-                    Console.WriteLine(
-                        "Check uniforms!\nIf you have missed any uniforms or they are not used in shader, this NullReferenceException is thrown");
+                    Console.WriteLine(e.Message);
                     throw;
                 }
                 catch (UniformNotFoundException u)
