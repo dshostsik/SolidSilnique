@@ -42,6 +42,7 @@ namespace SolidSilnique
         private SpriteBatch _text;
 
         private Skybox _skybox;
+        private EnvironmentObject _enviro;
 
 
         private bool firstMouse;
@@ -226,6 +227,8 @@ namespace SolidSilnique
             _skybox = new Skybox();
             _skybox.Setup(Content, _graphics, GraphicsDevice, _projection);
 
+            _enviro = new EnvironmentObject();
+
             _input = new Input(this);
             base.Initialize();
         }
@@ -254,6 +257,8 @@ namespace SolidSilnique
             EngineManager.scene.Setup();
 
             EngineManager.scene.mainCamera.mouseMovement(0, 0, 0);
+
+            _enviro.Generate("Map1", Content, _graphics.GraphicsDevice);
             
 
             EngineManager.Start();
@@ -368,6 +373,10 @@ namespace SolidSilnique
 
             float t = (float)gameTime.TotalGameTime.TotalSeconds;
             _leafSystem.Draw(GraphicsDevice, _view, _projection, t);
+
+            _enviro.Draw(GraphicsDevice, shader);
+
+
             //PerformCulledDraw();
             //EngineManager.Draw(shader);
             //Frustum Culling Setup
