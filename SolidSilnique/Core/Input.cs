@@ -21,6 +21,8 @@ namespace SolidSilnique.Core
         private bool wasBDownLastFrame;
         private bool wasPDownLastFrame;
         private bool wasF5DownLastFrame = false;
+        private bool wasCapDownLastFrame;
+        private bool mouseFree = false;
 
         public Input(Microsoft.Xna.Framework.Game game)
         {
@@ -57,9 +59,18 @@ namespace SolidSilnique.Core
             if (_kbState.IsKeyDown(Keys.D)) cam.move(Camera.directions.RIGHT, dt);
             if (_kbState.IsKeyDown(Keys.Space)) cam.move(Camera.directions.UP, dt);
 
-            if (_kbState.IsKeyDown(Keys.F)) cam.cameraComponent.Shoot();
 
             var kb = Keyboard.GetState();
+            
+
+            bool isCapDown = kb.IsKeyDown(Keys.CapsLock);
+            if (isCapDown && !wasCapDownLastFrame)
+                mouseFree = !mouseFree;
+
+            wasCapDownLastFrame = isCapDown;
+
+            if (_kbState.IsKeyDown(Keys.F)) cam.cameraComponent.Shoot();
+
             bool isPDown = kb.IsKeyDown(Keys.P);
 
             if (isPDown && !wasPDownLastFrame)
@@ -100,7 +111,7 @@ namespace SolidSilnique.Core
         private void ProcessMouse(GameTime gameTime)
         {
 
-            if (!_game.IsActive)
+            if (!_game.IsActive || mouseFree == true)
                 return; // Skip mouse processing if window is not active
 
             int w = _game.Window.ClientBounds.Center.X;
