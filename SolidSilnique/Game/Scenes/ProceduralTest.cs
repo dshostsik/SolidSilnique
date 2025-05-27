@@ -7,6 +7,7 @@ using SolidSilnique.Core.Components;
 using SolidSilnique.ProcderuralFoliage;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
 
@@ -22,8 +23,9 @@ class ProceduralTest : Scene
 		List<Texture2D> treeTextures = new List<Texture2D>();
 
 
+		public EnvironmentObject enviro = new EnvironmentObject();
+	
 
-		
 		ContentManager content;
 		public ProceduralTest() {
 
@@ -83,10 +85,10 @@ class ProceduralTest : Scene
 		}
 
 		public override void Setup()
-		{
+	{
 
-
-			ProceduralGrass newProc = new ProceduralGrass(models,textures,treeModels,treeTextures,content);
+			enviro.Generate("Map1", content, 2, 30,3);
+			ProceduralGrass newProc = new ProceduralGrass(models,textures,treeModels,treeTextures,content,enviro);
 			Task task1 = Task.Run(() => newProc.precomputeNoise());
 			
 			GameObject go = new GameObject("Camera");
@@ -100,7 +102,7 @@ class ProceduralTest : Scene
 			go = new GameObject("ground");
 			go.transform.position = new Vector3(250, 0, 250);
 			go.transform.scale = new Vector3(500, 1, 500);
-			go.model = loadedModels["plane"];
+			//go.model = loadedModels["plane"];
 			go.texture = loadedTextures["simpleGreen"];
 			go.AddComponent(new PlaneColliderComponent(new Vector3(0,1,0), true));
 			this.AddChild(go);
@@ -230,6 +232,12 @@ class ProceduralTest : Scene
 
 			
 
+		}
+
+		public override void Draw() {
+			enviro.Draw();
+
+			base.Draw();
 		}
 
 		void AddPlanet()

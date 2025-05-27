@@ -36,7 +36,8 @@ struct VertexShaderOutput
 	float4 Normal : TEXCOORD0;
     float2 TexCoords : TEXCOORD1;
     float3 FragPos : TEXCOORD2;
-    float3x3 TBN : TEXCOORD3;
+    float3x3 TBN : TEXCOORD4;
+    float2 globalUVs : TEXCOORD3;
 };
 
 //-------------------------------------
@@ -59,6 +60,8 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     float3 N = normalize((float3) mul(World, float4(input.aNormal, 0.0f)));
     float3 B = cross(N, T);
     output.TBN = float3x3(T, B, N);
+    
+    output.globalUVs = float2(input.aPos.x, input.aPos.z) / 512.0f;
     
     return output;
 }
@@ -128,12 +131,52 @@ float3 viewPos;
 
 
 //-------------------------------------
+//           Enviro Layering           
+//-------------------------------------
+int useLayering;
+sampler2D layer_diffuse_1;
+//sampler2D layer_normal[4];
+sampler2D layer_roughness_1;
+sampler2D layer_ao_1;
+sampler2D layer_mask_1;
+
+sampler2D layer_diffuse_2;
+//sampler2D layer_normal[4];
+sampler2D layer_roughness_2;
+sampler2D layer_ao_2;
+sampler2D layer_mask_2;
+
+//-------------------------------------
 //           PIXEL SHADER            
 //-------------------------------------
+
+
+float4 blend(float4 baseTexture, sampler2D blendTexture, sampler2D maskTex, float2 texCoords, float2 globalUVs)
+{
+    float4 texblend = tex2D(blendTexture, texCoords); // też tilowana
+    float mask = tex2D(maskTex, globalUVs).r; // maska z GlobalUV
+
+    return lerp(baseTexture, texblend, mask);
+}
+
+
 float4 MainPS(VertexShaderOutput input) : SV_TARGET
 {
     float4 textureVector = tex2D(texture_diffuse1, input.TexCoords);
-    float3 norm = normalize(input.Normal.xyz); 
+    
+    if (useLayering > 0)
+    {
+        textureVector = blend(textureVector, layer_diffuse_1, layer_mask_1, input.TexCoords, input.globalUVs);
+        if (useLayering > 1)
+        {
+            textureVector = blend(textureVector, layer_diffuse_2, layer_mask_2, input.TexCoords, input.globalUVs);
+        }
+    }
+    
+    
+    
+    
+        float3 norm = normalize(input.Normal.xyz);
     float3 viewDir = normalize(viewPos - input.FragPos);
     
     float3 directionalLight = float3(0.f, 0.f, 0.f);
@@ -155,10 +198,26 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
     float roughness = 0.5;
     if (useRoughnessMap != 0)
         roughness = tex2D(texture_roughness1, input.TexCoords).r;
+        if (useLayering > 0)
+        {
+            roughness = blend(textureVector, layer_roughness_1, layer_mask_1, input.TexCoords, input.globalUVs);
+            if (useLayering > 1)
+            {
+                roughness = blend(textureVector, layer_roughness_2, layer_mask_2, input.TexCoords, input.globalUVs);
+            }
+        }
     // Sample ambient occlusion
     float ao = 1.0;
     if (useAOMap != 0)
         ao = tex2D(texture_ao1, input.TexCoords).r;
+        if (useLayering > 0)
+        {
+            ao = blend(textureVector, layer_ao_1, layer_mask_1, input.TexCoords, input.globalUVs);
+            if (useLayering > 1)
+            {
+                ao = blend(textureVector, layer_ao_2, layer_mask_2, input.TexCoords, input.globalUVs);
+            }
+        }
     if (dirlightEnabled == true)
     {
         float3 ambient = dirlight_ambientColor.rgb;
@@ -324,6 +383,15 @@ technique BasicColorDrawingWithLights
 		VertexShader = compile VS_SHADERMODEL MainVS();
 		PixelShader = compile PS_SHADERMODEL MainPS();
 	}
+}
+
+technique EnvironmentMap
+{
+    pass P0
+    {
+        VertexShader = compile VS_SHADERMODEL MainVS();
+        PixelShader = compile PS_SHADERMODEL MainPS();
+    }
 }
 
 technique CelShadingOutline

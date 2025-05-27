@@ -11,6 +11,8 @@ using SolidSilnique.Core.Diagnostics;
 
 namespace SolidSilnique.Core
 {
+
+    
     static class EngineManager
     {
         public static Scene scene = null;
@@ -27,7 +29,8 @@ namespace SolidSilnique.Core
         public static Texture2D defaultAOMap;
 
         public static BasicEffect wireframeEffect;
-
+        public static GraphicsDevice graphics;
+        public static Shader shader;
 
         public static void Start()
         {
@@ -42,20 +45,19 @@ namespace SolidSilnique.Core
             scene.Update();
         }
 
-        public static void Draw(Shader shader, GraphicsDevice graphics, Matrix view, Matrix projection)
+        public static void Draw(Matrix view, Matrix projection)
         {
             scene.Draw();
 
+			var viewProjection = view * projection;
+			var frustum = new BoundingFrustum(viewProjection);
 
-            while (renderQueue.Count > 0)
+			while (renderQueue.Count > 0)
             {
                 GameObject go = renderQueue.Dequeue();
 
                 //FRUSTUM CULLING
-                var viewProjection = view * projection;
-                // TODO: 1127,7 MB  allocated in SOH; AVOID allocation in EVERY FRAME
-                // https://www.jetbrains.com/help/rider/Fixing_Issues_Found_by_DPA.html
-                var frustum = new BoundingFrustum(viewProjection);
+                
 
                 var position = go.transform.position;
 
@@ -85,7 +87,8 @@ namespace SolidSilnique.Core
                     shader.SetTexture("texture_roughness1", go.roughnessMap ?? defaultRoughnessMap);
                     shader.SetTexture("texture_ao1", go.aoMap ?? defaultAOMap);
 
-                    shader.SetUniform("useNormalMap", (go.normalMap != null) ? 1 : 0);
+					shader.SetUniform("useLayering", 0);
+					shader.SetUniform("useNormalMap", (go.normalMap != null) ? 1 : 0);
                     shader.SetUniform("useRoughnessMap", (go.roughnessMap != null) ? 1 : 0);
                     shader.SetUniform("useAOMap", (go.aoMap != null) ? 1 : 0);
 

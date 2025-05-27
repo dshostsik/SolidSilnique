@@ -25,10 +25,11 @@ public class ProceduralGrass
     public List<Texture2D>	loadedTextures;
     public List<Model>		loadedTrees;
     public List<Texture2D>	loadedTexturesTrees;
-    
-    
-    public List<GameObject>	createdObjects = new List<GameObject>();
-    public ProceduralGrass(List<Model>loadedModels,List<Texture2D>loadedTextures,List<Model>loadedTrees,List<Texture2D>loadedTexturesTrees,ContentManager Content)
+    public EnvironmentObject enviro;
+
+
+	public List<GameObject>	createdObjects = new List<GameObject>();
+    public ProceduralGrass(List<Model>loadedModels,List<Texture2D>loadedTextures,List<Model>loadedTrees,List<Texture2D>loadedTexturesTrees,ContentManager Content, EnvironmentObject enviro)
     {
         levelMap = Content.Load<Texture2D>("levelMap");
         this.lenght = levelMap.Height;
@@ -37,6 +38,7 @@ public class ProceduralGrass
         this.loadedTextures = loadedTextures;
         this.loadedTrees = loadedTrees;
         this.loadedTexturesTrees = loadedTexturesTrees;
+        this.enviro = enviro;
     }
 
     public void precomputeNoise()
@@ -117,8 +119,10 @@ public class ProceduralGrass
         randX += DisNoise[i, j] / 60f;
         randZ -= DisNoise[i, j] / 60f;
         go.transform.position = new Vector3(randX, -0.3f, randZ);
+        go.transform.position += Vector3.Up * enviro.GetHeight(go.transform.position);
 
-        float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
+
+		float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
         MaximumHeight = myCeiling(MaximumHeight,0.8f + Red/255f * 1.5f);
         float scaleY = MaximumHeight;
         float scaleXZ = 1.2f + ((TransformNoise[i,j] + computedNoise[i,j]) / 510f);
@@ -157,9 +161,10 @@ public class ProceduralGrass
             randX += DisNoise[i, j] / 60f;
             randZ -= DisNoise[i, j] / 60f;
             go.transform.position = new Vector3(randX, -0.3f, randZ);
+			go.transform.position += Vector3.Up * enviro.GetHeight(go.transform.position);
 
 
-            float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
+			float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
             MaximumHeight = myCeiling(MaximumHeight,0.8f+ Red/255f * 1.5f);
             float scaleY = MaximumHeight;
             float scaleXZ = 0.9f + ((TransformNoise[i,j] + computedNoise[i,j]) / 510f);

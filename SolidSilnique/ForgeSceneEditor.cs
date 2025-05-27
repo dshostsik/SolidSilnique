@@ -355,7 +355,7 @@ namespace SolidSilnique
             //if (useCulling)
             //PerformCulledDraw();
             //else
-            EngineManager.Draw(shader, GraphicsDevice, _view, _projection);
+            //....... EngineManager.Draw(shader, GraphicsDevice, _view, _projection);
             //PerformCulledDraw();
             //EngineManager.Draw(shader);
             //Frustum Culling Setup
