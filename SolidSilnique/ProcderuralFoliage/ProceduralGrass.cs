@@ -96,13 +96,13 @@ public class ProceduralGrass
                 switch (Green)
                 {
                     case 0:
-                        standardTerrain(i,j,Red,Blue);
+                        standardTerrain(j,i,Red,Blue);
                         break;
                     case 120:
-                        generatePath(i,j,Red,Blue);
+                        generatePath(j, i, Red,Blue);
                         break;
                     case 255:
-                        GenerateTreeWall(i,j,Red,Blue);
+                        GenerateTreeWall(j, i,Red,Blue);
                         break;
                 }
             }

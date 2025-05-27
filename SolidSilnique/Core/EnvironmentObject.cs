@@ -208,7 +208,7 @@ namespace SolidSilnique.Core
 
 		public float GetHeight(Vector3 point) {
 
-			//Find Quad
+			/*//Find Quad
 			int x = (int)(point.X/cellSize); int z = (int)(point.Z / cellSize); //QUAD TOPLEFT CORNER
 			x = Math.Clamp(x, 0, meshMap.GetLength(0) - 1);
 			z = Math.Clamp(z, 0, meshMap.GetLength(0) - 1);
@@ -233,13 +233,36 @@ namespace SolidSilnique.Core
 
 			//Baricentric Interpolation
 			float Area = calcArea(triangle);
-			float A0 = calcArea([point, triangle[1], triangle[2]]);
+			float A0 = calcArea(new Vector3[] { point, triangle[1], triangle[2] });
 			A0 /= Area;
-			float A1 = calcArea([triangle[0], point, triangle[2]]);
+			
+			float A1 = calcArea(new Vector3[] { triangle[0], point, triangle[2] });
 			A1 /= Area;
 			float A2 = 1 - A1 - A0;
 
-			return A0 * triangle[0].Y + A1 * triangle[1].Y + A2 * triangle[2].Y;
+			return A0 * triangle[0].Y + A1 * triangle[1].Y + A2 * triangle[2].Y;*/
+			int x = (int)(point.X / cellSize);
+			int z = (int)(point.Z / cellSize);
+
+			// ogranicz tak, by mieć miejsce na x+1, z+1
+			x = Math.Clamp(x, 0, meshMap.GetLength(1) - 1);
+			z = Math.Clamp(z, 0, meshMap.GetLength(0) - 1);
+
+			float localX = (point.X % cellSize) / cellSize;
+			float localZ = (point.Z % cellSize) / cellSize;
+
+			float h00 = meshMap[z, x].Y;
+			float h10 = meshMap[z, x + 1].Y;
+			float h01 = meshMap[z + 1, x].Y;
+			float h11 = meshMap[z + 1, x + 1].Y;
+
+			float height =
+				h00 * (1 - localX) * (1 - localZ) +
+				h10 * localX * (1 - localZ) +
+				h01 * (1 - localX) * localZ +
+				h11 * localX * localZ;
+
+			return height;
 		}
 
 		float calcArea(Vector3[] v)
