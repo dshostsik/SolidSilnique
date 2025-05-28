@@ -4,6 +4,7 @@ using SolidSilnique.Core;
 using SolidSilnique.GameContent;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,9 @@ namespace SolidSilnique.Core
         public static Queue<GameObject> renderQueue = [];
         public static bool celShadingEnabled = false;
 
+        private static Queue<GameObject> shadowsQueue = new Queue<GameObject>();
+        private static Vector3 offset = new Vector3(250,100f,250);
+        
         //Debug flags
         public static bool useCulling = true;
         public static bool useWireframe = false;
@@ -45,11 +49,13 @@ namespace SolidSilnique.Core
 
         private static RenderTarget2D _shadowMapRenderTarget;
 
+        private static Matrix _lightProjection =  Matrix.CreateOrthographic(512, 512, 0.01f, 10000f);
+
         public static void Start()
         {
-            _shadowMapRenderTarget  = new RenderTarget2D(graphics, _testSettings,
+            _shadowMapRenderTarget = new RenderTarget2D(graphics, _testSettings,
                 _testSettings, false,
-                SurfaceFormat.Single, DepthFormat.Depth24, 0, RenderTargetUsage.DiscardContents);
+                SurfaceFormat.Single, DepthFormat.Depth24);
             scene.Start();
         }
 
@@ -57,7 +63,6 @@ namespace SolidSilnique.Core
         {
             Time.deltaTimeMs = gameTime.ElapsedGameTime.Milliseconds;
             Time.deltaTime = Time.deltaTimeMs / 1000.0f;
-
             scene.Update();
         }
 
@@ -65,12 +70,62 @@ namespace SolidSilnique.Core
             Matrix projection, LightsManagerComponent manager)
         {
             scene.Draw();
+            // TODO: fix this sh
+            shadowsQueue = new Queue<GameObject>(renderQueue);
+            // Drawing shadows
+            graphics.SetRenderTarget(_shadowMapRenderTarget);
+            graphics.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
+            Matrix lightView = Matrix.CreateLookAt(-manager.DirectionalLight.Direction*10 + offset,
+                Vector3.Zero + offset,
+                Vector3.Up);
 
+            Matrix lightViewProjection = lightView * _lightProjection;
 
+            shadowShader.SwapTechnique("ShadeTheSceneRightNow");
+            graphics.RasterizerState = RasterizerState.CullClockwise;
+            for (int i = 0; i < shadowsQueue.Count; i++)
+            {
+                GameObject go = shadowsQueue.Dequeue();
+                if (go.model == null)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < go.model.Meshes.Count; j++)
+                {
+                    var shadowMesh = go.model.Meshes[j];
+                    // if (useCulling)
+                    // {
+                    //     var sphere = mesh.BoundingSphere.Transform(go.transform.getModelMatrix());
+                    //     
+                    //     if (!_frustum.Intersects(sphere))
+                    //         continue;
+                    // }
+                    
+                    shadowShader.SetUniform("World", go.transform.getModelMatrix());
+                    shadowShader.SetUniform("LightViewProj", lightViewProjection);
+                    
+                    for (int k = 0; k < shadowMesh.MeshParts.Count; k++)
+                    {
+                        var part = shadowMesh.MeshParts[k];
+                        part.Effect = shadowShader.Effect;
+                    }
+                    shadowMesh.Draw();
+                }
+            }
+
+            // using (var stream = new FileStream("shadowMap.png", FileMode.Create))
+            // {
+            //     _shadowMapRenderTarget.SaveAsPng(stream, _shadowMapRenderTarget.Width, _shadowMapRenderTarget.Height);
+            // }
+            graphics.RasterizerState = RasterizerState.CullCounterClockwise;
+            graphics.SetRenderTarget(null);
+            //-------------------------------------
+            
+            // Normal rendering 
             while (renderQueue.Count > 0)
             {
                 GameObject go = renderQueue.Dequeue();
-
                 //FRUSTUM CULLING
                 _frustum.Matrix = view * projection;
 
@@ -109,7 +164,8 @@ namespace SolidSilnique.Core
                     shader.SetUniform("World", model);
                     Matrix modelTransInv = Matrix.Transpose(Matrix.Invert(go.transform.getModelMatrix()));
                     shader.SetUniform("WorldTransInv", modelTransInv);
-
+                    shader.SetUniform("LightViewProj", lightViewProjection);
+                    shader.SetTexture("shadowMap", _shadowMapRenderTarget);
 
                     for (int i = 0; i < go.model.Meshes.Count; i++)
                     {
@@ -168,34 +224,6 @@ namespace SolidSilnique.Core
                             if (!visible)
                                 continue;
                         }
-                        // Drawing shadows
-                        /*var currentRenderState = graphics.GetRenderTargets();
-                        graphics.SetRenderTargets(_shadowMapRenderTarget);
-                        for (int k = 0; k < mesh.MeshParts.Count; k++)
-                        {
-                            var part = mesh.MeshParts[k];
-                            part.Effect = shadowShader.Effect;
-                            Matrix lightViewProjection = Matrix.CreateLookAt(
-                                                             manager.DirectionalLightPosition,
-                                                             manager.DirectionalLightPosition +
-                                                             manager.DirectionalLight.Direction,
-                                                             Vector3.Up)
-                                                         * Matrix.CreateOrthographic(_testSettings, _testSettings, 0.1f,
-                                                             1000.0f);
-                            shadowShader.SetUniform("LightViewProj", go.transform.modelMatrix * lightViewProjection);
-
-                            shadowShader.Effect.CurrentTechnique.Passes[0].Apply();
-
-                            graphics.SetVertexBuffer(part.VertexBuffer);
-                            graphics.Indices = part.IndexBuffer;
-                            int primitiveCount = part.PrimitiveCount;
-                            int vertexOffset = part.VertexOffset;
-                            int startIndex = part.StartIndex;
-
-                            graphics.DrawIndexedPrimitives(PrimitiveType.TriangleList, vertexOffset, startIndex,
-                                primitiveCount);
-                        }
-                        graphics.SetRenderTargets(currentRenderState);*/
                         
                         for (int j = 0; j < mesh.MeshParts.Count; j++)
                         {
@@ -217,14 +245,11 @@ namespace SolidSilnique.Core
                                 mesh.Draw();
                             }
                         }
-                        
                     }
                 }
-
-
                 catch (NullReferenceException e)
                 {
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.Message, e.Source, e.StackTrace);
                     throw;
                 }
                 catch (UniformNotFoundException u)
@@ -233,6 +258,7 @@ namespace SolidSilnique.Core
                     throw;
                 }
             }
+            //-------------------------------------------
         }
     }
 }

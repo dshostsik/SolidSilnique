@@ -36,7 +36,6 @@ namespace SolidSilnique
         private Matrix _lightView;
         private Matrix _lightProjection;
         private Matrix _lightViewProjection;
-        private RenderTarget2D shadowMapRenderTarget;
 
         private SpriteFont _font;
         private SpriteBatch _text;
@@ -162,8 +161,6 @@ namespace SolidSilnique
                 GraphicsDevice,
                 this,
                 "ShadeTheSceneRightNow");
-            shadowMapRenderTarget = new RenderTarget2D(GraphicsDevice, 1024, 1024, false, SurfaceFormat.Color,
-                DepthFormat.Depth24, 0, RenderTargetUsage.PlatformContents);
 
 
             manager = new LightsManagerComponent(shader);
@@ -206,7 +203,7 @@ namespace SolidSilnique
             testPointLight.Enabled = 1;
             testSpotlight.Enabled = 1;
 
-            sunPosition = new Vector3(50.0f, 50.0f, 0.0f);
+            sunPosition = new Vector3(150.0f, 150.0f, 0.0f);
             //testSpotlight.Enabled = false;
 
             manager.AddPointLight(testPointLight);
@@ -222,7 +219,7 @@ namespace SolidSilnique
             //EngineManager.scene = new TestScene();
             EngineManager.graphics = GraphicsDevice;
             EngineManager.scene = new ProceduralTest();
-
+            
             _skybox = new Skybox();
             _skybox.Setup(Content, _graphics, GraphicsDevice, _projection);
 
@@ -323,8 +320,8 @@ namespace SolidSilnique
             Vector3 axis = Vector3.Up; // e.g., Y-axis (0, 1, 0)
             float angleRadians = MathHelper.ToRadians(10 * Time.deltaTime); // 90 degrees
 
-            Matrix rotation = Matrix.CreateFromAxisAngle(axis, angleRadians);
-            testDirectionalLight.Direction = Vector3.Transform(originalVector, rotation);
+            //Matrix rotation = Matrix.CreateFromAxisAngle(axis, angleRadians);
+            //testDirectionalLight.Direction = Vector3.Transform(originalVector, rotation);
 
 
             _input.Process(gameTime);

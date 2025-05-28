@@ -8,26 +8,34 @@
 #endif
 
 matrix LightViewProj;
+matrix World;
+
 
 struct VertexShaderOutput
 {
-	float4 Position : SV_POSITION;
-	float Depth : TEXCOORD0;
+    float4 Position : SV_POSITION;
+	float z : TEXCOORD0;
+	float w : TEXCOORD1;
 };
 
-VertexShaderOutput MainVS(float4 Position : SV_POSITION)
+VertexShaderOutput MainVS(float4 Position : POSITION)
 {
-	VertexShaderOutput output = (VertexShaderOutput)0;
+	VertexShaderOutput output;
 
-	output.Position = mul(Position, LightViewProj);
-	output.Depth = output.Position.xyz / output.Position.w;
+	output.Position = mul(Position, mul(World, LightViewProj));
+	output.z = output.Position.z; 
+	output.w = output.Position.w;
 
 	return output;
 }
 
 float4 MainPS(VertexShaderOutput input) : SV_TARGET
 {
-    return float4(input.Depth, 0, 0, 0);
+    //float depth = saturate(input.Depth);
+    //float4 pos = input.Position;
+    float depth = input.z / input.w;
+    //depth = saturate(depth); 
+    return float4(depth, depth, depth, 1); // grayscale
 }
 
 technique ShadeTheSceneRightNow

@@ -126,6 +126,24 @@ int useAOMap;
 int useNormalMap;
 float3 viewPos;
 
+matrix LightViewProj;
+sampler2D shadowMap;
+
+
+
+float ComputeShadows(float3 fragPos, float3 normal) {
+    float4 shadowCoord = mul(float4(fragPos, 1.f), LightViewProj);
+    shadowCoord.xyz /= shadowCoord.w;
+    shadowCoord = shadowCoord * 0.5f + 0.5f;
+    float shadowMapDepth = tex2D(shadowMap, shadowCoord.xy * float2(1,-1)).r;
+    float currentDepth = shadowCoord.z;
+    //float bias = max(0.05 * (1.f - dot(normal, dirlight_direction)), 0.001f);
+    float shadow = currentDepth < shadowMapDepth ? 0.1f : 1.0f;
+    if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 || shadowCoord.y < 0.0 || shadowCoord.y > 1.0) {
+           shadow = 0.0;
+    }
+    return shadow;
+}
 
 //-------------------------------------
 //           PIXEL SHADER            
@@ -171,7 +189,8 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
         float specPower = lerp(64.0, 2.0, roughness);
         float spec = pow(max(dot(viewDir, reflectDir), 0.0), specPower);
         float3 specular = dirlight_specularColor.rgb * spec;
-        directionalLight = ambient + diffuse + specular;
+        float shadows = ComputeShadows(input.FragPos, norm);
+        directionalLight = (ambient + (1.0f - shadows)) * (diffuse + specular);
     }
         
     float3 totalPointLight = float3(0.f, 0.f, 0.f);  
@@ -243,8 +262,11 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
         totalSpotlight += spotlight;
     }    
     
-	return float4(directionalLight + totalPointLight + totalSpotlight, 1.0) * textureVector;
+    
+    
+	return float4((directionalLight + totalPointLight + totalSpotlight), 1.0)  * textureVector;
 }
+
 
 //-------------------------------------
 //           CEL SHADER          

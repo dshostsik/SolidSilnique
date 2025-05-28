@@ -42,6 +42,7 @@ class ProceduralTest : Scene
 			loadedModels.Add("brzewno1/brzewno", Content.Load<Model>("brzewno1/brzewno"));
 			loadedModels.Add("brzewno3/brzewno", Content.Load<Model>("brzewno3/brzewno3"));
 			loadedModels.Add("drzewo/drzewo", Content.Load<Model>("drzewo/drzewo"));
+			loadedModels.Add("trent", Content.Load<Model>("trent"));
 
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 			loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
@@ -70,6 +71,11 @@ class ProceduralTest : Scene
 			loadedTextures.Add("drzewo/normal", Content.Load<Texture2D>("drzewo/normal"));
 			loadedTextures.Add("drzewo/ao", Content.Load<Texture2D>("drzewo/ao"));
 			loadedTextures.Add("drzewo/glossy", Content.Load<Texture2D>("drzewo/glossy"));
+			
+			loadedTextures.Add("trent/diffuse", Content.Load<Texture2D>("trent_fire/low_material_Base_color"));
+			loadedTextures.Add("trent/normal", Content.Load<Texture2D>("trent_fire/low_material_Normal_DirectX"));
+			//loadedTextures.Add("trent/ao", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Mixed_AO"));
+			//loadedTextures.Add("trent/roughness", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Coat_roughness"));
 			
 			models.Add(Content.Load<Model>("pModels/Rock1"));
 			models.Add(Content.Load<Model>("pModels/Branch"));
@@ -236,9 +242,18 @@ class ProceduralTest : Scene
 		brow2.model = loadedModels["cube"];
 		brow2.texture = loadedTextures["simpleBlack"];
 		gab.AddChild(brow2);
-
+		
+		// GameObject ch = new GameObject("chujniaOdDimy");
+		// ch.transform.position = new Vector3(200, 10, 190);
+		// ch.model = loadedModels["trent/untitled"];
+		// ch.texture = loadedTextures["trent/diffuse"];
+		// ch.normalMap = loadedTextures["trent/normal"];
+		// ch.aoMap = loadedTextures["trent/ao"];
+		// ch.roughnessMap = loadedTextures["trent/roughness"];
+		
+		
 		GameObject prevGeb = gab;
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 1; i++)
 			{
 				GameObject gogus = CreateGebus(new Vector3(150 + i*2, 2, 150 + i*2));
 				gogus.GetComponent<Follower>().Target = prevGeb;
@@ -280,13 +295,19 @@ class ProceduralTest : Scene
 
 			go.transform.position = pos;
 			go.transform.scale = new Vector3(0.75f);
-			go.model = loadedModels["sphere"];
-			go.texture = loadedTextures["gabTex"];
+			// go.model = loadedModels["sphere"];
+			// go.texture = loadedTextures["gabTex"];
 			// go.model = loadedModels["drzewo/drzewo"];
 			// go.texture = loadedTextures["drzewo/diffuse"];
 			// go.normalMap = loadedTextures["drzewo/normal"];
 			// go.aoMap = loadedTextures["drzewo/ao"];
 			// go.roughnessMap = loadedTextures["drzewo/glossy"];
+			go.transform.position = new Vector3(200, 10, 190);
+			go.model = loadedModels["trent"];
+			go.texture = loadedTextures["trent/diffuse"];
+			go.normalMap = loadedTextures["trent/normal"];
+			//go.aoMap = loadedTextures["trent/ao"];
+			//go.roughnessMap = loadedTextures["trent/roughness"];
 			go.AddComponent(new SphereColliderComponent(0.75f,false));
 			go.AddComponent(new DebugMoveComponent());
 			go.GetComponent<DebugMoveComponent>().move = false;
