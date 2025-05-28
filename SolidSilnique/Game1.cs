@@ -99,6 +99,7 @@ namespace SolidSilnique
         private bool useNormalMap = true;
 
         GameTime gameTime;
+        private LeafParticle _leafSystem;
 
 
 
@@ -127,7 +128,8 @@ namespace SolidSilnique
 
             Window.AllowUserResizing = true;
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
+            Window.IsBorderless = true;
             // _graphics.HardwareModeSwitch = true;
             _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
@@ -218,11 +220,15 @@ namespace SolidSilnique
             manager.Start();
 
             //EngineManager.scene = new TestScene();
-
+            EngineManager.graphics = GraphicsDevice;
+            EngineManager.shader = shader;
             EngineManager.scene = new ProceduralTest();
+            
 
             _skybox = new Skybox();
             _skybox.Setup(Content, _graphics, GraphicsDevice, _projection);
+
+            
 
             _input = new Input(this);
             base.Initialize();
@@ -252,9 +258,18 @@ namespace SolidSilnique
             EngineManager.scene.Setup();
 
             EngineManager.scene.mainCamera.mouseMovement(0, 0, 0);
+
+            
             
 
             EngineManager.Start();
+
+            // Initialize GPU leaf particles
+            _leafSystem = new LeafParticle(maxParticles: (int)2e+3)
+            {
+                _game = this
+            };
+            _leafSystem.LoadContent(GraphicsDevice, Content);
         }
 
         /// <summary>
@@ -277,7 +292,6 @@ namespace SolidSilnique
                 Exit();
 
             // Get current camera view
-            //_view = EngineManager.scene.mainCamera.getViewMatrix(); //TODO Delete
             if (EngineManager.scene.mainCamera == EngineManager.scene.TPCamera)
             {
                 // Monster’s world position
@@ -343,6 +357,7 @@ namespace SolidSilnique
             shader.SetUniform("View", _view);
             shader.SetUniform("Projection", _projection);
             shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
+
             //testDirectionalLight.SendToShader(shader);
             // TODO: Integrate light objects inheritance from GameObject class
             //shader.SetUniform("pointlight1_position", pointlight_position);
@@ -351,31 +366,12 @@ namespace SolidSilnique
             //shader.SetUniform("spotlight1_position", spotlight_position);
             //testSpotlight.SendToShader(shader);
 
+            EngineManager.Draw(_view, _projection);
 
-            //if (useCulling)
-            //PerformCulledDraw();
-            //else
-            EngineManager.Draw(shader, GraphicsDevice, _view, _projection);
-            //PerformCulledDraw();
-            //EngineManager.Draw(shader);
-            //Frustum Culling Setup
+            float t = (float)gameTime.TotalGameTime.TotalSeconds;
+            _leafSystem.Draw(GraphicsDevice, _view, _projection, t);
 
-            /*
-            foreach (ModelMeshPart part in mesh.MeshParts)
-                    {
-                        shadowShader.SetUniform("LightViewProj", _world * _lightViewProjection);
-
-                        shadowShader.Effect.CurrentTechnique.Passes[0].Apply();
-
-                        GraphicsDevice.SetVertexBuffer(part.VertexBuffer);
-                        GraphicsDevice.Indices = part.IndexBuffer;
-                        int primitiveCount = part.PrimitiveCount;
-                        int vertexOffset = part.VertexOffset;
-                        int startIndex = part.StartIndex;
-
-                        GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, vertexOffset, startIndex, primitiveCount);
-                    }
-                    */
+            
 
             _text.Begin();
             _text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Aqua);
@@ -385,130 +381,6 @@ namespace SolidSilnique
             base.Draw(gameTime);
         }
 
-        private void PerformCulledDraw()
-        {
-            // Build view-projection frustum
-            var viewProjection = _view * _projection;
-            var frustum = new BoundingFrustum(viewProjection);
-
-            // Debug wireframe setup if enabled
-            var prevRasterizer = GraphicsDevice.RasterizerState;
-            if (useDebugWireframe)
-            {
-                _debugEffect.View = _view;
-                _debugEffect.Projection = _projection;
-                _debugEffect.World = Matrix.Identity;
-                GraphicsDevice.RasterizerState = new RasterizerState { FillMode = FillMode.WireFrame };
-            }
-
-            // Iterate through each GameObject in the scene
-            foreach (var go in EngineManager.scene.gameObjects)
-            {
-                if (go.model == null) continue;
-
-                // Compute world transform and object position
-                var world = go.transform.getModelMatrix();
-                var position = go.transform.position;
-
-
-                bool objectNormal = useNormalMap && go.normalMap != null;
-
-                //shader.SetTexture("texture_diffuse1", go.texture);
-                //shader.SetUniform("useNormalMap", objectNormal ? 1 : 0);
-                //shader.SetTexture("texture_normal1", go.normalMap ?? _normalMap);
-
-                // bind per-object PBR maps (fall back to defaults)
-                shader.SetTexture("texture_diffuse1", go.texture);
-                shader.SetTexture("texture_normal1", go.normalMap ?? _normalMap);
-                shader.SetTexture("texture_roughness1", go.roughnessMap ?? _defaultRoughnessMap);
-                shader.SetTexture("texture_ao1", go.aoMap ?? _defaultAOMap);
-
-                // toggles (as ints) for the HLSL if-tests
-                shader.SetUniform("useNormalMap", (go.normalMap != null && useNormalMap) ? 1 : 0);
-                shader.SetUniform("useRoughnessMap", (go.roughnessMap != null) ? 1 : 0);
-                shader.SetUniform("useAOMap", (go.aoMap != null) ? 1 : 0);
-                Model modelToDraw = go.model;
-
-                // Cull and draw each mesh of the selected model
-                foreach (var mesh in modelToDraw.Meshes)
-                {
-                    // Transform bounding sphere to world space
-                    var sphere = mesh.BoundingSphere.Transform(world);
-                    bool visible = frustum.Intersects(sphere);
-
-                    // Draw debug bounding box if enabled
-                    if (useDebugWireframe)
-                    {
-                        var box = BoundingBox.CreateFromSphere(sphere);
-                        var corners = box.GetCorners();
-                        var lines = new VertexPositionColor[24];
-                        Color wireColor = visible ? Color.Green : Color.Red;
-                        int idx = 0;
-                        int[,] edges =
-                        {
-                            { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
-                            { 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 4 },
-                            { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 }
-                        };
-                        for (int e = 0; e < edges.GetLength(0); e++)
-                        {
-                            var a = corners[edges[e, 0]];
-                            var b = corners[edges[e, 1]];
-                            lines[idx++] = new VertexPositionColor(a, wireColor);
-                            lines[idx++] = new VertexPositionColor(b, wireColor);
-                        }
-
-                        foreach (var pass in _debugEffect.CurrentTechnique.Passes)
-                        {
-                            pass.Apply();
-                            GraphicsDevice.DrawUserPrimitives(
-                                PrimitiveType.LineList,
-                                lines,
-                                0,
-                                edges.GetLength(0));
-                        }
-                    }
-
-                    // Skip drawing if mesh is outside the frustum
-                    if (!visible)
-                        continue;
-
-                    // Determine distance from camera to object
-                    var distance = Vector3.Distance(
-                        EngineManager.scene.mainCamera.CameraPosition,
-                        position);
-
-                    // Select appropriate LOD model based on distance
-
-                    if (go.LODModels != null && go.LODModels.Count > 0)
-                    {
-                        modelToDraw = go.GetLODModel(distance);
-                    }
-
-                    // Configure effects and draw mesh
-                    foreach (var effect in mesh.Effects)
-                    {
-                        if (effect is BasicEffect basic)
-                        {
-                            basic.World = world;
-                            basic.View = _view;
-                            basic.Projection = _projection;
-                            basic.EnableDefaultLighting();
-                            basic.TextureEnabled = true;
-                            basic.Texture = go.texture;
-                        }
-                        else
-                        {
-                            shader.SetUniform("World", world);
-                        }
-                    }
-
-                    mesh.Draw();
-                }
-            }
-
-            // Restore original rasterizer state
-            GraphicsDevice.RasterizerState = prevRasterizer;
-        }
+       
     }
 }

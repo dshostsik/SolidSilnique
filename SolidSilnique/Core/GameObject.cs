@@ -144,8 +144,13 @@ namespace SolidSilnique.Core
         /// </summary>
         public void Destroy()
         {
-            if (parent != null) {
+
+            if (parent != null)
+            {
                 parent.RemoveChild(this);
+            }
+            else { 
+                //EngineManager.scene.RemoveChild(this);
             }
         }
 

@@ -27,12 +27,12 @@ namespace SolidSilnique.Core
         }
 
         
-        Vector3 Front;
+        public Vector3 Front;
         Vector3 Up;
         Vector3 Right;
         Vector3 WorldUp;
 
-        public Vector3 CameraPosition { get { return cameraComponent.gameObject.transform.globalPosition; } }
+        public Vector3 CameraPosition { get { return cameraComponent.gameObject.transform.getModelMatrix().Translation; } }
         
         float Yaw;
         float Pitch;
@@ -40,7 +40,7 @@ namespace SolidSilnique.Core
         float MovementSpeed;
         float MouseSensitivity;
         public float Zoom;
-        CameraComponent cameraComponent;
+        public CameraComponent cameraComponent;
 
         public Camera(CameraComponent camComponent, float yaw = YAW, float pitch = PITCH)
         {
@@ -64,7 +64,7 @@ namespace SolidSilnique.Core
             MovementSpeed = SPEED;
             MouseSensitivity = SENSE;
             Zoom = ZOOM;
-            UpdateCameraVectors();
+            //UpdateCameraVectors();
         }
 
         public Matrix getViewMatrix()
@@ -94,7 +94,7 @@ namespace SolidSilnique.Core
             xOffset *= MouseSensitivity;
             yOffset *= MouseSensitivity;
 
-            Yaw -= xOffset * (deltaTime / 1000.0f);
+            Yaw += xOffset * (deltaTime / 1000.0f);
             Pitch -= yOffset * (deltaTime / 1000.0f);
 
             //Yaw += xOffset;
@@ -112,7 +112,8 @@ namespace SolidSilnique.Core
                     Pitch = -89.0f;
                 }
             }
-            
+
+            cameraComponent.gameObject.transform.rotation = new Vector3(Pitch, Yaw, 0);// + Right * Pitch;
             Console.WriteLine("Yaw: " + Yaw + " pitch: " + Pitch);
             UpdateCameraVectors();
         }
@@ -128,11 +129,14 @@ namespace SolidSilnique.Core
         {
             Vector3 front;
             front.X = MathF.Cos(MathHelper.ToRadians(Yaw)) * MathF.Cos(MathHelper.ToRadians(Pitch));
-            front.Y = MathF.Sin(MathHelper.ToRadians(Pitch));
+            front.Y = MathF.Sin(MathHelper.ToRadians(Pitch)); 
             front.Z = MathF.Sin(MathHelper.ToRadians(Yaw)) * MathF.Cos(MathHelper.ToRadians(Pitch));
             Front = Vector3.Normalize(front);
 
-            Right = Vector3.Normalize(Vector3.Cross(Front, WorldUp));
+            Front = cameraComponent.gameObject.transform.getModelMatrix().Forward;
+
+
+			Right = Vector3.Normalize(Vector3.Cross(Front, WorldUp));
             Up = Vector3.Normalize(Vector3.Cross(Right, Front));
         }
     }

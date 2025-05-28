@@ -25,10 +25,11 @@ public class ProceduralGrass
     public List<Texture2D>	loadedTextures;
     public List<Model>		loadedTrees;
     public List<Texture2D>	loadedTexturesTrees;
-    
-    
-    public List<GameObject>	createdObjects = new List<GameObject>();
-    public ProceduralGrass(List<Model>loadedModels,List<Texture2D>loadedTextures,List<Model>loadedTrees,List<Texture2D>loadedTexturesTrees,ContentManager Content)
+    public EnvironmentObject enviro;
+
+
+	public List<GameObject>	createdObjects = new List<GameObject>();
+    public ProceduralGrass(List<Model>loadedModels,List<Texture2D>loadedTextures,List<Model>loadedTrees,List<Texture2D>loadedTexturesTrees,ContentManager Content, EnvironmentObject enviro)
     {
         levelMap = Content.Load<Texture2D>("levelMap");
         this.lenght = levelMap.Height;
@@ -37,6 +38,7 @@ public class ProceduralGrass
         this.loadedTextures = loadedTextures;
         this.loadedTrees = loadedTrees;
         this.loadedTexturesTrees = loadedTexturesTrees;
+        this.enviro = enviro;
     }
 
     public void precomputeNoise()
@@ -94,13 +96,13 @@ public class ProceduralGrass
                 switch (Green)
                 {
                     case 0:
-                        standardTerrain(i,j,Red,Blue);
+                        standardTerrain(j,i,Red,Blue);
                         break;
                     case 120:
-                        generatePath(i,j,Red,Blue);
+                        generatePath(j, i, Red,Blue);
                         break;
                     case 255:
-                        GenerateTreeWall(i,j,Red,Blue);
+                        GenerateTreeWall(j, i,Red,Blue);
                         break;
                 }
             }
@@ -117,8 +119,10 @@ public class ProceduralGrass
         randX += DisNoise[i, j] / 60f;
         randZ -= DisNoise[i, j] / 60f;
         go.transform.position = new Vector3(randX, -0.3f, randZ);
+        go.transform.position += Vector3.Up * enviro.GetHeight(go.transform.position);
 
-        float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
+
+		float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
         MaximumHeight = myCeiling(MaximumHeight,0.8f + Red/255f * 1.5f);
         float scaleY = MaximumHeight;
         float scaleXZ = 1.2f + ((TransformNoise[i,j] + computedNoise[i,j]) / 510f);
@@ -140,7 +144,7 @@ public class ProceduralGrass
         go.AddLOD(null, 1200f);
         
         go.texture = loadedTexturesTrees[randomTreeModel];
-        go.AddComponent(new TreeCollider(0.6f*scaleXZ,10));
+        go.AddComponent(new TreeColliderComponent(0.6f*scaleXZ,10));
         createdObjects.Add(go);
     }
 
@@ -157,9 +161,10 @@ public class ProceduralGrass
             randX += DisNoise[i, j] / 60f;
             randZ -= DisNoise[i, j] / 60f;
             go.transform.position = new Vector3(randX, -0.3f, randZ);
+			go.transform.position += Vector3.Up * enviro.GetHeight(go.transform.position);
 
 
-            float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
+			float MaximumHeight =1f + (TransformNoise[i,j] /255f * 1.5f);
             MaximumHeight = myCeiling(MaximumHeight,0.8f+ Red/255f * 1.5f);
             float scaleY = MaximumHeight;
             float scaleXZ = 0.9f + ((TransformNoise[i,j] + computedNoise[i,j]) / 510f);

@@ -38,7 +38,7 @@ namespace SolidSilnique.Core
 		/// <summary>
 		/// Wykonywana na początku programu
 		/// </summary>
-		public void Start()
+		public virtual void Start()
 		{
 			foreach (var child in gameObjects)
 			{
@@ -50,7 +50,7 @@ namespace SolidSilnique.Core
 		/// <summary>
 		/// Wykonywana w każdej klatce programu
 		/// </summary>
-		public void Update()
+		public virtual void Update()
 		{
 
 
@@ -65,7 +65,7 @@ namespace SolidSilnique.Core
 		/// <summary>
 		/// Wykonywana w pętli rysowania
 		/// </summary>
-		public void Draw()
+		public virtual void Draw()
 		{
 			foreach (var child in gameObjects)
 			{

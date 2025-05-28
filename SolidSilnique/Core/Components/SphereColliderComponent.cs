@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using SolidSilnique.Core.Physics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace SolidSilnique.Core.Components
 {
 	class SphereColliderComponent : Component
 	{
-		static List<GameObject> instances = [];
+		static public List<GameObject> instances = [];
 
 		public BoundingSphere boundingSphere;
 		
@@ -34,24 +35,18 @@ namespace SolidSilnique.Core.Components
 			CheckCollisionWithSphere();
 			CheckCollisionWithPlane();
 			CheckCollisionWithTree();
+			CheckCollisionWithEnviro();
 		}
 
 		public void CheckCollisionWithSphere()
 		{
 			foreach (var instance in instances)
 			{
-
-				if (instance != gameObject) {
-					BoundingSphere other = instance.GetComponent<SphereColliderComponent>().boundingSphere;
-					if (boundingSphere.Intersects(other)){ 
-						Vector3 distVector = boundingSphere.Center - other.Center;
-						float dist = distVector.Length();
-						distVector.Normalize();
-						float sepDist = (boundingSphere.Radius + other.Radius) - dist;
-						Vector3 sepVector = distVector * sepDist;
-						gameObject.transform.position += sepVector;
-						boundingSphere.Center = gameObject.transform.position;
-					}
+				Vector3 sepVector = PhysicsManager.SphereToSphereCollision(this, instance.GetComponent<SphereColliderComponent>());
+				if(sepVector != Vector3.Zero)
+				{
+					gameObject.transform.position += sepVector;
+					boundingSphere.Center = gameObject.transform.position;
 				}
 			}
 		}
@@ -61,42 +56,40 @@ namespace SolidSilnique.Core.Components
 			foreach (var instance in PlaneColliderComponent.instances)
 			{
 
-				if (instance != gameObject) {
-					Plane other = instance.GetComponent<PlaneColliderComponent>().plane;
-					if (boundingSphere.Intersects(other) == PlaneIntersectionType.Intersecting){ 
-						//TO DO fix
-						float distance = Vector3.Dot(other.Normal, boundingSphere.Center) - other.D;
-						float sepDist = (boundingSphere.Radius) - distance;
-						Vector3 sepVector = other.Normal * sepDist;
-						gameObject.transform.position += sepVector;
-						boundingSphere.Center = gameObject.transform.position;
-					}
+				Vector3 sepVector = PhysicsManager.SphereToPlaneCollision(this, instance.GetComponent<PlaneColliderComponent>());
+				if (sepVector != Vector3.Zero)
+				{
+					gameObject.transform.position += sepVector;
+					boundingSphere.Center = gameObject.transform.position;
+				}
+
+			}
+		}
+
+		public void CheckCollisionWithTree()
+		{
+			foreach (var instance in TreeColliderComponent.instances)
+			{
+
+				Vector3 sepVector = PhysicsManager.SphereToTreeCollision(this, instance.GetComponent<TreeColliderComponent>());
+				if (sepVector != Vector3.Zero)
+				{
+					gameObject.transform.position += sepVector;
+					boundingSphere.Center = gameObject.transform.position;
 				}
 			}
 		}
-		
-		public void CheckCollisionWithTree()
-		{
-			foreach (var instance in TreeCollider.instances)
-			{
 
-				if (instance != gameObject) {
-					TreeCollider other = instance.GetComponent<TreeCollider>();
-					Vector3 otherCenter = new Vector3(other.gameObject.transform.position.X,MathF.Min(boundingSphere.Center.Y,other.HeightLimit),other.gameObject.transform.position.Z);
-					float distance = Vector3.Distance(boundingSphere.Center, otherCenter);
-					if (distance < boundingSphere.Radius + other.Radius){ 
-						//Separate
-						
-						Vector3 distVector = boundingSphere.Center - otherCenter;
-						float dist = distVector.Length();
-						distVector.Normalize();
-						float sepDist = (boundingSphere.Radius + other.Radius) - dist;
-						Vector3 sepVector = distVector * sepDist;
-						gameObject.transform.position += sepVector;
-						boundingSphere.Center = gameObject.transform.position;
-					}
+		public void CheckCollisionWithEnviro()
+		{
+			
+				Vector3 sepVector = PhysicsManager.SphereToEnviroConstraint(this);
+				if (sepVector != Vector3.Zero)
+				{
+					gameObject.transform.position += sepVector;
+					boundingSphere.Center = gameObject.transform.position;
 				}
-			}
+			
 		}
 	}
 }
