@@ -876,6 +876,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/default_roughness.png
 
+#begin Textures/Dust.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Dust.png
+
 #begin Textures/eye_tex.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -935,6 +947,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/gab_tex.png
+
+#begin Textures/GoldDust.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/GoldDust.png
 
 #begin Textures/gun_normal.png
 /importer:TextureImporter

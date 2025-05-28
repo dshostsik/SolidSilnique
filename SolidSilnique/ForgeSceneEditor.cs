@@ -225,6 +225,8 @@ namespace SolidSilnique
             _skybox.Setup(Content, _graphics, GraphicsDevice, _projection);
 
             _input = new Input(this);
+
+
             base.Initialize();
         }
 
