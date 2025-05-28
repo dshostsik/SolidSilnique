@@ -105,7 +105,7 @@ namespace SolidSilnique.Core
         public void Draw(GraphicsDevice gd, Matrix view, Matrix proj, float totalTime)
         {
             gd.RasterizerState = RasterizerState.CullNone;
-            gd.DepthStencilState = DepthStencilState.Default;
+            gd.DepthStencilState = DepthStencilState.DepthRead;
             gd.BlendState = BlendState.AlphaBlend;
             gd.SetVertexBuffer(_vb);
 
