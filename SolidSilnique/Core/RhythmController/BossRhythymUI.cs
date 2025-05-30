@@ -3,16 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core;
-
+using SolidSilnique.Core.RhythmController;
+using SolidSilnique.MonoAL;
 using static NotesLoader;
 public class BossRhythymUI
 {
-    
+    float offset = 0.32f;
     private Stack<int> buttons = new Stack<int>();
     private Stack<float> accuracy = new Stack<float>();
     private List<Note> loadedNotes = new List<Note>();
+    private List<float> offsets = new List<float>();
     int[] buttonsPressed = new int[4];
     float[] accuracyPressed = new float[4];
     private float songTime;
@@ -20,23 +24,55 @@ public class BossRhythymUI
     private int combo = 0;
     bool turnedOff = false;
     KeyboardState kState = new KeyboardState();
+    ContentManager content;
+    AtomicSoundTrack audio;
+    SpriteBatch spriteBatch;
+    private GUIRhythymController visuals;
+    List<Texture2D> textures = new List<Texture2D>();
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void Start(ContentManager content,SpriteBatch spriteBatch)
     {
-        loadedNotes = NotesLoader.LoadNotesFromXml("level.xml");
+        this.spriteBatch = spriteBatch;
+        this.content = content;
+        textures.Add(content.Load<Texture2D>("Textures/redNote"));
+        textures.Add(content.Load<Texture2D>("Textures/blueNote"));
+        textures.Add(content.Load<Texture2D>("Textures/yellowNote"));
+        textures.Add(content.Load<Texture2D>("Textures/violetNote"));
+        
+        audio = new AtomicSoundTrack("Caramell Dansen SpeedyCake ReMix",
+            content, 1f);
+        loadedNotes = NotesLoader.LoadNotesFromXml("Content/level.xml");
+        visuals = new GUIRhythymController(loadedNotes,content);
         songTime = 0f;
+        audio.Play();
+        
     }
 
     // Update is called once per frame
-    void Update(GameTime time)
+    public void Update()
     {
+        
         kState = Keyboard.GetState();
         if (turnedOff)
         {
             return;
         }
         songTime += Time.deltaTime;
+        
+        visuals.updateGUIRhythym(loadedNotes,buttonsPressed,songTime);
+        visuals.drawNotes(spriteBatch);
         readInput();
+        
+        
+        Color[] colors = new Color[2];
+        colors[0] = Color.Black;
+        colors[1] = Color.White;
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[0], new Vector2(1080-64, 80), colors[buttonsPressed[0]]));
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[1], new Vector2(400, 720-64), colors[buttonsPressed[1]]));
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[2], new Vector2(1080-64, 1296), colors[buttonsPressed[2]]));
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(1676, 720-64), colors[buttonsPressed[3]]));
+        
+        
         if (CheckNotZero(buttonsPressed) > 0)
         {
             for (int i = 0; i < 4; i++)
@@ -44,12 +80,22 @@ public class BossRhythymUI
                 if(buttonsPressed[i] != 0)
                     CheckCorespondingNote(buttonsPressed[i], accuracyPressed[i]);
             }
-            checkTooOldNotes();
+            
         }
-
+        checkTooOldNotes();
+        Console.WriteLine(loadedNotes.Count);
+        Console.WriteLine(songTime);
         if (loadedNotes.Count == 0)
         {
             EndingScreen();
+            audio.Stop();
+            turnedOff = true;
+        }
+
+        if (health == 0)
+        {
+            EndingScreen();
+            audio.Stop();
             turnedOff = true;
         }
         buttonsPressed = new int[4];
@@ -70,16 +116,28 @@ public class BossRhythymUI
 
     void CheckCorespondingNote(int a,float pressTime)
     {
-        for (int i = 0; i < 4; i++)
+        
+        int limit = 4;
+        if (loadedNotes.Count <= 4)
+        {
+            limit = loadedNotes.Count;
+        }
+        for (int i = 0; i < limit; i++)
         {
             if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time) < 0.5f)
             {
+                offsets.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time));
+                visuals.setNoteInvisible(loadedNotes[i].Button, loadedNotes[i].Time);
                 loadedNotes.RemoveAt(i);
                 accuracy.Push(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
                 Console.WriteLine("Hit in Time");
                 Console.WriteLine("Accuracy");
                 Console.WriteLine(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
                 combo++;
+                if (health < 96)
+                {
+                    health += 5;
+                }
             }
         }
         
@@ -87,11 +145,16 @@ public class BossRhythymUI
 
     void checkTooOldNotes()
     {
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < loadedNotes.Count; i++)
         {
-            if (loadedNotes[i].Time < songTime - 0.5)
+            if (loadedNotes[i].Time < songTime - 2.5f)
             {
                 loadedNotes.RemoveAt(i);
+                if (health >= 5)
+                {
+                    health -= 5;
+                }
+                
             }
         }
         
@@ -100,26 +163,33 @@ public class BossRhythymUI
 
     void EndingScreen()
     {
+        Console.WriteLine("Wyniki");
         float totalScore = 0;
         for (int i = 0; i < accuracy.Count; i++)
         {
             totalScore += accuracy.Pop();
         }
         Console.WriteLine(totalScore);
+        float avgOffset = 0;
+        for (int i = 0; i < offsets.Count; i++)
+        {
+            avgOffset += offsets[i];
+        }
+        Console.WriteLine(avgOffset / offsets.Count);
     }
 
     void readInput()
     {
         if (kState.IsKeyDown(Keys.J))
         {
-            buttonsPressed[0] = 1;
-            accuracyPressed[0] = songTime;
-        }
-            
-            if (kState.IsKeyDown(Keys.I))
-            {
-                buttonsPressed[1] = 1;
-                accuracyPressed[1] = songTime;
+            buttonsPressed[1] = 1;
+            accuracyPressed[1] = songTime;
+        }  
+             
+              if  (kState.IsKeyDown(Keys.I))
+             { 
+                        buttonsPressed[0] = 1         ;
+                accuracyPressed[0] = songTime;
             }
             
             if (kState.IsKeyDown(Keys.K))

@@ -1,66 +1,90 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace SolidSilnique.Core.RhythmController;
 
+
 public class HitNoteVisual
 {
-    private int positionX;
-    private int positionY;
-    private float noteTime;
-    private int noteButton;
-    private bool noteVisible = false;
-    public HitNoteVisual(float noteTime, int noteButton)
+    private int positionX=0;
+    private int positionY=0;
+    public float noteTime;
+    public int noteButton;
+    public bool noteVisible = false;
+    Texture2D noteTexture;
+    public HitNoteVisual(float noteTime, int noteButton,List<Texture2D> TextureNotes)
     {
         this.noteTime = noteTime;
         this.noteButton = noteButton;
+        positionX = 1080-64;
+        positionY = 720-64;
+        noteVisible = false;
+        /*
         switch (noteButton)
         {
             case 0:
-                positionX +=  64;
+                
                 break;
             case 1:
-                positionY += 64;
+                positionX = 1080;
+                positionY = 720 + 64;
                 break;
             case 2:
-                positionX += 64;
+                positionX = 1080 - 64;
+                positionY = 720 + 64;
                 break;
             case 3:
-                positionY += 64;
+                positionX = 1080 + 64;
+                positionY = 720 + 64;
                 break;
                 
         }
-        
+*/
+        noteTexture = TextureNotes[noteButton];
     }
     
 
-    public void updatePos(GameTime gameTime,float songTime)
+    public void updatePos(float songTime)
     {
-        if (songTime + 2f >= songTime && !noteVisible)
+        if (songTime + 2f >= noteTime && !noteVisible)
         {
             noteVisible = true;
         }
-        switch (noteButton)
+        float gameTime = Time.deltaTime;
+        if (noteVisible)
         {
-            case 0:
-                positionY +=  gameTime.ElapsedGameTime.Milliseconds * 10;
-                break;
-            case 1:
-                positionX -=  gameTime.ElapsedGameTime.Milliseconds * 10;
-                break;
-            case 2:
-                positionY -=  gameTime.ElapsedGameTime.Milliseconds * 10;
-                break;
-            case 3:
-                positionX +=  gameTime.ElapsedGameTime.Milliseconds * 10;
-                break;
+            switch (noteButton)
+            {
                 
+                case 0:
+                    positionY -=  (int)(gameTime * 288);
+                    break;
+                case 1:
+                    positionX -=  (int)(gameTime * 288);
+                    break;
+                case 2:
+                    positionY +=  (int)(gameTime * 288);
+                    break;
+                case 3:
+                    positionX +=  (int)(gameTime * 288);
+                    break;
+                
+            }  
         }
+        
 
-        if (noteTime < songTime + 1f)
+        if (noteTime < songTime -0.5f)
         {
             Console.WriteLine("usun jakos te notke");
             noteVisible = false;
         }
+    }
+
+    public void draw(SpriteBatch spriteBatch)
+    {
+        if(noteVisible)
+            EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(noteTexture, new Vector2(positionX, positionY), Color.White));
     }
 }

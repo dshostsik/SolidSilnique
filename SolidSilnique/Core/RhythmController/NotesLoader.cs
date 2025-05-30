@@ -15,8 +15,7 @@ public static class NotesLoader
     public static List<Note> LoadNotesFromXml(string xmlFilePath)
     {
         var notes = new List<Note>();
-        if (!File.Exists(xmlFilePath))
-            throw new FileNotFoundException("File not found", xmlFilePath);
+        
 
         XDocument doc = XDocument.Load(xmlFilePath);
 

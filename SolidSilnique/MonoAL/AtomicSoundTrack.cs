@@ -29,4 +29,9 @@ public class AtomicSoundTrack
         MediaPlayer.Volume = volume;
         MediaPlayer.Play(song);
     }
+
+    public void Stop()
+    {
+        MediaPlayer.Stop();
+    }
 }

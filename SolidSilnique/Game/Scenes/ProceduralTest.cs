@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Input;
 
 
 namespace SolidSilnique.GameContent;
@@ -24,7 +25,9 @@ class ProceduralTest : Scene
 
 
 		public EnvironmentObject enviro = new EnvironmentObject();
-	
+		KeyboardState kState = new KeyboardState();
+		private BossRhythymUI bossRhythym = new BossRhythymUI();
+		SpriteBatch spriteBatch = new SpriteBatch(EngineManager.graphics);
 
 		ContentManager content;
 		public ProceduralTest() {
@@ -77,9 +80,7 @@ class ProceduralTest : Scene
 			//treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
 
 			content = Content;
-
-
-
+		
 
 
 		}
@@ -277,6 +278,20 @@ class ProceduralTest : Scene
 
 			return go;
 
+		}
+		private bool turnedOn = false;
+		public override void Update()
+		{
+			kState = Keyboard.GetState();
+			if (kState.IsKeyDown(Keys.M) && !turnedOn)
+			{
+				bossRhythym.Start(content,spriteBatch);
+				turnedOn = true;
+			}
+			if(turnedOn)
+				bossRhythym.Update();
+			
+			base.Update();
 		}
 	
 }

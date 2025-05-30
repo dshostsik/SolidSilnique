@@ -17,6 +17,7 @@ namespace SolidSilnique.Core
     {
         public static Scene scene = null;
         public static Queue<GameObject> renderQueue = [];
+        public static Queue<Tuple<Texture2D,Vector2,Color>> renderQueueUI = [];
         public static bool celShadingEnabled = false;
 
         //Debug flags
@@ -187,6 +188,17 @@ namespace SolidSilnique.Core
                     throw;
                 }
             }
+
+            SpriteBatch UiRenderer = new SpriteBatch(graphics);
+            UiRenderer.Begin();
+            while(renderQueueUI.Count > 0)
+            {
+                Tuple<Texture2D,Vector2,Color> element = renderQueueUI.Dequeue();
+                
+                UiRenderer.Draw(element.Item1, element.Item2, element.Item3);
+                
+            }
+            UiRenderer.End();
         }
     }
 }
