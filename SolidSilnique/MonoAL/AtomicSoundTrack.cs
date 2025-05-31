@@ -34,4 +34,10 @@ public class AtomicSoundTrack
     {
         MediaPlayer.Stop();
     }
+
+    public float songTime()
+    {
+        return (float)MediaPlayer.PlayPosition.TotalSeconds;
+    }
+    
 }

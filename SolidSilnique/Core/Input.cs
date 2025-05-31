@@ -119,9 +119,9 @@ namespace SolidSilnique.Core
             float mouseX, mouseY;
 
 
-            Console.WriteLine("Mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
-            Console.WriteLine("Mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " +
-                              Mouse.GetState().Position.Y);
+            //Console.WriteLine("Mouse position: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
+            //Console.WriteLine("Mouse position (using Mouse.GetState().Position): " + Mouse.GetState().Position.X + " " +
+            //                  Mouse.GetState().Position.Y);
             mouseX = w - Mouse.GetState().X;
             mouseY = Mouse.GetState().Y - h;
 

@@ -39,8 +39,8 @@ public class BossRhythymUI
         textures.Add(content.Load<Texture2D>("Textures/yellowNote"));
         textures.Add(content.Load<Texture2D>("Textures/violetNote"));
         
-        audio = new AtomicSoundTrack("Caramell Dansen SpeedyCake ReMix",
-            content, 1f);
+        audio = new AtomicSoundTrack("master house",
+            content, 0.1f);
         loadedNotes = NotesLoader.LoadNotesFromXml("Content/level.xml");
         visuals = new GUIRhythymController(loadedNotes,content);
         songTime = 0f;
@@ -58,6 +58,10 @@ public class BossRhythymUI
             return;
         }
         songTime += Time.deltaTime;
+        if (audio.songTime() < 0)
+        {
+            Console.WriteLine("o kurwa");
+        }
         
         visuals.updateGUIRhythym(loadedNotes,buttonsPressed,songTime);
         visuals.drawNotes(spriteBatch);
@@ -67,12 +71,10 @@ public class BossRhythymUI
         Color[] colors = new Color[2];
         colors[0] = Color.Black;
         colors[1] = Color.White;
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[0], new Vector2(1080-64, 80), colors[buttonsPressed[0]]));
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[1], new Vector2(400, 720-64), colors[buttonsPressed[1]]));
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[2], new Vector2(1080-64, 1296), colors[buttonsPressed[2]]));
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(1676, 720-64), colors[buttonsPressed[3]]));
-        
-        
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[0], new Vector2(1080-64, 80), colors[buttonsPressed[0]])); // I
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[1], new Vector2(400, 720-64), colors[buttonsPressed[1]])); // <
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[2], new Vector2(1080-64, 1296), colors[buttonsPressed[2]])); // K
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(1676, 720-64), colors[buttonsPressed[3]])); // >
         if (CheckNotZero(buttonsPressed) > 0)
         {
             for (int i = 0; i < 4; i++)
@@ -83,8 +85,6 @@ public class BossRhythymUI
             
         }
         checkTooOldNotes();
-        Console.WriteLine(loadedNotes.Count);
-        Console.WriteLine(songTime);
         if (loadedNotes.Count == 0)
         {
             EndingScreen();
@@ -124,15 +124,16 @@ public class BossRhythymUI
         }
         for (int i = 0; i < limit; i++)
         {
-            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time) < 0.5f)
+            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time -3.5) < 1.5f)
             {
                 offsets.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time));
                 visuals.setNoteInvisible(loadedNotes[i].Button, loadedNotes[i].Time);
                 loadedNotes.RemoveAt(i);
                 accuracy.Push(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
-                Console.WriteLine("Hit in Time");
-                Console.WriteLine("Accuracy");
-                Console.WriteLine(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
+                EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(1300, 720-64), Color.White));
+                Console.WriteLine(songTime - loadedNotes[i].Time);
+                Console.WriteLine(loadedNotes[i].Button);
+                Console.WriteLine("przerwa");
                 combo++;
                 if (health < 96)
                 {
@@ -147,7 +148,7 @@ public class BossRhythymUI
     {
         for (int i = 0; i < loadedNotes.Count; i++)
         {
-            if (loadedNotes[i].Time < songTime - 2.5f)
+            if (loadedNotes[i].Time < songTime - 1f)
             {
                 loadedNotes.RemoveAt(i);
                 if (health >= 5)
@@ -163,19 +164,17 @@ public class BossRhythymUI
 
     void EndingScreen()
     {
-        Console.WriteLine("Wyniki");
         float totalScore = 0;
         for (int i = 0; i < accuracy.Count; i++)
         {
             totalScore += accuracy.Pop();
         }
-        Console.WriteLine(totalScore);
+       
         float avgOffset = 0;
         for (int i = 0; i < offsets.Count; i++)
         {
             avgOffset += offsets[i];
         }
-        Console.WriteLine(avgOffset / offsets.Count);
     }
 
     void readInput()
@@ -183,25 +182,25 @@ public class BossRhythymUI
         if (kState.IsKeyDown(Keys.J))
         {
             buttonsPressed[1] = 1;
-            accuracyPressed[1] = songTime;
+            accuracyPressed[1] = audio.songTime();
         }  
              
               if  (kState.IsKeyDown(Keys.I))
              { 
                         buttonsPressed[0] = 1         ;
-                accuracyPressed[0] = songTime;
+                accuracyPressed[0] = audio.songTime();
             }
             
             if (kState.IsKeyDown(Keys.K))
             {
                 buttonsPressed[2] = 1; 
-                accuracyPressed[1] = songTime;
+                accuracyPressed[2] = audio.songTime();
             }
             
             if (kState.IsKeyDown(Keys.L))
             {
                 buttonsPressed[3] = 1; 
-                accuracyPressed[1] = songTime;
+                accuracyPressed[3] = audio.songTime();
             }
             
         

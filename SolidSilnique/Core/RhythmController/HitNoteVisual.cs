@@ -48,7 +48,7 @@ public class HitNoteVisual
 
     public void updatePos(float songTime)
     {
-        if (songTime + 2f >= noteTime && !noteVisible)
+        if (songTime + 0.5f >= noteTime && !noteVisible)
         {
             noteVisible = true;
         }
@@ -59,25 +59,24 @@ public class HitNoteVisual
             {
                 
                 case 0:
-                    positionY -=  (int)(gameTime * 288);
+                    positionY -=  (int)(gameTime * 1152);
                     break;
                 case 1:
-                    positionX -=  (int)(gameTime * 288);
+                    positionX -=  (int)(gameTime * 1152);
                     break;
                 case 2:
-                    positionY +=  (int)(gameTime * 288);
+                    positionY +=  (int)(gameTime * 1152);
                     break;
                 case 3:
-                    positionX +=  (int)(gameTime * 288);
+                    positionX +=  (int)(gameTime * 1152);
                     break;
                 
             }  
         }
         
 
-        if (noteTime < songTime -0.5f)
+        if (noteTime < songTime -0.05f)
         {
-            Console.WriteLine("usun jakos te notke");
             noteVisible = false;
         }
     }
