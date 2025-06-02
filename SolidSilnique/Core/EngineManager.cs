@@ -27,8 +27,7 @@ namespace SolidSilnique.Core
         public static Queue<GameObject> renderQueue = [];
         public static bool celShadingEnabled = false;
 
-        private static Queue<GameObject> shadowsQueue = new Queue<GameObject>();
-        private static Vector3 offset = new Vector3(250,100f,250);
+        private static Queue<GameObject> shadowsQueue;
         
         //Debug flags
         public static bool useCulling = true;
@@ -47,15 +46,13 @@ namespace SolidSilnique.Core
 
         internal static GraphicsDevice graphics;
 
-        private static RenderTarget2D _shadowMapRenderTarget;
-
-        private static Matrix _lightProjection =  Matrix.CreateOrthographic(512, 512, 0.01f, 10000f);
+        private static RenderTarget2D _staticShadowMapRenderTarget;
+        private static int _iterationsCounter = 0;
+        private static Matrix lightViewProjection;
+        private static Matrix _lightProjection =  Matrix.CreateOrthographic(_testSettings/8, _testSettings/8, 0.0001f, 5000f);
 
         public static void Start()
         {
-            _shadowMapRenderTarget = new RenderTarget2D(graphics, _testSettings,
-                _testSettings, false,
-                SurfaceFormat.Single, DepthFormat.Depth24);
             scene.Start();
         }
 
@@ -66,20 +63,20 @@ namespace SolidSilnique.Core
             scene.Update();
         }
 
-        public static void Draw(Shader shader, Shader shadowShader, Matrix view,
-            Matrix projection, LightsManagerComponent manager)
+        private static RenderTarget2D BakeStaticShadows(Shader shadowShader, LightsManagerComponent manager)
         {
-            scene.Draw();
-            // TODO: fix this sh
+            RenderTarget2D output = new RenderTarget2D(graphics, _testSettings,
+                _testSettings, false,
+                SurfaceFormat.Single, DepthFormat.Depth24);
             shadowsQueue = new Queue<GameObject>(renderQueue);
             // Drawing shadows
-            graphics.SetRenderTarget(_shadowMapRenderTarget);
+            graphics.SetRenderTarget(output);
             graphics.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
-            Matrix lightView = Matrix.CreateLookAt(-manager.DirectionalLight.Direction*10 + offset,
-                Vector3.Zero + offset,
+            Matrix lightView = Matrix.CreateLookAt(manager.DirectionalLightPosition,
+                manager.DirectionalLight.Direction,
                 Vector3.Up);
 
-            Matrix lightViewProjection = lightView * _lightProjection;
+            lightViewProjection = lightView * _lightProjection;
 
             shadowShader.SwapTechnique("ShadeTheSceneRightNow");
             graphics.RasterizerState = RasterizerState.CullClockwise;
@@ -114,13 +111,29 @@ namespace SolidSilnique.Core
                 }
             }
 
-            // using (var stream = new FileStream("shadowMap.png", FileMode.Create))
-            // {
-            //     _shadowMapRenderTarget.SaveAsPng(stream, _shadowMapRenderTarget.Width, _shadowMapRenderTarget.Height);
-            // }
-            graphics.RasterizerState = RasterizerState.CullCounterClockwise;
+            using (var stream = new FileStream("shadowMap2.png", FileMode.Create))
+            {
+                output.SaveAsPng(stream, output.Width, output.Height);
+            } 
+            //graphics.RasterizerState = RasterizerState.CullCounterClockwise;
+            //graphics.RasterizerState = RasterizerState.CullClockwise;
             graphics.SetRenderTarget(null);
             //-------------------------------------
+            
+            return output;
+        }
+        
+        public static void Draw(Shader shader, Shader shadowShader, Matrix view,
+            Matrix projection, LightsManagerComponent manager)
+        {
+            scene.Draw();
+            
+            if (_iterationsCounter < 1)
+            {
+                _iterationsCounter++;
+                _staticShadowMapRenderTarget = BakeStaticShadows(shadowShader, manager);
+            }
+            
             
             // Normal rendering 
             while (renderQueue.Count > 0)
@@ -165,7 +178,7 @@ namespace SolidSilnique.Core
                     Matrix modelTransInv = Matrix.Transpose(Matrix.Invert(go.transform.getModelMatrix()));
                     shader.SetUniform("WorldTransInv", modelTransInv);
                     shader.SetUniform("LightViewProj", lightViewProjection);
-                    shader.SetTexture("shadowMap", _shadowMapRenderTarget);
+                    shader.SetTexture("shadowMap", _staticShadowMapRenderTarget);
 
                     for (int i = 0; i < go.model.Meshes.Count; i++)
                     {
@@ -242,6 +255,7 @@ namespace SolidSilnique.Core
                             else
                             {
                                 part.Effect.CurrentTechnique = shader.Effect.Techniques["BasicColorDrawingWithLights"];
+                                graphics.RasterizerState = RasterizerState.CullNone;
                                 mesh.Draw();
                             }
                         }

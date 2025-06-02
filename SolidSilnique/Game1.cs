@@ -178,7 +178,7 @@ namespace SolidSilnique
                 500f);
 
 
-            testDirectionalLight = new DirectionalLight(new Vector3(1, -1, 0));
+            testDirectionalLight = new DirectionalLight(new Vector3(0, -1, 0));
             testDirectionalLight.AmbientColor = dirlight_ambient;
             testDirectionalLight.DiffuseColor = dirlight_diffuse;
             testDirectionalLight.SpecularColor = dirlight_specular;
@@ -203,7 +203,7 @@ namespace SolidSilnique
             testPointLight.Enabled = 1;
             testSpotlight.Enabled = 1;
 
-            sunPosition = new Vector3(150.0f, 150.0f, 0.0f);
+            sunPosition = new Vector3(1024f, 500f, 1024f);
             //testSpotlight.Enabled = false;
 
             manager.AddPointLight(testPointLight);

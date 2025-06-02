@@ -34,7 +34,7 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
     //float depth = saturate(input.Depth);
     //float4 pos = input.Position;
     float depth = input.z / input.w;
-    //depth = saturate(depth); 
+    depth = saturate(depth); 
     return float4(depth, depth, depth, 1); // grayscale
 }
 
