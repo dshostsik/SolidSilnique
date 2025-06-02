@@ -263,11 +263,6 @@ namespace SolidSilnique
             _leafSystem.LoadContent(GraphicsDevice, Content);
         }
 
-        /// <summary>
-        /// Function defining mouse behaviour
-        /// </summary>
-        /// <param name="gameTime">Object containing time values</param>
-
 
         private readonly Vector3 _tpcOffset = new Vector3(0, 5, -10);
         private readonly Vector3 _tpcLookOffset = new Vector3(0, 2, 0);
