@@ -52,7 +52,7 @@ namespace SolidSilnique.Core
         private static RenderTarget2D _staticShadowMapRenderTarget;
         private static int _iterationsCounter = 0;
         private static Matrix lightViewProjection;
-        private static Matrix _lightProjection =  Matrix.CreateOrthographic(_testSettings/8, _testSettings/8, 0.0001f, 5000f);
+        private static Matrix _lightProjection =  Matrix.CreateOrthographic(512*1.421f, 512*1.421f, 0.0001f, 5000f);
 
         public static void Start()
         {
@@ -77,15 +77,15 @@ namespace SolidSilnique.Core
             // Drawing shadows
             graphics.SetRenderTarget(output);
             graphics.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
-            Matrix lightView = Matrix.CreateLookAt(manager.DirectionalLightPosition,
-                manager.DirectionalLight.Direction,
+            Matrix lightView = Matrix.CreateLookAt(manager.DirectionalLightPosition - manager.DirectionalLight.Direction * 500,
+                manager.DirectionalLightPosition,
                 Vector3.Up);
 
             lightViewProjection = lightView * _lightProjection;
 
             shadowShader.SwapTechnique("ShadeTheSceneRightNow");
             graphics.RasterizerState = RasterizerState.CullClockwise;
-            for (int i = 0; i < shadowsQueue.Count; i++)
+            while (shadowsQueue.Count > 0)
             {
                 GameObject go = shadowsQueue.Dequeue();
                 if (go.model == null)

@@ -115,7 +115,7 @@ class ProceduralTest : Scene
 
 			enviro.Generate("Map1", content, 2, 30,3);
 			ProceduralGrass newProc = new ProceduralGrass(models,textures,treeModels,treeTextures,content,enviro);
-			Task task1 = Task.Run(() => newProc.precomputeNoise());
+			newProc.precomputeNoise();
 			
 			GameObject go = new GameObject("Camera");
 			go.transform.position = new Vector3(250, 3f, 250);
@@ -132,7 +132,7 @@ class ProceduralTest : Scene
 			go.texture = loadedTextures["simpleGreen"];
 			go.AddComponent(new PlaneColliderComponent(new Vector3(0,1,0), true));
 			this.AddChild(go);
-			Task.WhenAll(task1).Wait(); //:O
+			//Task.WhenAll(task1).Wait(); //:O
 			
 			newProc.GenerateObjects();
 			List<GameObject> goList = newProc.createdObjects;
