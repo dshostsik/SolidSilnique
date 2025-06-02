@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SolidSilnique.Core.Components;
 using SolidSilnique.Core.Diagnostics;
+using System.Reflection;
 
 namespace SolidSilnique.Core
 {
@@ -25,7 +26,8 @@ namespace SolidSilnique.Core
     {
         public static Scene scene = null;
         public static Queue<GameObject> renderQueue = [];
-        public static bool celShadingEnabled = false;
+		public static Dictionary<GameObject, VertexBufferBindingGroup> InstancesQueue = []; //representative, InstanceBuffer
+		public static bool celShadingEnabled = false;
 
         private static Queue<GameObject> shadowsQueue;
         
@@ -43,8 +45,9 @@ namespace SolidSilnique.Core
         private static int _testSettings = (int)ShadowResolution.Ultra;
 
         public static BasicEffect wireframeEffect;
+        public static GraphicsDevice graphics;
+        public static Shader shader;
 
-        internal static GraphicsDevice graphics;
 
         private static RenderTarget2D _staticShadowMapRenderTarget;
         private static int _iterationsCounter = 0;
@@ -54,12 +57,14 @@ namespace SolidSilnique.Core
         public static void Start()
         {
             scene.Start();
+            GenerateInstanceData();
         }
 
         public static void Update(GameTime gameTime)
         {
             Time.deltaTimeMs = gameTime.ElapsedGameTime.Milliseconds;
             Time.deltaTime = Time.deltaTimeMs / 1000.0f;
+
             scene.Update();
         }
 
@@ -123,8 +128,8 @@ namespace SolidSilnique.Core
             return output;
         }
         
-        public static void Draw(Shader shader, Shader shadowShader, Matrix view,
-            Matrix projection, LightsManagerComponent manager)
+        
+        public static void Draw( Shader shadowShader, Matrix view, Matrix projection, LightsManagerComponent manager)
         {
             scene.Draw();
             
@@ -139,6 +144,7 @@ namespace SolidSilnique.Core
             while (renderQueue.Count > 0)
             {
                 GameObject go = renderQueue.Dequeue();
+
                 //FRUSTUM CULLING
                 _frustum.Matrix = view * projection;
 
@@ -170,7 +176,8 @@ namespace SolidSilnique.Core
                     shader.SetTexture("texture_roughness1", go.roughnessMap ?? defaultRoughnessMap);
                     shader.SetTexture("texture_ao1", go.aoMap ?? defaultAOMap);
 
-                    shader.SetUniform("useNormalMap", (go.normalMap != null) ? 1 : 0);
+					shader.SetUniform("useLayering", 0);
+					shader.SetUniform("useNormalMap", (go.normalMap != null) ? 1 : 0);
                     shader.SetUniform("useRoughnessMap", (go.roughnessMap != null) ? 1 : 0);
                     shader.SetUniform("useAOMap", (go.aoMap != null) ? 1 : 0);
 
@@ -255,12 +262,13 @@ namespace SolidSilnique.Core
                             else
                             {
                                 part.Effect.CurrentTechnique = shader.Effect.Techniques["BasicColorDrawingWithLights"];
-                                graphics.RasterizerState = RasterizerState.CullNone;
                                 mesh.Draw();
                             }
                         }
                     }
                 }
+
+
                 catch (NullReferenceException e)
                 {
                     Console.WriteLine(e.Message, e.Source, e.StackTrace);
@@ -271,8 +279,172 @@ namespace SolidSilnique.Core
                     Console.WriteLine(u.Message);
                     throw;
                 }
-            }
-            //-------------------------------------------
-        }
-    }
+
+                
+
+			}
+			DrawInstanceData();
+		}
+
+
+
+
+
+
+		//INSTANCING
+
+		struct InstanceMatrix : IVertexType
+		{
+			public Vector4 Row1;
+			public Vector4 Row2;
+			public Vector4 Row3;
+			public Vector4 Row4;
+
+			public static readonly VertexDeclaration VertexDeclaration = new VertexDeclaration
+			(
+				new VertexElement(0, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 10),
+				new VertexElement(16, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 11),
+				new VertexElement(32, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 12),
+				new VertexElement(48, VertexElementFormat.Vector4, VertexElementUsage.TextureCoordinate, 13)
+			);
+
+			VertexDeclaration IVertexType.VertexDeclaration => VertexDeclaration;
+
+			public InstanceMatrix(Matrix matrix)
+			{
+				Row1 = new Vector4(matrix.M11, matrix.M12, matrix.M13, matrix.M14);
+				Row2 = new Vector4(matrix.M21, matrix.M22, matrix.M23, matrix.M24);
+				Row3 = new Vector4(matrix.M31, matrix.M32, matrix.M33, matrix.M34);
+				Row4 = new Vector4(matrix.M41, matrix.M42, matrix.M43, matrix.M44);
+			}
+		}
+
+		public struct VertexBufferBindingGroup
+		{
+            public VertexBufferBinding[] vertexBufferBindings = new VertexBufferBinding[2];
+			public int InstanceCount;
+
+            public VertexBufferBindingGroup() { }
+		}
+
+		static void GenerateInstanceData() {
+            Dictionary<Model, List<GameObject>> modelsToInsta = new Dictionary<Model, List<GameObject>>();
+
+            foreach (var goTop in scene.gameObjects)
+            {
+				foreach (var goChild in goTop.children)
+				{
+                    if (goChild.useInstancing) {
+                        if (!modelsToInsta.ContainsKey(goChild.model))
+                        {
+                            modelsToInsta.Add(goChild.model, new List<GameObject>());
+                        }
+						modelsToInsta.TryGetValue(goChild.model, out List<GameObject> list);
+						list.Add(goChild);
+
+					}
+				}
+				if (goTop.useInstancing)
+				{
+					if (!modelsToInsta.ContainsKey(goTop.model))
+					{
+						modelsToInsta.Add(goTop.model, new List<GameObject>());
+					}
+					modelsToInsta.TryGetValue(goTop.model, out List<GameObject> list);
+					list.Add(goTop);
+
+				}
+			}
+
+            //Create Vertex Bindigns
+
+            foreach (Model key in modelsToInsta.Keys)
+            {
+				modelsToInsta.TryGetValue(key, out List<GameObject> list);
+
+				InstanceMatrix[] instances = new InstanceMatrix[list.Count];
+                for (int i = 0; i < list.Count; i++) {
+                    instances[i] = new InstanceMatrix(list[i].transform.getModelMatrix());
+                }
+
+				VertexBuffer instanceVertexBuffer = new VertexBuffer(graphics,
+					typeof(InstanceMatrix),
+					list.Count,
+					BufferUsage.WriteOnly);
+
+				instanceVertexBuffer.SetData(instances);
+
+				ModelMeshPart part = key.Meshes[0].MeshParts[0];
+				int vertexOffset = part.VertexOffset;
+
+				VertexBuffer vertexBuffer = part.VertexBuffer;
+
+                VertexBufferBindingGroup vertexBufferBinding = new VertexBufferBindingGroup();
+                vertexBufferBinding.vertexBufferBindings[0] = new VertexBufferBinding(vertexBuffer);//, vertexOffset, 0); // slot 0 – dane modelu
+				vertexBufferBinding.vertexBufferBindings[1] = new VertexBufferBinding(instanceVertexBuffer, 0, 1); // slot 1 – instancje
+				vertexBufferBinding.InstanceCount = instances.Length;
+
+
+				InstancesQueue.Add(list[0], vertexBufferBinding);
+			}
+
+            int a = 0;
+
+		}
+
+			static void DrawInstanceData()
+		{
+
+            shader.SetUniform("useInstancing", 1);
+
+            foreach (GameObject representative in InstancesQueue.Keys) {
+
+				ModelMeshPart part = representative.model.Meshes[0].MeshParts[0];
+
+				IndexBuffer indexBuffer = part.IndexBuffer;
+
+				// Potrzebne do rysowania
+				int vertexOffset = part.VertexOffset;
+				int startIndex = part.StartIndex;
+				int primitiveCount = part.PrimitiveCount;
+
+				InstancesQueue.TryGetValue(representative, out var instances);
+
+				/*graphics.SetVertexBuffers(instances);
+				graphics.Indices = indexBuffer;*/
+
+				/*graphics.DrawInstancedPrimitives(
+	                PrimitiveType.TriangleList,
+	                baseVertex: part.VertexOffset,
+	                startIndex: part.StartIndex,
+	                primitiveCount: part.PrimitiveCount,
+	                instanceCount: 1//instances[1].VertexBuffer.VertexCount
+				);*/
+
+
+				foreach (EffectPass pass in shader.Effect.CurrentTechnique.Passes)
+				{
+					pass.Apply();
+
+					// Now call draw function
+					graphics.SetVertexBuffers(instances.vertexBufferBindings);
+					graphics.Indices = indexBuffer;
+
+					graphics.DrawInstancedPrimitives(
+						PrimitiveType.TriangleList,
+						baseVertex: part.VertexOffset,
+						startIndex: part.StartIndex,
+						primitiveCount: part.PrimitiveCount,
+						instanceCount: instances.InstanceCount
+					);
+				}
+
+			}
+
+			shader.SetUniform("useInstancing", 0);
+
+
+
+		}
+	}
 }

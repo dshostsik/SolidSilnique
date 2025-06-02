@@ -2,10 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SolidSilnique.Core
 {
@@ -36,13 +32,15 @@ namespace SolidSilnique.Core
         private float _lifeTime = 20f;
         private Vector3 _gravity = new Vector3(0, -0.1f, 0);
 
-        public LeafParticle(int maxParticles)
+        public LeafParticle(int maxParticles, float lifeTime, Vector3 gravity)
         {
             _particleCount = maxParticles;
+            _lifeTime = lifeTime;
+            _gravity = gravity;
             _vertices = new ParticleVertex[_particleCount * 6]; // 4 vertices per particle
         }
 
-        public void LoadContent(GraphicsDevice gd, ContentManager content)
+        public void LoadContent(GraphicsDevice gd, ContentManager content, Texture2D particle)
         {
             Random rnd = new Random();
 
@@ -74,6 +72,9 @@ namespace SolidSilnique.Core
                     -(2 + (float)rnd.NextDouble() * 1f),
                     (float)(rnd.NextDouble() - 0.5) * 0.5f
                 );
+                Vector3 vel0 = new Vector3(0, 0, 0
+
+                );
 
                 float spawnTime = 0f;
 
@@ -83,7 +84,7 @@ namespace SolidSilnique.Core
                     _vertices[vi++] = new ParticleVertex
                     {
                         InitialPos = pos,
-                        Velocity = vel,
+                        Velocity = vel0,
                         SpawnTime = spawnTime,
                         Corner = quadCorners[j]
                     };
@@ -99,14 +100,16 @@ namespace SolidSilnique.Core
             _vb.SetData(_vertices);
 
             _shader = new Shader("Shaders/LeafParticle", gd, _game, "DrawLeafParticles");
-            _leafTex = content.Load<Texture2D>("Textures/leaf_diffuse");
+            _leafTex = particle;
+            //content.Load<Texture2D>("Textures/Dust")
         }
 
         public void Draw(GraphicsDevice gd, Matrix view, Matrix proj, float totalTime)
         {
             gd.RasterizerState = RasterizerState.CullNone;
-            gd.DepthStencilState = DepthStencilState.Default;
+            gd.DepthStencilState = DepthStencilState.DepthRead;
             gd.BlendState = BlendState.AlphaBlend;
+
             gd.SetVertexBuffer(_vb);
 
             _shader.SetUniform("currentTime", totalTime);
@@ -115,6 +118,7 @@ namespace SolidSilnique.Core
             _shader.SetUniform("View", view);
             _shader.SetUniform("Projection", proj);
             _shader.SetTexture("LeafSampler", _leafTex);
+            
 
             foreach (var pass in _shader.Effect.CurrentTechnique.Passes)
             {

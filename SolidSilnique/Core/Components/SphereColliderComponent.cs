@@ -35,6 +35,7 @@ namespace SolidSilnique.Core.Components
 			CheckCollisionWithSphere();
 			CheckCollisionWithPlane();
 			CheckCollisionWithTree();
+			CheckCollisionWithEnviro();
 		}
 
 		public void CheckCollisionWithSphere()
@@ -77,6 +78,18 @@ namespace SolidSilnique.Core.Components
 					boundingSphere.Center = gameObject.transform.position;
 				}
 			}
+		}
+
+		public void CheckCollisionWithEnviro()
+		{
+			
+				Vector3 sepVector = PhysicsManager.SphereToEnviroConstraint(this);
+				if (sepVector != Vector3.Zero)
+				{
+					gameObject.transform.position += sepVector;
+					boundingSphere.Center = gameObject.transform.position;
+				}
+			
 		}
 	}
 }

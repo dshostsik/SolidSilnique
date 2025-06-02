@@ -11,6 +11,8 @@ namespace SolidSilnique.Core.Physics
 	static class PhysicsManager
 	{
 
+		public static EnvironmentObject enviro;
+
 		//TODO raycast
 		static public GameObject Raycast(Vector3 from, Vector3 direction, float distance) {
 
@@ -49,12 +51,25 @@ namespace SolidSilnique.Core.Physics
 			return Vector3.Zero;
 		}
 
+		static public Vector3 SphereToEnviroConstraint(SphereColliderComponent a)
+		{
+
+			if (enviro != null)
+			{
+				if (a.boundingSphere.Center.Y - a.boundingSphere.Radius < enviro.GetHeight(a.boundingSphere.Center)) {
+					return (enviro.GetHeight(a.boundingSphere.Center) - a.boundingSphere.Center.Y + a.boundingSphere.Radius) *Vector3.Up;
+				}
+				
+			}
+			return Vector3.Zero;
+		}
+
 		static public Vector3 SphereToTreeCollision(SphereColliderComponent a, TreeColliderComponent b)
 		{
 			if (a.gameObject != b.gameObject)
 			{
 				
-				Vector3 otherCenter = new Vector3(b.gameObject.transform.position.X, MathF.Min(a.boundingSphere.Center.Y, b.HeightLimit), b.gameObject.transform.position.Z);
+				Vector3 otherCenter = new Vector3(b.gameObject.transform.position.X, MathF.Min(a.boundingSphere.Center.Y, b.HeightLimit+b.gameObject.transform.position.Y), b.gameObject.transform.position.Z);
 				float distance = Vector3.Distance(a.boundingSphere.Center, otherCenter);
 				if (distance < a.boundingSphere.Radius + b.Radius)
 				{

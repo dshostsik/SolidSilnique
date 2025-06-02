@@ -27,7 +27,7 @@ namespace SolidSilnique.Core.Components
 				hor = 0;
 				vert = 0;
 			}
-			gameObject.transform.rotation += new Vector3(0, hor, 0) * Time.deltaTime * 10;
+			gameObject.transform.rotation += new Vector3(0, hor, 0) * Time.deltaTime * 30;
 			gameObject.transform.position += gameObject.transform.Forward * -vert * Time.deltaTime * 10;
 			gameObject.transform.position += Vector3.Down * Time.deltaTime * 5;
 

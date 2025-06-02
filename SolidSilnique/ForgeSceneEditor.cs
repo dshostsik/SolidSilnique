@@ -225,6 +225,8 @@ namespace SolidSilnique
             _skybox.Setup(Content, _graphics, GraphicsDevice, _projection);
 
             _input = new Input(this);
+
+
             base.Initialize();
         }
 
@@ -355,7 +357,7 @@ namespace SolidSilnique
             //if (useCulling)
             //PerformCulledDraw();
             //else
-            EngineManager.Draw(shader, shadowShader, _view, _projection, manager);
+            //....... EngineManager.Draw(shader, GraphicsDevice, _view, _projection);
             //PerformCulledDraw();
             //EngineManager.Draw(shader);
             //Frustum Culling Setup
