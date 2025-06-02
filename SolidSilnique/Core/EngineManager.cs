@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GUIRESOURCES;
 using SolidSilnique.Core.Diagnostics;
 
 namespace SolidSilnique.Core
@@ -19,6 +20,7 @@ namespace SolidSilnique.Core
         public static Queue<GameObject> renderQueue = [];
         public static Queue<Tuple<Texture2D,Vector2,Color>> renderQueueUI = [];
         public static bool celShadingEnabled = false;
+        public static GUI currentGui;
 
         //Debug flags
         public static bool useCulling = true;
@@ -198,6 +200,15 @@ namespace SolidSilnique.Core
                 UiRenderer.Draw(element.Item1, element.Item2, element.Item3);
                 
             }
+            
+            
+            //Rednder Mateuszkowe GUI :) using the same SpriteBatch :) 
+            if (currentGui != null)
+            {
+                currentGui.Draw(UiRenderer);
+            }
+
+            
             UiRenderer.End();
         }
     }

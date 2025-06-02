@@ -21,7 +21,7 @@ public class BossRhythymUI
     float[] accuracyPressed = new float[4];
     private float songTime;
     public int health = 100;
-    private int combo = 0;
+    public int combo = 0;
     bool turnedOff = false;
     KeyboardState kState = new KeyboardState();
     ContentManager content;
@@ -136,7 +136,7 @@ public class BossRhythymUI
         {
             
             
-            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time -3.5) < 1.2f)
+            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time -3.5) < 2f)
             {
                 offsets.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time));
                 
@@ -172,7 +172,7 @@ public class BossRhythymUI
             if (loadedNotes[i].Time < songTime - 1.5f)
             {
                 
-                
+                combo = 0;
                 loadedNotes.RemoveAt(i);
                 if (health >= 5)
                 {
@@ -182,7 +182,7 @@ public class BossRhythymUI
             }
         }
         
-        combo = 0;
+       
     }
 
     void EndingScreen()

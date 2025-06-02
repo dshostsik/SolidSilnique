@@ -29,7 +29,7 @@ class ProceduralTest : Scene
 		KeyboardState kState = new KeyboardState();
 		private BossRhythymUI bossRhythym = new BossRhythymUI();
 		SpriteBatch spriteBatch = new SpriteBatch(EngineManager.graphics);
-		private GUI rhythymGui;
+		public GUI rhythymGui;
 		ContentManager content;
 		public ProceduralTest() {
 
@@ -232,7 +232,8 @@ class ProceduralTest : Scene
 			}
 
 
-			rhythymGui = new GUI("RhythymGui.xml", content);
+			rhythymGui = new GUI("Content/RhythymGui.xml", content);
+			EngineManager.currentGui = rhythymGui;
 
 	}
 
@@ -291,7 +292,9 @@ class ProceduralTest : Scene
 			}
 			if(turnedOn)
 				bossRhythym.Update();
-			
+			rhythymGui.progressBars[0].progress = bossRhythym.health;
+			rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
+			rhythymGui.texts[1].text = bossRhythym.combo.ToString();
 			base.Update();
 		}
 	
