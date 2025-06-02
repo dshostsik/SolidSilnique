@@ -26,6 +26,11 @@ struct VertexShaderInput
 	float3 aNormal : NORMAL0;
 	float2 aTexCoords : TEXCOORD0;
     float3 aTangent : TANGENT0;
+    
+    float4 instanceRow0 : TEXCOORD10;
+    float4 instanceRow1 : TEXCOORD11;
+    float4 instanceRow2 : TEXCOORD12;
+    float4 instanceRow3 : TEXCOORD13;
 };
 //-------------------------------------
 //           OUTPUT STRUCTURE            
@@ -40,6 +45,10 @@ struct VertexShaderOutput
     float2 globalUVs : TEXCOORD3;
 };
 
+
+int useInstancing = 0;
+
+
 //-------------------------------------
 //            VERTEX SHADER            
 //-------------------------------------
@@ -47,17 +56,32 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 {
 	VertexShaderOutput output = (VertexShaderOutput)0;
     
-    output.Position = mul(input.aPos, mul(mul(World, View), Projection));
+    float4x4 newWorld = World;
+    
+    if (useInstancing != 0)
+    {
+        float4x4 instanceWorld = float4x4(
+            input.instanceRow0,
+            input.instanceRow1,
+            input.instanceRow2,
+            input.instanceRow3
+        );
+        newWorld = instanceWorld;
+    }
+    
+    
+    output.Position = mul(input.aPos, mul(mul(newWorld, View), Projection));
     output.TexCoords = input.aTexCoords;
     //output.Normal = float3x3(transpose(inverse(World))) * input.aNormal;
     //output.Normal = transpose(inverse(input.aNormal));
-    output.Normal = mul(transpose(WorldTransInv), float4(input.aNormal, 0.0f));
-    output.FragPos = mul(input.aPos, World).xyz;
+    //output.Normal = mul(transpose(WorldTransInv), float4(input.aNormal, 0.0f));
+    output.Normal = mul(transpose(newWorld), float4(input.aNormal, 0.0f));
+    output.FragPos = mul(input.aPos, newWorld).xyz;
     
    
     
-    float3 T = normalize((float3) mul(World, float4(input.aTangent, 0.0f)));
-    float3 N = normalize((float3) mul(World, float4(input.aNormal, 0.0f)));
+    float3 T = normalize((float3) mul(newWorld, float4(input.aTangent, 0.0f)));
+    float3 N = normalize((float3) mul(newWorld, float4(input.aNormal, 0.0f)));
     float3 B = cross(N, T);
     output.TBN = float3x3(T, B, N);
     

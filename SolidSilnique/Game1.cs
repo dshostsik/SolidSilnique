@@ -456,5 +456,8 @@ namespace SolidSilnique
             }
             
         }
-    }
+
+        void OnMouseClicked(MouseButton a) { }
+
+	}
 }

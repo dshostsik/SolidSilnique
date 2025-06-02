@@ -113,7 +113,9 @@ public class ProceduralGrass
     {
         
         Random random = new Random();
-        GameObject go = new GameObject("Tree");
+        GameObject go = new GameObject("Tree") { 
+            useInstancing = true
+        };
         float randX = i * 5, randZ = j * 5;
 
         randX += DisNoise[i, j] / 60f;

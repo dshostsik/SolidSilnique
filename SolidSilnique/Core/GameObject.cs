@@ -54,6 +54,8 @@ namespace SolidSilnique.Core
         /// </summary>
         public List<float> LODRanges { get; private set; } = new List<float>();
 
+
+        public bool useInstancing = false;
         
         //Components
         [JsonInclude]
@@ -130,7 +132,11 @@ namespace SolidSilnique.Core
         /// </summary>
         public void Draw()
         {
-            EngineManager.renderQueue.Enqueue(this);
+            if (!useInstancing)
+            {
+				EngineManager.renderQueue.Enqueue(this);
+			}
+            
 
 			foreach (var child in children)
 			{
