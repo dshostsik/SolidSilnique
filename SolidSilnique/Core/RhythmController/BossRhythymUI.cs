@@ -14,7 +14,7 @@ public class BossRhythymUI
 {
     float offset = 0.32f;
     private Stack<int> buttons = new Stack<int>();
-    private Stack<float> accuracy = new Stack<float>();
+    private List<float> accuracy = new List<float>();
     private List<Note> loadedNotes = new List<Note>();
     private List<float> offsets = new List<float>();
     int[] buttonsPressed = new int[4];
@@ -79,8 +79,17 @@ public class BossRhythymUI
         {
             for (int i = 0; i < 4; i++)
             {
-                if(buttonsPressed[i] != 0)
-                    CheckCorespondingNote(buttonsPressed[i], accuracyPressed[i]);
+                if (buttonsPressed[i] != 0)
+                {
+                    if (i == 0 || i == 2)
+                    {
+                        
+                        CheckCorespondingNote(i, accuracyPressed[i]); 
+                    }
+                    CheckCorespondingNote(i, accuracyPressed[i]);   
+                }
+                    
+                
             }
             
         }
@@ -118,27 +127,39 @@ public class BossRhythymUI
     {
         
         int limit = 4;
-        if (loadedNotes.Count <= 4)
+        if (loadedNotes.Count < 4)
         {
+            Console.WriteLine(loadedNotes.Count);
             limit = loadedNotes.Count;
         }
         for (int i = 0; i < limit; i++)
         {
-            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time -3.5) < 1.5f)
+            
+            
+            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time -3.5) < 1.2f)
             {
                 offsets.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time));
-                visuals.setNoteInvisible(loadedNotes[i].Button, loadedNotes[i].Time);
-                loadedNotes.RemoveAt(i);
-                accuracy.Push(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
+                
+                accuracy.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
                 EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(1300, 720-64), Color.White));
+                
                 Console.WriteLine(songTime - loadedNotes[i].Time);
                 Console.WriteLine(loadedNotes[i].Button);
                 Console.WriteLine("przerwa");
+                
                 combo++;
                 if (health < 96)
                 {
                     health += 5;
                 }
+                visuals.setNoteInvisible(loadedNotes[i].Button, loadedNotes[i].Time);
+                loadedNotes.RemoveAt(i);
+                limit = loadedNotes.Count;
+            }
+
+            if (i >= limit)
+            {
+                break;
             }
         }
         
@@ -148,8 +169,10 @@ public class BossRhythymUI
     {
         for (int i = 0; i < loadedNotes.Count; i++)
         {
-            if (loadedNotes[i].Time < songTime - 1f)
+            if (loadedNotes[i].Time < songTime - 1.5f)
             {
+                
+                
                 loadedNotes.RemoveAt(i);
                 if (health >= 5)
                 {
@@ -167,7 +190,7 @@ public class BossRhythymUI
         float totalScore = 0;
         for (int i = 0; i < accuracy.Count; i++)
         {
-            totalScore += accuracy.Pop();
+            totalScore += accuracy[i];
         }
        
         float avgOffset = 0;
@@ -204,5 +227,15 @@ public class BossRhythymUI
             }
             
         
+    }
+
+    public float ReturnScoresAndAccuracy()
+    {
+        float score = 0;
+        for (int i = 0; i < accuracy.Count; i++)
+        {
+          score += accuracy[i];  
+        }
+        return score;
     }
 }

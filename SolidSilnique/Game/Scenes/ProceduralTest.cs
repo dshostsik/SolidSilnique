@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using GUIRESOURCES;
 using Microsoft.Xna.Framework.Input;
 
 
@@ -28,7 +29,7 @@ class ProceduralTest : Scene
 		KeyboardState kState = new KeyboardState();
 		private BossRhythymUI bossRhythym = new BossRhythymUI();
 		SpriteBatch spriteBatch = new SpriteBatch(EngineManager.graphics);
-
+		private GUI rhythymGui;
 		ContentManager content;
 		public ProceduralTest() {
 
@@ -229,11 +230,11 @@ class ProceduralTest : Scene
 				this.AddChild(gogus);
 				prevGeb = gogus;
 			}
-			
 
-			
 
-		}
+			rhythymGui = new GUI("RhythymGui.xml", content);
+
+	}
 
 		public override void Draw() {
 			enviro.Draw();
