@@ -278,7 +278,7 @@ namespace SolidSilnique.Core
 			}
             if(scene.environmentObject != null)
             {
-                scene.environmentObject.Draw(frustum);
+                scene.environmentObject.Draw(_frustum);
             }
 			DrawInstanceData();
 		}
