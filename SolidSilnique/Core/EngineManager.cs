@@ -16,10 +16,10 @@ namespace SolidSilnique.Core
 {
     internal enum ShadowResolution
     {
-        Low = 512,
-        Medium = 1024,
-        High = 2048,
-        Ultra = 4096
+        Low = 1024,
+        Medium = 2048,
+        High = 4096,
+        Ultra = 8192
     }
 
     static class EngineManager
@@ -116,12 +116,11 @@ namespace SolidSilnique.Core
                 }
             }
 
-            using (var stream = new FileStream("shadowMap2.png", FileMode.Create))
-            {
-                output.SaveAsPng(stream, output.Width, output.Height);
-            } 
-            //graphics.RasterizerState = RasterizerState.CullCounterClockwise;
-            //graphics.RasterizerState = RasterizerState.CullClockwise;
+            // using (var stream = new FileStream("shadowMap2.png", FileMode.Create))
+            // {
+            //     output.SaveAsPng(stream, output.Width, output.Height);
+            // }
+            graphics.RasterizerState = RasterizerState.CullCounterClockwise;
             graphics.SetRenderTarget(null);
             //-------------------------------------
             

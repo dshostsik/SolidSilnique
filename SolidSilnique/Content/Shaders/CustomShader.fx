@@ -164,8 +164,8 @@ float ComputeShadows(float3 fragPos, float3 normal) {
     shadowCoord = shadowCoord * 0.5f + 0.5f;
     float shadowMapDepth = tex2D(shadowMap, shadowCoord.xy * float2(1,-1)).r;
     float currentDepth = shadowCoord.z;
-    //float bias = max(0.05 * (1.f - dot(normal, dirlight_direction)), 0.001f);
-    float shadow = currentDepth <= shadowMapDepth ? 0.5f : 1.0f;
+    float bias = max(0.05 * (1.f - dot(normal, dirlight_direction)), 0.001f);
+    float shadow = currentDepth - bias < shadowMapDepth ? 0.5f : 1.0f;
     if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 || shadowCoord.y < 0.0 || shadowCoord.y > 1.0) {
            shadow = 0.0;
     }
