@@ -18,6 +18,8 @@ namespace SolidSilnique.Core
 		public string name { get; set; } = "scene";
 		public List<GameObject> gameObjects { get; set; } = [];
 
+		public EnvironmentObject environmentObject = null;
+
 		[JsonIgnore]
 		public Camera mainCamera;
 
@@ -67,6 +69,8 @@ namespace SolidSilnique.Core
 		/// </summary>
 		public virtual void Draw()
 		{
+
+			
 			foreach (var child in gameObjects)
 			{
 				child.Draw();

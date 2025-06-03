@@ -23,7 +23,7 @@ class ProceduralTest : Scene
 		List<Texture2D> treeTextures = new List<Texture2D>();
 
 
-		public EnvironmentObject enviro = new EnvironmentObject();
+		
 	
 
 		ContentManager content;
@@ -34,7 +34,7 @@ class ProceduralTest : Scene
 
 		public override void LoadContent(ContentManager Content)
 		{
-			//loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
+			loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
 			loadedModels.Add("deimos", Content.Load<Model>("deimos"));
 			loadedModels.Add("plane", Content.Load<Model>("plane"));
 			loadedModels.Add("cube", Content.Load<Model>("cube"));
@@ -112,10 +112,11 @@ class ProceduralTest : Scene
 
 		public override void Setup()
 	{
+			environmentObject = new EnvironmentObject();
+			environmentObject.Generate("Map1", content, 2, 30,3);
 
-			enviro.Generate("Map1", content, 2, 30,3);
-			ProceduralGrass newProc = new ProceduralGrass(models,textures,treeModels,treeTextures,content,enviro);
-			newProc.precomputeNoise();
+			ProceduralGrass newProc = new ProceduralGrass(models,textures,treeModels,treeTextures,content, environmentObject);
+			Task task1 = Task.Run(() => newProc.precomputeNoise());
 			
 			GameObject go = new GameObject("Camera");
 			go.transform.position = new Vector3(250, 3f, 250);
@@ -132,7 +133,7 @@ class ProceduralTest : Scene
 			go.texture = loadedTextures["simpleGreen"];
 			go.AddComponent(new PlaneColliderComponent(new Vector3(0,1,0), true));
 			this.AddChild(go);
-			//Task.WhenAll(task1).Wait(); //:O
+			Task.WhenAll(task1).Wait(); //:O
 			
 			newProc.GenerateObjects();
 			List<GameObject> goList = newProc.createdObjects;
@@ -244,18 +245,9 @@ class ProceduralTest : Scene
 		brow2.model = loadedModels["cube"];
 		brow2.texture = loadedTextures["simpleBlack"];
 		gab.AddChild(brow2);
-		
-		// GameObject ch = new GameObject("chujniaOdDimy");
-		// ch.transform.position = new Vector3(200, 10, 190);
-		// ch.model = loadedModels["trent/untitled"];
-		// ch.texture = loadedTextures["trent/diffuse"];
-		// ch.normalMap = loadedTextures["trent/normal"];
-		// ch.aoMap = loadedTextures["trent/ao"];
-		// ch.roughnessMap = loadedTextures["trent/roughness"];
-		
-		
+
 		GameObject prevGeb = gab;
-			for (int i = 0; i < 1; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				GameObject gogus = CreateGebus(new Vector3(150 + i*2, 2, 150 + i*2));
 				gogus.GetComponent<Follower>().Target = prevGeb;
@@ -269,11 +261,7 @@ class ProceduralTest : Scene
 
 		}
 
-		public override void Draw() {
-			enviro.Draw();
-
-			base.Draw();
-		}
+		
 
 		void AddPlanet()
 		{
@@ -303,19 +291,8 @@ class ProceduralTest : Scene
 
 			go.transform.position = pos;
 			go.transform.scale = new Vector3(0.75f);
-			// go.model = loadedModels["sphere"];
-			// go.texture = loadedTextures["gabTex"];
-			// go.model = loadedModels["drzewo/drzewo"];
-			// go.texture = loadedTextures["drzewo/diffuse"];
-			// go.normalMap = loadedTextures["drzewo/normal"];
-			// go.aoMap = loadedTextures["drzewo/ao"];
-			// go.roughnessMap = loadedTextures["drzewo/glossy"];
-			go.transform.position = new Vector3(200, 10, 190);
-			go.model = loadedModels["trent"];
-			go.texture = loadedTextures["trent/diffuse"];
-			go.normalMap = loadedTextures["trent/normal"];
-			//go.aoMap = loadedTextures["trent/ao"];
-			//go.roughnessMap = loadedTextures["trent/roughness"];
+			go.model = loadedModels["sphere"];
+			go.texture = loadedTextures["gabTex"];
 			go.AddComponent(new SphereColliderComponent(0.75f,false));
 			go.AddComponent(new DebugMoveComponent());
 			go.GetComponent<DebugMoveComponent>().move = false;
