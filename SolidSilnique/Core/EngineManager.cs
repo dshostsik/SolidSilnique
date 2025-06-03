@@ -85,17 +85,11 @@ namespace SolidSilnique.Core
                 try
                 {
                     Matrix model = go.transform.getModelMatrix();
-                    shader.SetUniform("texture_diffuse1", go.texture);
-                    shader.SetTexture("texture_normal1", go.normalMap ?? normalMap);
-                    shader.SetTexture("texture_roughness1", go.roughnessMap ?? defaultRoughnessMap);
-                    shader.SetTexture("texture_ao1", go.aoMap ?? defaultAOMap);
 
-					shader.SetUniform("useLayering", 0);
-					shader.SetUniform("useNormalMap", (go.normalMap != null) ? 1 : 0);
-                    shader.SetUniform("useRoughnessMap", (go.roughnessMap != null) ? 1 : 0);
-                    shader.SetUniform("useAOMap", (go.aoMap != null) ? 1 : 0);
+                    setMaterial(go);
 
-                    shader.SetUniform("World", model);
+
+					shader.SetUniform("World", model);
                     Matrix modelTransInv = Matrix.Transpose(Matrix.Invert(go.transform.getModelMatrix()));
                     shader.SetUniform("WorldTransInv", modelTransInv);
 
@@ -193,6 +187,10 @@ namespace SolidSilnique.Core
                 
 
 			}
+            if(scene.environmentObject != null)
+            {
+                scene.environmentObject.Draw(frustum);
+            }
 			DrawInstanceData();
 		}
 
@@ -236,6 +234,23 @@ namespace SolidSilnique.Core
 
             public VertexBufferBindingGroup() { }
 		}
+
+        static void setMaterial(GameObject go) {
+			shader.SetUniform("texture_diffuse1", go.texture);
+			shader.SetTexture("texture_normal1", go.normalMap ?? normalMap);
+			shader.SetTexture("texture_roughness1", go.roughnessMap ?? defaultRoughnessMap);
+			shader.SetTexture("texture_ao1", go.aoMap ?? defaultAOMap);
+
+			shader.SetUniform("useLayering", 0);
+			shader.SetUniform("useNormalMap", (go.normalMap != null) ? 1 : 0);
+			shader.SetUniform("useRoughnessMap", (go.roughnessMap != null) ? 1 : 0);
+			shader.SetUniform("useAOMap", (go.aoMap != null) ? 1 : 0);
+
+
+
+
+		}
+
 
 		static void GenerateInstanceData() {
             Dictionary<Model, List<GameObject>> modelsToInsta = new Dictionary<Model, List<GameObject>>();
@@ -284,6 +299,8 @@ namespace SolidSilnique.Core
 
 				instanceVertexBuffer.SetData(instances);
 
+				
+
 				ModelMeshPart part = key.Meshes[0].MeshParts[0];
 				int vertexOffset = part.VertexOffset;
 
@@ -320,16 +337,18 @@ namespace SolidSilnique.Core
 
 				InstancesQueue.TryGetValue(representative, out var instances);
 
-				/*graphics.SetVertexBuffers(instances);
+                /*graphics.SetVertexBuffers(instances);
 				graphics.Indices = indexBuffer;*/
 
-				/*graphics.DrawInstancedPrimitives(
+                /*graphics.DrawInstancedPrimitives(
 	                PrimitiveType.TriangleList,
 	                baseVertex: part.VertexOffset,
 	                startIndex: part.StartIndex,
 	                primitiveCount: part.PrimitiveCount,
 	                instanceCount: 1//instances[1].VertexBuffer.VertexCount
 				);*/
+
+                setMaterial(representative);
 
 
 				foreach (EffectPass pass in shader.Effect.CurrentTechnique.Passes)

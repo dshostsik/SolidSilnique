@@ -30,9 +30,9 @@ namespace SolidSilnique.Core
 		Vector3[,] meshMap;
 		Vector3[,] normalMap;
 
-		VertexBuffer vertexBuffer;
-
-		VertexPositionNormalTexture[] vertices;
+		VertexBuffer[,] chunkBuffers;
+		Vector3 chunkSize;
+		Vector3[,] chunkCenters;
 
 		Texture2D texture;
 
@@ -40,7 +40,7 @@ namespace SolidSilnique.Core
 
 		LayerMaterial[] layerMaterials;
 
-		public void Generate(string mapName, ContentManager content, float cellSize = 1, float maxHeight = 10, int layers = 1)
+		public void Generate(string mapName, ContentManager content, float cellSize = 1, float maxHeight = 10, int layers = 1,int chunksDensity = 4)
 		{
 			GraphicsDevice graphics = EngineManager.graphics;
 			this.cellSize = cellSize;
@@ -97,51 +97,78 @@ namespace SolidSilnique.Core
 			}
 
 
-					int index = 0;
+
 			//Create VertexBuffer
-			vertices = new VertexPositionNormalTexture[(heightMap.Width - 1) * (heightMap.Height - 1) * 6];
-			for (int i = 0; i < heightMap.Height - 1; i++)
+
+			chunkBuffers = new VertexBuffer[chunksDensity, chunksDensity];
+			chunkSize =  new Vector3(heightMap.Width*cellSize, 0, heightMap.Height * cellSize) / chunksDensity;
+			chunkCenters = new Vector3[chunksDensity, chunksDensity];
+
+			for (int z = 0; z < chunksDensity; z++)
 			{
-				for (int j = 0; j < heightMap.Width - 1; j++)
+				for (int x = 0; x < chunksDensity; x++)
 				{
-					Vector3 topLeft = meshMap[i, j];
-					Vector3 topRight = meshMap[i, j + 1];
-					Vector3 bottomLeft = meshMap[i + 1, j];
-					Vector3 bottomRight = meshMap[i + 1, j + 1];
+					int index = 0;
+					VertexPositionNormalTexture[] vertices = new VertexPositionNormalTexture[(((heightMap.Width) * (heightMap.Height)) / (chunksDensity * chunksDensity) )* 6];
+					for (int i = (heightMap.Height/chunksDensity)*z; i < ((heightMap.Height / chunksDensity) * (z+1)) - (int)((z+1)/chunksDensity); i++)
+					{
+						for (int j = (heightMap.Width / chunksDensity) * x; j < ((heightMap.Width / chunksDensity) * (x + 1) - (int)((x + 1) / chunksDensity)); j++)
+						{
+							Vector3 topLeft = meshMap[i, j];
+							Vector3 topRight = meshMap[i, j + 1];
+							Vector3 bottomLeft = meshMap[i + 1, j];
+							Vector3 bottomRight = meshMap[i + 1, j + 1];
 
-					Vector2 UVtopLeft = new Vector2(0, 0);
-					Vector2 UVtopRight = new Vector2(1, 0);
-					Vector2 UVbottomLeft = new Vector2(0, 1);
-					Vector2 UVbottomRight = new Vector2(1, 1);
+							Vector2 UVtopLeft = new Vector2(0, 0);
+							Vector2 UVtopRight = new Vector2(1, 0);
+							Vector2 UVbottomLeft = new Vector2(0, 1);
+							Vector2 UVbottomRight = new Vector2(1, 1);
 
-					Vector3 nTopLeft = normalMap[i, j];
-					Vector3 nTopRight = normalMap[i, j + 1];
-					Vector3 nBottomLeft = normalMap[i + 1, j];
-					Vector3 nBottomRight = normalMap[i + 1, j + 1];
+							Vector3 nTopLeft = normalMap[i, j];
+							Vector3 nTopRight = normalMap[i, j + 1];
+							Vector3 nBottomLeft = normalMap[i + 1, j];
+							Vector3 nBottomRight = normalMap[i + 1, j + 1];
 
-					//TRIANGLE 1
-					vertices[index++] = new VertexPositionNormalTexture(topRight, nTopRight, UVtopRight);
-					vertices[index++] = new VertexPositionNormalTexture(bottomLeft, nBottomLeft, UVbottomLeft);
-					vertices[index++] = new VertexPositionNormalTexture(topLeft, nTopLeft, UVtopLeft);
+							//TRIANGLE 1
+							vertices[index++] = new VertexPositionNormalTexture(topRight, nTopRight, UVtopRight);
+							vertices[index++] = new VertexPositionNormalTexture(bottomLeft, nBottomLeft, UVbottomLeft);
+							vertices[index++] = new VertexPositionNormalTexture(topLeft, nTopLeft, UVtopLeft);
 
 
 
-					//TRIANGLE 2
-					vertices[index++] = new VertexPositionNormalTexture(bottomRight, nBottomRight, UVbottomRight);
-					vertices[index++] = new VertexPositionNormalTexture(bottomLeft, nBottomLeft, UVbottomLeft);
-					vertices[index++] = new VertexPositionNormalTexture(topRight, nTopRight, UVtopRight);
+							//TRIANGLE 2
+							vertices[index++] = new VertexPositionNormalTexture(bottomRight, nBottomRight, UVbottomRight);
+							vertices[index++] = new VertexPositionNormalTexture(bottomLeft, nBottomLeft, UVbottomLeft);
+							vertices[index++] = new VertexPositionNormalTexture(topRight, nTopRight, UVtopRight);
+						}
+					}
+
 					
-					
+
+					VertexBuffer vertexBuffer = new VertexBuffer(
+						graphics,
+						typeof(VertexPositionNormalTexture),
+						vertices.Length,
+						BufferUsage.WriteOnly
+					);
+					vertexBuffer.SetData(vertices);
+
+					chunkBuffers[z,x] = vertexBuffer;
+
+
+
+					chunkCenters[z,x] = new Vector3(x, 0, z) * chunkSize + chunkSize / 2;
+					chunkCenters[z, x] += new Vector3(0, 1, 0) * GetHeight(chunkCenters[z, x]);
+
 				}
 			}
 
-			vertexBuffer = new VertexBuffer(
-				graphics,
-				typeof(VertexPositionNormalTexture),
-				vertices.Length,
-				BufferUsage.WriteOnly
-			);
-			vertexBuffer.SetData(vertices);
+			
+
+            
+
+
+            
 
 
 			//Load layers
@@ -164,12 +191,12 @@ namespace SolidSilnique.Core
 			PhysicsManager.enviro = this;
 		}
 
-		public void Draw() {
+		public void Draw(BoundingFrustum frustum) {
 			GraphicsDevice graphics = EngineManager.graphics;
 			Shader shader = EngineManager.shader;
-			graphics.SetVertexBuffer(vertexBuffer);
 
-			
+
+
 
 			shader.SetUniform("texture_diffuse1", layerMaterials[0].diffuse);
 			shader.SetTexture("texture_normal1", layerMaterials[0].normal);
@@ -181,29 +208,70 @@ namespace SolidSilnique.Core
 			shader.SetUniform("useAOMap", 1);
 			shader.SetUniform("useLayering", layerMaterials.Length - 1);
 
-			if (layerMaterials.Length > 0) { 
-			for(int i = 1; i < layerMaterials.Length; i++)
+			if (layerMaterials.Length > 0) {
+				for (int i = 1; i < layerMaterials.Length; i++)
 				{
-					
-					shader.SetUniform("layer_diffuse_"+i, layerMaterials[i].diffuse);
+
+					shader.SetUniform("layer_diffuse_" + i, layerMaterials[i].diffuse);
 					shader.SetTexture("layer_ao_" + i, layerMaterials[i].ao);
 					shader.SetTexture("layer_roughness_" + i, layerMaterials[i].roughness);
-					shader.SetTexture("layer_mask_"+i, layerMaterials[i].mask);
+					shader.SetTexture("layer_mask_" + i, layerMaterials[i].mask);
+				}
+
+			}
+
+
+
+			shader.SetUniform("World", Matrix.CreateTranslation(new Vector3(0, 0, 0)) * Matrix.CreateScale(1));
+
+
+			
+
+			for (int z = 0; z < chunkBuffers.GetLength(0); z++) { 
+				for (int x = 0; x < chunkBuffers.GetLength(1); x++)
+				{
+					
+					
+					BoundingSphere chunkSphere = new BoundingSphere(chunkCenters[z, x], chunkSize.X * 0.75f);
+
+					if (frustum.Intersects(chunkSphere))
+					{
+
+						VertexBuffer currBuffer = chunkBuffers[z, x];
+						graphics.SetVertexBuffer(currBuffer);
+
+						foreach (var pass in shader.Effect.CurrentTechnique.Passes)
+						{
+							pass.Apply();
+							graphics.DrawPrimitives(PrimitiveType.TriangleList, 0, currBuffer.VertexCount / 3);
+						}
+					}
 				}
 			
 			}
 			
+		}
 
-
-			shader.SetUniform("World", Matrix.CreateTranslation(new Vector3(0, 0, 0))*Matrix.CreateScale(1));
-
-			float test = GetHeight(new Vector3(12.3f, 0, 11.1f));
-
-			foreach (var pass in shader.Effect.CurrentTechnique.Passes)
+		public void DrawAllBuffersToShader(Shader shader) {
+			for (int z = 0; z < chunkBuffers.GetLength(0); z++)
 			{
-				pass.Apply();
-				graphics.DrawPrimitives(PrimitiveType.TriangleList, 0, vertices.Length / 3);
+				for (int x = 0; x < chunkBuffers.GetLength(1); x++)
+				{
+
+						VertexBuffer currBuffer = chunkBuffers[z, x];
+						EngineManager.graphics.SetVertexBuffer(currBuffer);
+
+						foreach (var pass in shader.Effect.CurrentTechnique.Passes)
+						{
+							pass.Apply();
+							EngineManager.graphics.DrawPrimitives(PrimitiveType.TriangleList, 0, currBuffer.VertexCount / 3);
+						}
+					
+				}
+
 			}
+
+
 		}
 
 		public float GetHeight(Vector3 point) {

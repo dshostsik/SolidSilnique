@@ -23,7 +23,7 @@ class ProceduralTest : Scene
 		List<Texture2D> treeTextures = new List<Texture2D>();
 
 
-		public EnvironmentObject enviro = new EnvironmentObject();
+		
 	
 
 		ContentManager content;
@@ -86,9 +86,10 @@ class ProceduralTest : Scene
 
 		public override void Setup()
 	{
+			environmentObject = new EnvironmentObject();
+			environmentObject.Generate("Map1", content, 2, 30,3);
 
-			enviro.Generate("Map1", content, 2, 30,3);
-			ProceduralGrass newProc = new ProceduralGrass(models,textures,treeModels,treeTextures,content,enviro);
+			ProceduralGrass newProc = new ProceduralGrass(models,textures,treeModels,treeTextures,content, environmentObject);
 			Task task1 = Task.Run(() => newProc.precomputeNoise());
 			
 			GameObject go = new GameObject("Camera");
@@ -234,11 +235,7 @@ class ProceduralTest : Scene
 
 		}
 
-		public override void Draw() {
-			enviro.Draw();
-
-			base.Draw();
-		}
+		
 
 		void AddPlanet()
 		{
