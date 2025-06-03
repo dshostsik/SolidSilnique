@@ -237,6 +237,7 @@ namespace SolidSilnique.Core
 					if (frustum.Intersects(chunkSphere))
 					{
 
+
 						VertexBuffer currBuffer = chunkBuffers[z, x];
 						graphics.SetVertexBuffer(currBuffer);
 
@@ -257,7 +258,7 @@ namespace SolidSilnique.Core
 			{
 				for (int x = 0; x < chunkBuffers.GetLength(1); x++)
 				{
-
+						shader.SetUniform("World", Matrix.CreateTranslation(new Vector3(0, 0, 0)) * Matrix.CreateScale(1));
 						VertexBuffer currBuffer = chunkBuffers[z, x];
 						EngineManager.graphics.SetVertexBuffer(currBuffer);
 
