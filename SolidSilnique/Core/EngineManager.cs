@@ -85,7 +85,7 @@ namespace SolidSilnique.Core
 
             shadowShader.SwapTechnique("ShadeTheSceneRightNow");
             shadowShader.SetUniform("LightViewProj", lightViewProjection);
-            
+            //shader.SetUniform("Dimensions", new Vector2(output.Width, output.Height));
             if(scene.environmentObject != null)
             {
 				graphics.RasterizerState = RasterizerState.CullNone;
@@ -125,10 +125,10 @@ namespace SolidSilnique.Core
 			
             
             
-            using (var stream = new FileStream("shadowMap.png", FileMode.Create))
-            {
-                output.SaveAsPng(stream, output.Width, output.Height);
-            }
+            // using (var stream = new FileStream("shadowMap.png", FileMode.Create))
+            // {
+            //     output.SaveAsPng(stream, output.Width, output.Height);
+            // }
             graphics.RasterizerState = RasterizerState.CullCounterClockwise;
             graphics.SetRenderTarget(null);
             //-------------------------------------

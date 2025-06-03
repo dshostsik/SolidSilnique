@@ -156,16 +156,28 @@ float3 viewPos;
 matrix LightViewProj;
 sampler2D shadowMap;
 
-
+//float2 Dimensions;
 
 float ComputeShadows(float3 fragPos, float3 normal) {
+    float shadow = 1.0f;
     float4 shadowCoord = mul(float4(fragPos, 1.f), LightViewProj);
     shadowCoord.xyz /= shadowCoord.w;
     shadowCoord = shadowCoord * 0.5f + 0.5f;
     float shadowMapDepth = tex2D(shadowMap, shadowCoord.xy * float2(1,-1)).r;
     float currentDepth = shadowCoord.z;
     float bias = max(0.05 * (1.f - dot(normal, dirlight_direction)), 0.001f);
-    float shadow = currentDepth - bias < shadowMapDepth ? 0.5f : 1.0f;
+    shadow = currentDepth - bias > shadowMapDepth ? 1.0f : 0.5f;
+    
+    //float2 texelSize = Dimensions;
+    
+    /*for (int i = -1; i < 1; i++) {
+        for (int j = -1; j < 1; j++) {
+            float pcfDepth = tex2D(shadowMap, shadowCoord.xy + float2(i, j) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 0.1f : 0.0f;
+        }
+    }
+    shadow /= 9.0f;*/
+    
     if (shadowCoord.x < 0.0 || shadowCoord.x > 1.0 || shadowCoord.y < 0.0 || shadowCoord.y > 1.0) {
            shadow = 0.0;
     }
