@@ -34,7 +34,7 @@ class ProceduralTest : Scene
 
 		public override void LoadContent(ContentManager Content)
 		{
-			loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
+			//loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
 			loadedModels.Add("deimos", Content.Load<Model>("deimos"));
 			loadedModels.Add("plane", Content.Load<Model>("plane"));
 			loadedModels.Add("cube", Content.Load<Model>("cube"));

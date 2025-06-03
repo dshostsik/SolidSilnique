@@ -84,6 +84,14 @@ namespace SolidSilnique.Core
             lightViewProjection = lightView * _lightProjection;
 
             shadowShader.SwapTechnique("ShadeTheSceneRightNow");
+            shadowShader.SetUniform("LightViewProj", lightViewProjection);
+            
+            if(scene.environmentObject != null)
+            {
+				graphics.RasterizerState = RasterizerState.CullNone;
+	            scene.environmentObject.DrawAllBuffersToShader(shadowShader);
+            }
+            
             graphics.RasterizerState = RasterizerState.CullClockwise;
             while (shadowsQueue.Count > 0)
             {
@@ -103,9 +111,8 @@ namespace SolidSilnique.Core
                     //     if (!_frustum.Intersects(sphere))
                     //         continue;
                     // }
-                    
+
                     shadowShader.SetUniform("World", go.transform.getModelMatrix());
-                    shadowShader.SetUniform("LightViewProj", lightViewProjection);
                     
                     for (int k = 0; k < shadowMesh.MeshParts.Count; k++)
                     {
@@ -115,11 +122,13 @@ namespace SolidSilnique.Core
                     shadowMesh.Draw();
                 }
             }
-
-            // using (var stream = new FileStream("shadowMap2.png", FileMode.Create))
-            // {
-            //     output.SaveAsPng(stream, output.Width, output.Height);
-            // }
+			
+            
+            
+            using (var stream = new FileStream("shadowMap.png", FileMode.Create))
+            {
+                output.SaveAsPng(stream, output.Width, output.Height);
+            }
             graphics.RasterizerState = RasterizerState.CullCounterClockwise;
             graphics.SetRenderTarget(null);
             //-------------------------------------
