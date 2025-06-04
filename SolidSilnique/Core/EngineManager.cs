@@ -218,7 +218,7 @@ namespace SolidSilnique.Core
             
             UiRenderer.End();
         }
-    }
+    
 		
 
 
