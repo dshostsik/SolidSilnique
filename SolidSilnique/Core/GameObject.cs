@@ -56,6 +56,7 @@ namespace SolidSilnique.Core
 
 
         public bool useInstancing = false;
+        public bool isStatic = false;
         
         //Components
         [JsonInclude]

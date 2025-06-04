@@ -10,6 +10,8 @@
 matrix LightViewProj;
 matrix World;
 
+float farPlane;
+float nearPlane;
 
 struct VertexShaderOutput
 {
@@ -34,8 +36,9 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
     //float depth = saturate(input.Depth);
     //float4 pos = input.Position;
     float depth = input.z / input.w;
-    depth = saturate(depth); 
-    return float4(depth, depth, depth, 1); // grayscale
+    depth = depth * 0.5f + 0.5f;
+    //depth = saturate(depth); 
+    return depth; //float4(depth, depth, depth, 1); // grayscale
 }
 
 technique ShadeTheSceneRightNow

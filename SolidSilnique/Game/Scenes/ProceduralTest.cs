@@ -43,7 +43,7 @@ class ProceduralTest : Scene
 			loadedModels.Add("levelTest", Content.Load<Model>("level_ground"));
 			loadedModels.Add("brzewno1/brzewno", Content.Load<Model>("brzewno1/brzewno"));
 			loadedModels.Add("brzewno3/brzewno", Content.Load<Model>("brzewno3/brzewno3"));
-			loadedModels.Add("drzewo/drzewo", Content.Load<Model>("drzewo/drzewo"));
+			//loadedModels.Add("drzewo/drzewo", Content.Load<Model>("drzewo/drzewo"));
 			loadedModels.Add("trent", Content.Load<Model>("trent"));
 
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));

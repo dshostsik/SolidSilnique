@@ -257,8 +257,8 @@ namespace SolidSilnique.Core
 			{
 				for (int x = 0; x < chunkBuffers.GetLength(1); x++)
 				{
-
-						VertexBuffer currBuffer = chunkBuffers[z, x];
+					shader.SetUniform("World", Matrix.CreateTranslation(new Vector3(0, 0, 0)) * Matrix.CreateScale(1));
+					VertexBuffer currBuffer = chunkBuffers[z, x];
 						EngineManager.graphics.SetVertexBuffer(currBuffer);
 
 						foreach (var pass in shader.Effect.CurrentTechnique.Passes)
