@@ -113,8 +113,8 @@ namespace SolidSilnique.Core
                 }
             }
 
-            cameraComponent.gameObject.transform.rotation = new Vector3(Pitch, -Yaw, 0);// + Right * Pitch;
-            Console.WriteLine("Yaw: " + Yaw + " pitch: " + Pitch);
+            cameraComponent.gameObject.transform.rotation = new Vector3(Pitch, Yaw, 0);// + Right * Pitch;
+            //Console.WriteLine("Yaw: " + Yaw + " pitch: " + Pitch);
             UpdateCameraVectors();
         }
 
