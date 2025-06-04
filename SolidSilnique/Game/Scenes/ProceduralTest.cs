@@ -37,7 +37,8 @@ class ProceduralTest : Scene
     private GameObject gab;
     private GameObject enemy;
     private int _enemyHP = 100;
-    private bool _playerInsideEnemyFOV = false;
+    
+    private bool turnedOn = false;
 
     public ProceduralTest()
     {
@@ -267,10 +268,13 @@ class ProceduralTest : Scene
         EngineManager.currentGui = rhythymGui;
 
         enemy = new GameObject("euzebiusz wiercibok");
-        enemy.AddComponent(new Follower(enemy, 5.0f));
-        enemy.GetComponent<Follower>().gameObject = enemy;
-        enemy.model = loadedModels["sphere"];
-        enemy.texture = loadedTextures["deimos"];
+        enemy.AddComponent(new SphereColliderComponent(3.5f, false));
+        enemy.AddComponent(new Follower(enemy, 3.0f));
+        enemy.GetComponent<Follower>().Target = null;
+        enemy.model = loadedModels["trent"];
+        enemy.texture = loadedTextures["trent/diffuse"];
+        enemy.normalMap = loadedTextures["trent/normal"];
+        enemy.transform.position = new Vector3(100, 0, 100);
         this.AddChild(enemy);
     }
 
@@ -300,10 +304,9 @@ class ProceduralTest : Scene
     {
         kState = Keyboard.GetState();
 
-        if (SquaredDistanceBetweenEnemyAndPlayer() <
-            enemy.GetComponent<Follower>().SocialDistance * 3.0f)
+        if (SquaredDistanceBetweenEnemyAndPlayer() <=
+            enemy.GetComponent<Follower>().SocialDistance * enemy.GetComponent<Follower>().SocialDistance * 3.0f)
         {
-            _playerInsideEnemyFOV = true;
             enemy.GetComponent<Follower>().Target = gab;
         }
 
@@ -339,7 +342,6 @@ class ProceduralTest : Scene
         return go;
     }
 
-    private bool turnedOn = false;
 
     private float SquaredDistanceBetweenEnemyAndPlayer()
     {
