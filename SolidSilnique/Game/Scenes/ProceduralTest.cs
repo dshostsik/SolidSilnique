@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using GUIRESOURCES;
+using Microsoft.Xna.Framework.Input;
 
 
 namespace SolidSilnique.GameContent;
@@ -23,9 +25,11 @@ class ProceduralTest : Scene
 		List<Texture2D> treeTextures = new List<Texture2D>();
 
 
-		
-	
-
+		public EnvironmentObject enviro = new EnvironmentObject();
+		KeyboardState kState = new KeyboardState();
+		private BossRhythymUI bossRhythym = new BossRhythymUI();
+		SpriteBatch spriteBatch = new SpriteBatch(EngineManager.graphics);
+		public GUI rhythymGui;
 		ContentManager content;
 		public ProceduralTest() {
 
@@ -103,9 +107,7 @@ class ProceduralTest : Scene
 			//treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
 
 			content = Content;
-
-
-
+		
 
 
 		}
@@ -255,11 +257,12 @@ class ProceduralTest : Scene
 				this.AddChild(gogus);
 				prevGeb = gogus;
 			}
-			
 
-			
 
-		}
+			rhythymGui = new GUI("Content/RhythymGui.xml", content);
+			EngineManager.currentGui = rhythymGui;
+
+	}
 
 		
 
@@ -300,6 +303,22 @@ class ProceduralTest : Scene
 
 			return go;
 
+		}
+		private bool turnedOn = false;
+		public override void Update()
+		{
+			kState = Keyboard.GetState();
+			if (kState.IsKeyDown(Keys.M) && !turnedOn)
+			{
+				bossRhythym.Start(content,spriteBatch);
+				turnedOn = true;
+			}
+			if(turnedOn)
+				bossRhythym.Update();
+			rhythymGui.progressBars[0].progress = bossRhythym.health;
+			rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
+			rhythymGui.texts[1].text = bossRhythym.combo.ToString();
+			base.Update();
 		}
 	
 }

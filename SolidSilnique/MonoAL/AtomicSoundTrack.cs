@@ -29,4 +29,15 @@ public class AtomicSoundTrack
         MediaPlayer.Volume = volume;
         MediaPlayer.Play(song);
     }
+
+    public void Stop()
+    {
+        MediaPlayer.Stop();
+    }
+
+    public float songTime()
+    {
+        return (float)MediaPlayer.PlayPosition.TotalSeconds;
+    }
+    
 }

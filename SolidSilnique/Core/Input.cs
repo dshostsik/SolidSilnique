@@ -29,6 +29,7 @@ namespace SolidSilnique.Core
                 if (cond(kb, gp)) return true;
             return false;
         }
+
     }
 
     public class Input
@@ -144,28 +145,28 @@ namespace SolidSilnique.Core
             // Forward = W, UpArrow, left-stick-up
             var forward = new ActionBinding();
             forward.Keys.Add(Keys.W);
-            forward.Keys.Add(Keys.Up);
+            //forward.Keys.Add(Keys.Up);
             forward.Conditions.Add((kb, gp) => gp.ThumbSticks.Left.Y > 0.3f);
             Add("Forward", forward);
 
             // Backward = S, DownArrow, left-stick-down
             var back = new ActionBinding();
             back.Keys.Add(Keys.S);
-            back.Keys.Add(Keys.Down);
+            //back.Keys.Add(Keys.Down);
             back.Conditions.Add((kb, gp) => gp.ThumbSticks.Left.Y < -0.3f);
             Add("Backward", back);
 
             // Left = A, LeftArrow, left-stick-left
             var left = new ActionBinding();
             left.Keys.Add(Keys.A);
-            left.Keys.Add(Keys.Left);
+            //left.Keys.Add(Keys.Left);
             left.Conditions.Add((kb, gp) => gp.ThumbSticks.Left.X < -0.3f);
             Add("Left", left);
 
             // Right = D, RightArrow, left-stick-right
             var right = new ActionBinding();
             right.Keys.Add(Keys.D);
-            right.Keys.Add(Keys.Right);
+            //right.Keys.Add(Keys.Right);
             right.Conditions.Add((kb, gp) => gp.ThumbSticks.Left.X > 0.3f);
             Add("Right", right);
 

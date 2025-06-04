@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SolidSilnique.Core.Components;
+using GUIRESOURCES;
 using SolidSilnique.Core.Diagnostics;
 using System.Reflection;
 
@@ -25,9 +26,13 @@ namespace SolidSilnique.Core
     static class EngineManager
     {
         public static Scene scene = null;
+        
         public static Queue<GameObject> renderQueue = [];
 		public static Dictionary<GameObject, VertexBufferBindingGroup> InstancesQueue = []; //representative, InstanceBuffer
-		public static bool celShadingEnabled = false;
+        public static Queue<Tuple<Texture2D,Vector2,Color>> renderQueueUI = [];
+
+        public static bool celShadingEnabled = false;
+        public static GUI currentGui;
 
         private static Queue<GameObject> shadowsQueue;
         
@@ -293,7 +298,29 @@ namespace SolidSilnique.Core
                 scene.environmentObject.Draw(_frustum);
             }
 			DrawInstanceData();
-		}
+
+            SpriteBatch UiRenderer = new SpriteBatch(graphics);
+            UiRenderer.Begin();
+            while(renderQueueUI.Count > 0)
+            {
+                Tuple<Texture2D,Vector2,Color> element = renderQueueUI.Dequeue();
+                
+                UiRenderer.Draw(element.Item1, element.Item2, element.Item3);
+                
+            }
+            
+            
+            //Rednder Mateuszkowe GUI :) using the same SpriteBatch :) 
+            if (currentGui != null)
+            {
+                currentGui.Draw(UiRenderer);
+            }
+
+            
+            UiRenderer.End();
+        }
+    
+		
 
 
 
@@ -477,4 +504,6 @@ namespace SolidSilnique.Core
 
 		}
 	}
+
+            
 }

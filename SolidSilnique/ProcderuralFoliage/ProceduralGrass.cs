@@ -192,7 +192,7 @@ public class ProceduralGrass
             if(randomModel == 2 || randomModel == 3 || randomModel == 4 || randomModel == 5)
             {
                 go.texture = loadedTextures[0];
-                Console.WriteLine("piwko");
+                
             }
             else
             {
