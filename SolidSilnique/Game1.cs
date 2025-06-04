@@ -118,6 +118,32 @@ namespace SolidSilnique
             counter = new FrameCounter();
             scrollWheelValue = 0;
         }
+        public void Set1080p(bool fullscreen = false)
+        {
+            // 1920×1080 is 1080p
+            _graphics.PreferredBackBufferWidth = 1920;
+            _graphics.PreferredBackBufferHeight = 1080;
+            _graphics.IsFullScreen = fullscreen;
+            _graphics.ApplyChanges();
+
+            // If you want to prevent the user from resizing:
+            Window.AllowUserResizing = false;
+            if (!fullscreen)
+                Window.IsBorderless = false;
+        }
+
+        public void Set1440p(bool fullscreen = false)
+        {
+            // 2560×1440 is 1440p
+            _graphics.PreferredBackBufferWidth = 2560;
+            _graphics.PreferredBackBufferHeight = 1440;
+            _graphics.IsFullScreen = fullscreen;
+            _graphics.ApplyChanges();
+
+            Window.AllowUserResizing = false;
+            if (!fullscreen)
+                Window.IsBorderless = false;
+        }
 
         /// <summary>
         /// Add your initialization logic here
@@ -125,7 +151,11 @@ namespace SolidSilnique
         protected override void Initialize()
         {
             //DISPLAY SETUP
+            // Force 1080p windowed
+            //Set1080p(fullscreen: false);
 
+            // If you’d rather start in fullscreen 1440p, use:
+            // Set1440p(fullscreen: true);
             Window.AllowUserResizing = true;
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
             _graphics.IsFullScreen = false;
@@ -138,6 +168,8 @@ namespace SolidSilnique
             _graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             _graphics.ApplyChanges();
 
+
+           
 
             // Create camera
             //TODO delete
