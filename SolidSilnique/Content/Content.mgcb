@@ -690,6 +690,12 @@
 /processorParam:TextureFormat=Color
 /build:Map1/layer2/roughness.png
 
+#begin master house.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:master house.mp3
+
 #begin Megafont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -1043,6 +1049,18 @@
 /processorParam:TextureFormat=Color
 /build:texture_level_ground.png
 
+#begin Textures/blueNote.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/blueNote.png
+
 #begin Textures/default_ao.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1199,6 +1217,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/normal_map.png
 
+#begin Textures/redNote.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/redNote.png
+
 #begin Textures/test_ao.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1271,6 +1301,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/tree2_diffuse.png
 
+#begin Textures/violetNote.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/violetNote.png
+
 #begin Textures/wood_ao.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1318,6 +1360,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/wood_tex.png
+
+#begin Textures/yellowNote.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/yellowNote.png
 
 #begin trawa2.fbx
 /importer:FbxImporter
