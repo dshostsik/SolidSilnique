@@ -159,6 +159,7 @@ float shadowMapResolution;
 
 
 float ComputeShadows(float3 fragPos, float3 normal) {
+    float shadow = 1.0f;
     float4 shadowCoord = mul(float4(fragPos, 1.f), LightViewProj);
     shadowCoord.xyz /= shadowCoord.w;
     shadowCoord = shadowCoord * 0.5f + 0.5f;
