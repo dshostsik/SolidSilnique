@@ -49,6 +49,8 @@ class ProceduralTest : Scene
 			loadedModels.Add("brzewno3/brzewno", Content.Load<Model>("brzewno3/brzewno3"));
 			//loadedModels.Add("drzewo/drzewo", Content.Load<Model>("drzewo/drzewo"));
 			loadedModels.Add("trent", Content.Load<Model>("trent"));
+			loadedModels.Add("eMonster1", Content.Load<Model>("Models/monstr"));
+			loadedModels.Add("tower", Content.Load<Model>("Models/tower"));
 
 			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
 			loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
@@ -248,7 +250,42 @@ class ProceduralTest : Scene
 		brow2.texture = loadedTextures["simpleBlack"];
 		gab.AddChild(brow2);
 
-		GameObject prevGeb = gab;
+
+
+
+        GameObject Tower = new GameObject("tower");
+        Tower.transform.position = new Vector3(0,80,0);
+        Tower.transform.scale = new Vector3(20,80,20);
+        Tower.transform.rotation = new Vector3(0f, 0, 0f);
+        Tower.model = loadedModels["tower"];
+        Tower.texture = loadedTextures["eye"];
+        this.AddChild(Tower);
+
+         Tower = new GameObject("tower");
+        Tower.transform.position = new Vector3(0, 80, 512);
+        Tower.transform.scale = new Vector3(20, 80, 20);
+        Tower.transform.rotation = new Vector3(0f, 0, 0f);
+        Tower.model = loadedModels["tower"];
+        Tower.texture = loadedTextures["eye"];
+        this.AddChild(Tower);
+
+         Tower = new GameObject("tower");
+        Tower.transform.position = new Vector3(512, 80, 512);
+        Tower.transform.scale = new Vector3(20, 80, 20);
+        Tower.transform.rotation = new Vector3(0f, 0, 0f);
+        Tower.model = loadedModels["tower"];
+        Tower.texture = loadedTextures["eye"];
+        this.AddChild(Tower);
+
+         Tower = new GameObject("tower");
+        Tower.transform.position = new Vector3(512, 80, 0);
+        Tower.transform.scale = new Vector3(20, 80, 20);
+        Tower.transform.rotation = new Vector3(0f, 0, 0f);
+        Tower.model = loadedModels["tower"];
+        Tower.texture = loadedTextures["eye"];
+        this.AddChild(Tower);
+
+        GameObject prevGeb = gab;
 			for (int i = 0; i < 10; i++)
 			{
 				GameObject gogus = CreateGebus(new Vector3(150 + i*2, 2, 150 + i*2));
@@ -294,12 +331,12 @@ class ProceduralTest : Scene
 
 			go.transform.position = pos;
 			go.transform.scale = new Vector3(0.75f);
-			go.model = loadedModels["sphere"];
+			go.model = loadedModels["eMonster1"];
 			go.texture = loadedTextures["gabTex"];
-			go.AddComponent(new SphereColliderComponent(0.75f,false));
+			go.AddComponent(new SphereColliderComponent(1f,false));
 			go.AddComponent(new DebugMoveComponent());
 			go.GetComponent<DebugMoveComponent>().move = false;
-			go.AddComponent(new Follower(go, 2f));
+			go.AddComponent(new Follower(go, 3f));
 
 			return go;
 
