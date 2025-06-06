@@ -318,6 +318,9 @@ namespace SolidSilnique
             Texture2D leaftex2 = Content.Load<Texture2D>("Textures/leaf_diffuse");
             _leafSystem2.LoadContent(GraphicsDevice, Content, leaftex2);
 
+            EngineManager._postSpriteBatch = new SpriteBatch(EngineManager.graphics);
+            EngineManager._postProcessEffect = Content.Load<Effect>("Shaders/postProcessShader");
+
         }
 
 

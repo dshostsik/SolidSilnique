@@ -1,77 +1,78 @@
-// SimpleShape.fx
+// postProcessShader.fx
+
+//-------------------------------------
+// Semantic macros for XNA/MonoGame
+//-------------------------------------
 #if OPENGL
-    #define SV_POSITION POSITION
-    #define VS_SHADERMODEL vs_3_0
-    #define PS_SHADERMODEL ps_3_0
+#define SV_POSITION    POSITION
+#define VS_SHADERMODEL vs_3_0
+#define PS_SHADERMODEL ps_3_0
 #else
-    #define VS_SHADERMODEL vs_5_0
-    #define PS_SHADERMODEL ps_5_0
+#define SV_POSITION    POSITION
+#define VS_SHADERMODEL vs_4_0_level_9_1
+#define PS_SHADERMODEL ps_4_0_level_9_1
 #endif
 
 //-------------------------------------
-//   UNIFORMS
+//   UNIFORMS (Parameters from C#)
 //-------------------------------------
-// Standard matrices (not strictly used here, but MonoGame expects them)
-matrix World;
-matrix View;
-matrix Projection;
+Texture2D PrevRendered;
+SamplerState PrevRenderedSampler;
 
-// Circle parameters
-float2 Center    = float2(0.5, 0.5);   // UV‐space center
-float  Radius    = 0.3;                // Radius in UV units (0..1)
-float4 FillColor = float4(1, 0, 0, 1);  // Red fill
-float4 BgColor   = float4(0, 0, 0, 1);  // Black background
+// A simple tint (set to float4(1,1,1,1) from C# if you don’t want any change)
+float4 BrightnessTint;
 
 //-------------------------------------
-//   VERTEX & PIXEL STRUCTS
+//   SPRITEBATCH‐COMPATIBLE VS INPUT/OUTPUT
 //-------------------------------------
-struct VertexInput
+struct VS_INPUT
 {
-    float4 Position : POSITION0;   // NDC coordinates
-    float2 TexCoord : TEXCOORD0;   // UV (0..1)
+    float4 Position : POSITION0; // Already pre‐transformed to clip‐space
+    float4 Color : COLOR0; // Vertex color / tint
+    float2 TexCoord : TEXCOORD0; // 0..1
 };
 
-struct PixelInput
+struct VS_OUTPUT
 {
     float4 Position : SV_POSITION;
+    float4 Color : COLOR0;
     float2 TexCoord : TEXCOORD0;
 };
 
 //-------------------------------------
-//   VERTEX SHADER
+//   VERTEX SHADER (passthrough for SpriteBatch)
 //-------------------------------------
-PixelInput VS_Main(VertexInput vin)
+VS_OUTPUT VS_Main(VS_INPUT input)
 {
-    PixelInput vout;
-    vout.Position = vin.Position;
-    vout.TexCoord = vin.TexCoord;
-    return vout;
+    VS_OUTPUT output;
+    // SpriteBatch already gives us clip‐space positions, so just pass through:
+    output.Position = input.Position;
+    output.Color = input.Color;
+    output.TexCoord = input.TexCoord;
+    return output;
 }
 
 //-------------------------------------
-//   PIXEL SHADER
+//   PIXEL SHADER (just copies the texture for now)
 //-------------------------------------
-float4 PS_Main(PixelInput pin) : SV_TARGET
+float4 PS_Main(VS_OUTPUT input) : SV_TARGET
 {
-    // Compute distance from UV to the circle center
-    float2 uv = pin.TexCoord;
-    float d = distance(uv, Center);
+    // Sample the “PrevRendered” render‐target
+    float4 col = PrevRendered.Sample(PrevRenderedSampler, input.TexCoord);
 
-    // If inside radius, output FillColor; otherwise BgColor
-    if (d <= Radius)
-        return FillColor;
-    else
-        return BgColor;
+    // Multiply by a tint (use this later when you do bloom‐brightening)
+    col.rgb *= BrightnessTint.rgb;
+    return col;
 }
 
 //-------------------------------------
-//   TECHNIQUE
+//   TECHNIQUE FOR SPRITEBATCH
 //-------------------------------------
-technique DrawShape
+technique PostProcess
 {
     pass P0
     {
-        VertexShader   = compile VS_SHADERMODEL VS_Main();
-        PixelShader    = compile PS_SHADERMODEL PS_Main();
+        VertexShader = compile VS_SHADERMODEL VS_Main();
+        PixelShader = compile PS_SHADERMODEL PS_Main();
     }
 }

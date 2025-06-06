@@ -12,6 +12,7 @@ using SolidSilnique.Core.Components;
 using GUIRESOURCES;
 using SolidSilnique.Core.Diagnostics;
 using System.Reflection;
+using System.Reflection.Metadata;
 
 namespace SolidSilnique.Core
 {
@@ -58,6 +59,10 @@ namespace SolidSilnique.Core
         private static int _iterationsCounter = 0;
         private static Matrix lightViewProjection;
         private static Matrix _lightProjection =  Matrix.CreateOrthographic(512 * 1.41f, 512*1.41f, -128f, 128);
+
+        private static RenderTarget2D _sceneRenderTarget;
+        public static SpriteBatch _postSpriteBatch;
+        public static Effect _postProcessEffect;
 
         public static void Start()
         {
@@ -142,104 +147,90 @@ namespace SolidSilnique.Core
         
         public static void Draw( Shader shadowShader, Matrix view, Matrix projection, LightsManagerComponent manager,Shader PostProcessShader )
         {
+            if (_sceneRenderTarget == null)
+            {
+                _sceneRenderTarget = new RenderTarget2D(
+                    graphics,
+                    1920, 1080,
+                    false,
+                    SurfaceFormat.Color,
+                    DepthFormat.Depth24);
+            }
+
+            graphics.SetRenderTarget(_sceneRenderTarget);
+            graphics.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
+
             scene.Draw();
 
             if (_iterationsCounter < 1)
             {
                 _iterationsCounter++;
-				_staticShadowMapRenderTarget = BakeStaticShadows(shadowShader, manager);
-			}
-			
-            RenderTarget2D output = new RenderTarget2D(graphics, 1920,
-	            1080, false,
-	            SurfaceFormat.Single, DepthFormat.Depth24);
-			graphics.SetRenderTarget(output);
+                _staticShadowMapRenderTarget = BakeStaticShadows(shadowShader, manager);
+            }
 
-			shader.SetUniform("LightViewProj", lightViewProjection);
-			shader.SetTexture("shadowMap", _staticShadowMapRenderTarget);
+            shader.SetUniform("LightViewProj", lightViewProjection);
+            shader.SetTexture("shadowMap", _staticShadowMapRenderTarget);
             shader.SetUniform("shadowMapResolution", _testSettings);
 
-			// Normal rendering 
-			while (renderQueue.Count > 0)
+            while (renderQueue.Count > 0)
             {
                 GameObject go = renderQueue.Dequeue();
 
-                //FRUSTUM CULLING
                 _frustum.Matrix = view * projection;
-
                 var position = go.transform.position;
-
-                // Determine distance from camera to object
                 var distance = Vector3.Distance(
                     EngineManager.scene.mainCamera.CameraPosition,
                     position);
 
-                // Select appropriate LOD model based on distance
-
                 if (go.LODModels != null && go.LODModels.Count > 0)
-                {
                     go.model = go.GetLODModel(distance);
-                }
-
 
                 if (go.model == null)
-                {
                     continue;
-                }
 
                 try
                 {
                     Matrix model = go.transform.getModelMatrix();
-
                     setMaterial(go);
 
-
-					shader.SetUniform("World", model);
-                    Matrix modelTransInv = Matrix.Transpose(Matrix.Invert(go.transform.getModelMatrix()));
+                    shader.SetUniform("World", model);
+                    Matrix modelTransInv = Matrix.Transpose(Matrix.Invert(model));
                     shader.SetUniform("WorldTransInv", modelTransInv);
-                    
 
-                    for (int i = 0; i < go.model.Meshes.Count; i++)
+                    foreach (var mesh in go.model.Meshes)
                     {
-                        ModelMesh mesh = go.model.Meshes[i];
                         if (useCulling)
                         {
-                            var sphere = mesh.BoundingSphere.Transform(go.transform.getModelMatrix());
+                            var sphere = mesh.BoundingSphere.Transform(model);
                             bool visible = _frustum.Intersects(sphere);
 
                             if (useWireframe)
                             {
-                                var prevRasterizer = graphics.RasterizerState;
-
-
+                                var prevRaster = graphics.RasterizerState;
                                 wireframeEffect.View = view;
                                 wireframeEffect.Projection = projection;
                                 wireframeEffect.World = Matrix.Identity;
-                                // TODO: may be we can get rid of this somehow
                                 graphics.RasterizerState = new RasterizerState { FillMode = FillMode.WireFrame };
-
 
                                 var box = BoundingBox.CreateFromSphere(sphere);
                                 var corners = box.GetCorners();
-                                // TODO: and this
                                 var lines = new VertexPositionColor[24];
                                 Color wireColor = visible ? Color.Green : Color.Red;
+                                int[,] edges = {
+                            {0,1},{1,2},{2,3},{3,0},
+                            {4,5},{5,6},{6,7},{7,4},
+                            {0,4},{1,5},{2,6},{3,7}
+                        };
                                 int idx = 0;
-                                // TODO: and this
-                                int[,] edges =
-                                {
-                                    { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
-                                    { 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 4 },
-                                    { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 }
-                                };
                                 for (int e = 0; e < edges.GetLength(0); e++)
                                 {
-                                    var a = corners[edges[e, 0]];
-                                    var b = corners[edges[e, 1]];
-                                    lines[idx++] = new VertexPositionColor(a, wireColor);
-                                    lines[idx++] = new VertexPositionColor(b, wireColor);
+                                    lines[idx++] = new VertexPositionColor(
+                                        corners[edges[e, 0]],
+                                        wireColor);
+                                    lines[idx++] = new VertexPositionColor(
+                                        corners[edges[e, 1]],
+                                        wireColor);
                                 }
-
                                 foreach (var pass in wireframeEffect.CurrentTechnique.Passes)
                                 {
                                     pass.Apply();
@@ -249,17 +240,15 @@ namespace SolidSilnique.Core
                                         0,
                                         edges.GetLength(0));
                                 }
-
-                                graphics.RasterizerState = prevRasterizer;
+                                graphics.RasterizerState = prevRaster;
                             }
 
                             if (!visible)
                                 continue;
                         }
-                        
-                        for (int j = 0; j < mesh.MeshParts.Count; j++)
+
+                        foreach (var part in mesh.MeshParts)
                         {
-                            var part = mesh.MeshParts[j];
                             part.Effect = shader.Effect;
                             if (celShadingEnabled)
                             {
@@ -279,51 +268,49 @@ namespace SolidSilnique.Core
                         }
                     }
                 }
-
-
-                catch (NullReferenceException e)
+                catch (Exception e)
                 {
-                    Console.WriteLine(e.Message, e.Source, e.StackTrace);
+                    Console.WriteLine(e);
                     throw;
                 }
-                catch (UniformNotFoundException u)
-                {
-                    Console.WriteLine(u.Message);
-                    throw;
-                }
+            }
 
-                
-
-			}
-            if(scene.environmentObject != null)
-            {
+            if (scene.environmentObject != null)
                 scene.environmentObject.Draw(_frustum);
-            }
-			DrawInstanceData();
+            DrawInstanceData();
 
-            SpriteBatch UiRenderer = new SpriteBatch(graphics);
+            var UiRenderer = new SpriteBatch(graphics);
             UiRenderer.Begin();
-            while(renderQueueUI.Count > 0)
+            while (renderQueueUI.Count > 0)
             {
-                Tuple<Texture2D,Vector2,Color> element = renderQueueUI.Dequeue();
-                
+                var element = renderQueueUI.Dequeue();
                 UiRenderer.Draw(element.Item1, element.Item2, element.Item3);
-                
             }
-            
-            
-            //Rednder Mateuszkowe GUI :) using the same SpriteBatch :) 
             if (currentGui != null)
             {
                 currentGui.Draw(UiRenderer);
             }
-
-            
             UiRenderer.End();
-            
-            PostProcessShader.SetTexture("PrevRendered",output);
-            
-            
+            var vp = graphics.Viewport;
+            graphics.SetRenderTarget(null);
+             graphics.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
+
+            //PostProcessShader.Effect.Parameters["PrevRendered"]?.SetValue(_sceneRenderTarget);
+            //PostProcessShader.Effect.Parameters["BrightnessTint"]?.SetValue(Vector4.One);
+
+            _postSpriteBatch.Begin();
+            //     SpriteSortMode.Immediate,
+            //   BlendState.Opaque,
+            //   null, null, null,
+            //   PostProcessShader.Effect);
+
+            //var vp = graphics.Viewport;
+            _postSpriteBatch.Draw(
+                _sceneRenderTarget,
+                new Rectangle(0, 0, vp.Width, vp.Height),
+                Color.White);
+            _postSpriteBatch.End();
+            //graphics.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
         }
     
 		
