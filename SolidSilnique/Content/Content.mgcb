@@ -898,6 +898,12 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/LeafParticle.fx
 
+#begin Shaders/postProcessShader.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/postProcessShader.fx
+
 #begin Shaders/ShadowMapShader.fx
 /importer:EffectImporter
 /processor:EffectProcessor
