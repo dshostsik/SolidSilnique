@@ -154,17 +154,17 @@ namespace SolidSilnique
         {
             //DISPLAY SETUP
             // Force 1080p windowed
-            //Set1080p(fullscreen: false);
+            Set1080p(fullscreen: false);
 
             // If you’d rather start in fullscreen 1440p, use:
             // Set1440p(fullscreen: true);
             Window.AllowUserResizing = true;
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
             _graphics.IsFullScreen = false;
-            Window.IsBorderless = true;
+            //Window.IsBorderless = true;
             // _graphics.HardwareModeSwitch = true;
-            _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
-            _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+            //_graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
+            //_graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
             _graphics.SynchronizeWithVerticalRetrace = true; //VSync
             //_graphics.SynchronizeWithVerticalRetrace = false; // disabled VSync for uncapped FPS
             _graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;

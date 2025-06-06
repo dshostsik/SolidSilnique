@@ -112,7 +112,8 @@ class ProceduralTest : Scene
         treeTextures.Add(Content.Load<Texture2D>("Textures/tree1_diffuse"));
         treeTextures.Add(Content.Load<Texture2D>("Textures/tree2_diffuse"));
         //treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
-
+        loadedModels.Add("tower", Content.Load<Model>("Models/tower"));
+        loadedModels.Add("eMonster1", Content.Load<Model>("Models/monstr"));
         content = Content;
     }
 
@@ -151,11 +152,6 @@ class ProceduralTest : Scene
         }
 
 
-        for (int i = 0; i < 5; i++)
-        {
-            AddPlanet();
-        }
-
         GameObject goTest = new GameObject("Deimos");
 
 
@@ -189,80 +185,116 @@ class ProceduralTest : Scene
         gab = new GameObject("gab");
         gab.transform.position = new Vector3(250, 15, 220);
 
-        gab.transform.scale = new Vector3(1f);
-        gab.model = loadedModels["cube"];
-        gab.texture = loadedTextures["gabTex"];
-        //gab.normalMap = loadedTextures["gabNo"];
-        //gab.roughnessMap = loadedTextures["gabRo"];
-        //gab.aoMap = loadedTextures["gabAo"];
-        gab.AddComponent(new DebugMoveComponent());
-        gab.AddComponent(new SphereColliderComponent(1));
+            gab.transform.scale = new Vector3(1f);
+			gab.model = loadedModels["cube"];
+			gab.texture = loadedTextures["gabTex"];
+			//gab.normalMap = loadedTextures["gabNo"];
+			//gab.roughnessMap = loadedTextures["gabRo"];
+			//gab.aoMap = loadedTextures["gabAo"];
+			gab.AddComponent(new DebugMoveComponent());
+			gab.AddComponent(new SphereColliderComponent(1));
+			
+
+			this.AddChild(gab);
+			GameObject TPcam = new GameObject("cam");
+			var tpcCamComp = new CameraComponent();
+			TPcam.AddComponent(tpcCamComp);
+			TPcam.transform.position = new Vector3(0,5, -10);
+			this.TPCamera = new Camera(tpcCamComp);
+			
+			gab.AddChild(TPcam);
+
+			GameObject eye1 = new GameObject("eye1");
+			eye1.transform.position = new Vector3(-0.25f*2, 0.209f, 0.427f * 2);
+			eye1.transform.scale = new Vector3(0.4f);
+			eye1.model = loadedModels["sphere"];
+			eye1.texture = loadedTextures["eye"];
+			gab.AddChild(eye1);
+
+			GameObject pupil1 = new GameObject("pupil1");
+				pupil1.transform.position = new Vector3(0, 0, 0.427f * 2);
+				pupil1.transform.scale = new Vector3(0.4f,0.4f,0.2f);
+				pupil1.model = loadedModels["sphere"];
+				pupil1.texture = loadedTextures["simpleBlack"];
+				eye1.AddChild(pupil1);
+
+		GameObject brow1 = new GameObject("brow1");
+		brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, 0.427f * 2);
+		brow1.transform.scale = new Vector3(0.45f, 0.2f,0.4f);
+		brow1.transform.rotation = new Vector3(0f,0,-20f);
+		brow1.model = loadedModels["cube"];
+		brow1.texture = loadedTextures["simpleBlack"];
+		gab.AddChild(brow1);
+
+		GameObject eye2 = new GameObject("eye2");
+			eye2.transform.position = new Vector3(0.25f*2, 0.209f, 0.427f*2);
+			eye2.transform.scale = new Vector3(0.4f);
+			eye2.model = loadedModels["sphere"];
+			eye2.texture = loadedTextures["eye"];
+			gab.AddChild(eye2);
+
+		GameObject pupil2 = new GameObject("pupil1");
+		pupil2.transform.position = new Vector3(0, 0, 0.427f * 2);
+		pupil2.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
+		pupil2.model = loadedModels["sphere"];
+		pupil2.texture = loadedTextures["simpleBlack"];
+		eye2.AddChild(pupil2);
+
+		GameObject brow2 = new GameObject("brow1");
+		brow2.transform.position = new Vector3(0.25f * 2, 0.5f, 0.427f * 2);
+		brow2.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
+		brow2.transform.rotation = new Vector3(0f, 0, 20f);
+		brow2.model = loadedModels["cube"];
+		brow2.texture = loadedTextures["simpleBlack"];
+		gab.AddChild(brow2);
 
 
-        this.AddChild(gab);
-        GameObject TPcam = new GameObject("cam");
-        var tpcCamComp = new CameraComponent();
-        TPcam.AddComponent(tpcCamComp);
-        TPcam.transform.position = new Vector3(0, 5, -10);
-        this.TPCamera = new Camera(tpcCamComp);
 
-        gab.AddChild(TPcam);
 
-        GameObject eye1 = new GameObject("eye1");
-        eye1.transform.position = new Vector3(-0.25f * 2, 0.209f, 0.427f * 2);
-        eye1.transform.scale = new Vector3(0.4f);
-        eye1.model = loadedModels["sphere"];
-        eye1.texture = loadedTextures["eye"];
-        gab.AddChild(eye1);
+        GameObject Tower = new GameObject("tower");
+        Tower.transform.position = new Vector3(0,80,0);
+        Tower.transform.scale = new Vector3(20,80,20);
+        Tower.transform.rotation = new Vector3(0f, 0, 0f);
+        Tower.model = loadedModels["tower"];
+        Tower.texture = loadedTextures["eye"];
+        this.AddChild(Tower);
 
-        GameObject pupil1 = new GameObject("pupil1");
-        pupil1.transform.position = new Vector3(0, 0, 0.427f * 2);
-        pupil1.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
-        pupil1.model = loadedModels["sphere"];
-        pupil1.texture = loadedTextures["simpleBlack"];
-        eye1.AddChild(pupil1);
+         Tower = new GameObject("tower");
+        Tower.transform.position = new Vector3(0, 80, 512);
+        Tower.transform.scale = new Vector3(20, 80, 20);
+        Tower.transform.rotation = new Vector3(0f, 0, 0f);
+        Tower.model = loadedModels["tower"];
+        Tower.texture = loadedTextures["eye"];
+        this.AddChild(Tower);
 
-        GameObject brow1 = new GameObject("brow1");
-        brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, 0.427f * 2);
-        brow1.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
-        brow1.transform.rotation = new Vector3(0f, 0, -20f);
-        brow1.model = loadedModels["cube"];
-        brow1.texture = loadedTextures["simpleBlack"];
-        gab.AddChild(brow1);
+         Tower = new GameObject("tower");
+        Tower.transform.position = new Vector3(512, 80, 512);
+        Tower.transform.scale = new Vector3(20, 80, 20);
+        Tower.transform.rotation = new Vector3(0f, 0, 0f);
+        Tower.model = loadedModels["tower"];
+        Tower.texture = loadedTextures["eye"];
+        this.AddChild(Tower);
 
-        GameObject eye2 = new GameObject("eye2");
-        eye2.transform.position = new Vector3(0.25f * 2, 0.209f, 0.427f * 2);
-        eye2.transform.scale = new Vector3(0.4f);
-        eye2.model = loadedModels["sphere"];
-        eye2.texture = loadedTextures["eye"];
-        gab.AddChild(eye2);
-
-        GameObject pupil2 = new GameObject("pupil1");
-        pupil2.transform.position = new Vector3(0, 0, 0.427f * 2);
-        pupil2.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
-        pupil2.model = loadedModels["sphere"];
-        pupil2.texture = loadedTextures["simpleBlack"];
-        eye2.AddChild(pupil2);
-
-        GameObject brow2 = new GameObject("brow1");
-        brow2.transform.position = new Vector3(0.25f * 2, 0.5f, 0.427f * 2);
-        brow2.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
-        brow2.transform.rotation = new Vector3(0f, 0, 20f);
-        brow2.model = loadedModels["cube"];
-        brow2.texture = loadedTextures["simpleBlack"];
-        gab.AddChild(brow2);
+         Tower = new GameObject("tower");
+        Tower.transform.position = new Vector3(512, 80, 0);
+        Tower.transform.scale = new Vector3(20, 80, 20);
+        Tower.transform.rotation = new Vector3(0f, 0, 0f);
+        Tower.model = loadedModels["tower"];
+        Tower.texture = loadedTextures["eye"];
+        this.AddChild(Tower);
 
         GameObject prevGeb = gab;
-        for (int i = 0; i < 10; i++)
-        {
-            GameObject gogus = CreateGebus(new Vector3(150 + i * 2, 2, 150 + i * 2));
-            gogus.GetComponent<Follower>().Target = prevGeb;
-            if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
-            this.AddChild(gogus);
-            prevGeb = gogus;
-        }
+			for (int i = 0; i < 10; i++)
+			{
+				GameObject gogus = CreateGebus(new Vector3(150 + i*2, 2, 150 + i*2));
+				gogus.GetComponent<Follower>().Target = prevGeb;
+				if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
+				this.AddChild(gogus);
+				prevGeb = gogus;
+			}
 
 
+       
         rhythymGui = new GUI("Content/RhythymGui.xml", content);
         EngineManager.currentGui = rhythymGui;
 
@@ -272,28 +304,9 @@ class ProceduralTest : Scene
         enemy.model = loadedModels["sphere"];
         enemy.texture = loadedTextures["deimos"];
         this.AddChild(enemy);
-    }
-
-
-    void AddPlanet()
-    {
-        Random rand = new Random();
-        GameObject go = new GameObject("Deimos");
-        float randX = 0, randZ = 0;
-        while (new Vector3(randX, 0, randZ).Length() < 5)
-        {
-            randX = (float)rand.NextDouble() * 50 - 25;
-            randZ = (float)rand.NextDouble() * 50 - 25;
-        }
-
-
-        go.transform.position = new Vector3(randX, 2.5f, randZ);
-        go.model = loadedModels["deimos"];
-        go.texture = loadedTextures["deimos"];
-        go.AddComponent(new SphereColliderComponent(3.5f, true));
-
 
         this.AddChild(go);
+    
     }
 
     public override void Update()

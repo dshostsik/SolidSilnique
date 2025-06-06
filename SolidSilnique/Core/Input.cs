@@ -117,21 +117,27 @@ namespace SolidSilnique.Core
 
         private void EvaluateMouseMovement()
         {
-            var center = _game.Window.ClientBounds.Center;
-
+            // Try to cast to Game1 so we can check its mouseFree flag
             var game1 = _game as Game1;
 
+            if (game1 != null && game1.mouseFree)
+                return;
+
+            // Always compute delta relative to window center
+            var center = _game.Window.ClientBounds.Center;
             float dx = _msState.X - center.X;
             float dy = _msState.Y - center.Y;
-            if (dx != 0 || dy != 0)
-            {
-                MouseMoved?.Invoke(dx, dy);
-                // recenter for next delta
-                if (game1 != null && game1.mouseFree)
-                    return;
-                Mouse.SetPosition(center.X, center.Y);
 
-            }
+            // Fire the MouseMoved event even if (dx, dy) is (0,0)
+            MouseMoved?.Invoke(dx, dy);
+
+            // Recenter cursor every frame so that next frame produces a fresh delta
+            Mouse.SetPosition(center.X, center.Y);
+        }
+
+        private void EvaluatePadLook()
+        {
+
         }
 
         private void InitializeDefaultBindings()
@@ -170,7 +176,7 @@ namespace SolidSilnique.Core
             right.Conditions.Add((kb, gp) => gp.ThumbSticks.Left.X > 0.3f);
             Add("Right", right);
 
-            // Up = Space or GamePad A
+            // Up = Space or GamePad
             var up = new ActionBinding();
             up.Keys.Add(Keys.Space);
             up.Buttons.Add(Buttons.A);
