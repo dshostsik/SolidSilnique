@@ -18,8 +18,8 @@ public class HitNoteVisual
     {
         this.noteTime = noteTime;
         this.noteButton = noteButton;
-        positionX = 1080-64;
-        positionY = 720-64;
+        positionX = 896;
+        positionY = 476;
         noteVisible = false;
         /*
         switch (noteButton)
@@ -59,16 +59,16 @@ public class HitNoteVisual
             {
                 
                 case 0:
-                    positionY -=  (int)(gameTime * 1152);
+                    positionY -=  (int)(gameTime * 872);
                     break;
                 case 1:
-                    positionX -=  (int)(gameTime * 1152);
+                    positionX -=  (int)(gameTime * 872);
                     break;
                 case 2:
-                    positionY +=  (int)(gameTime * 1152);
+                    positionY +=  (int)(gameTime * 872);
                     break;
                 case 3:
-                    positionX +=  (int)(gameTime * 1152);
+                    positionX +=  (int)(gameTime * 872);
                     break;
                 
             }  
