@@ -11,30 +11,27 @@ using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using GUIRESOURCES;
 using Microsoft.Xna.Framework.Input;
+using SolidSilnique.Core.Diagnostics;
 
 
 namespace SolidSilnique.GameContent;
 
 class ProceduralTest : Scene
 {
-		
-		//PROCEDURAL HELPERS
-		List<Model>models = new List<Model>();
-		List<Texture2D>textures = new List<Texture2D>();
-		List<Model> treeModels = new List<Model>();
-		List<Texture2D> treeTextures = new List<Texture2D>();
+    //PROCEDURAL HELPERS
+    List<Model> models = new List<Model>();
+    List<Texture2D> textures = new List<Texture2D>();
+    List<Model> treeModels = new List<Model>();
+    List<Texture2D> treeTextures = new List<Texture2D>();
 
 
-		public EnvironmentObject enviro = new EnvironmentObject();
-		KeyboardState kState = new KeyboardState();
-		private BossRhythymUI bossRhythym = new BossRhythymUI();
-		SpriteBatch spriteBatch = new SpriteBatch(EngineManager.graphics);
-		public GUI rhythymGui;
-		ContentManager content;
-		public ProceduralTest() {
+    public EnvironmentObject enviro = new EnvironmentObject();
+    KeyboardState kState = new KeyboardState();
+    private BossRhythymUI bossRhythym = new BossRhythymUI();
+    SpriteBatch spriteBatch = new SpriteBatch(EngineManager.graphics);
+    public GUI rhythymGui;
 
-			
-		}
+    ContentManager content;
 
 		public override void LoadContent(ContentManager Content)
 		{
@@ -51,141 +48,162 @@ class ProceduralTest : Scene
 			loadedModels.Add("trent", Content.Load<Model>("trent"));
 			loadedModels.Add("eMonster1", Content.Load<Model>("Models/monstr"));
 			loadedModels.Add("tower", Content.Load<Model>("Models/tower"));
+        }
+    // let's assume it as a player object so far
+    private GameObject gab;
+    private GameObject enemy;
+    private int _enemyHP = 100;
+    private bool _playerInsideEnemyFOV = false;
 
-			loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
-			loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
-			loadedTextures.Add("simpleGreen", Content.Load<Texture2D>("simpleGreen"));
-			loadedTextures.Add("simpleBlack", Content.Load<Texture2D>("simpleBlack"));
-			loadedTextures.Add("gabTex", Content.Load<Texture2D>("Textures/gab_tex"));
-			loadedTextures.Add("gabNo", Content.Load<Texture2D>("Textures/gab_no"));
-			loadedTextures.Add("gabRo", Content.Load<Texture2D>("Textures/gab_ro"));
-			loadedTextures.Add("gabAo", Content.Load<Texture2D>("Textures/gab_ao"));
+    public ProceduralTest()
+    {
+    }
 
-			loadedTextures.Add("eye", Content.Load<Texture2D>("Textures/eye_tex"));
+    public override void LoadContent(ContentManager Content)
+    {
+        //loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
+        loadedModels.Add("deimos", Content.Load<Model>("deimos"));
+        loadedModels.Add("plane", Content.Load<Model>("plane"));
+        loadedModels.Add("cube", Content.Load<Model>("cube"));
+        loadedModels.Add("cone", Content.Load<Model>("cone"));
+        loadedModels.Add("sphere", Content.Load<Model>("sphere"));
+        loadedModels.Add("levelTest", Content.Load<Model>("level_ground"));
+        loadedModels.Add("brzewno1/brzewno", Content.Load<Model>("brzewno1/brzewno"));
+        loadedModels.Add("brzewno3/brzewno", Content.Load<Model>("brzewno3/brzewno3"));
+        //loadedModels.Add("drzewo/drzewo", Content.Load<Model>("drzewo/drzewo"));
+        loadedModels.Add("trent", Content.Load<Model>("trent"));
 
-			loadedTextures.Add("leafTex", Content.Load<Texture2D>("Textures/leaf_diffuse"));
-			
-			loadedTextures.Add("brzewno1/diffuse", Content.Load<Texture2D>("brzewno1/diffuse"));
-			loadedTextures.Add("brzewno1/normal", Content.Load<Texture2D>("brzewno1/normal"));
-			loadedTextures.Add("brzewno1/ao", Content.Load<Texture2D>("brzewno1/ao"));
-			loadedTextures.Add("brzewno1/glossy", Content.Load<Texture2D>("brzewno1/glossy"));
-			
-			loadedTextures.Add("brzewno3/diffuse", Content.Load<Texture2D>("brzewno3/diffuse"));
-			loadedTextures.Add("brzewno3/normal", Content.Load<Texture2D>("brzewno3/normal"));
-			loadedTextures.Add("brzewno3/ao", Content.Load<Texture2D>("brzewno3/ao"));
-			loadedTextures.Add("brzewno3/glossy", Content.Load<Texture2D>("brzewno3/glossy"));
-			
-			loadedTextures.Add("drzewo/diffuse", Content.Load<Texture2D>("drzewo/diffuse"));
-			loadedTextures.Add("drzewo/normal", Content.Load<Texture2D>("drzewo/normal"));
-			loadedTextures.Add("drzewo/ao", Content.Load<Texture2D>("drzewo/ao"));
-			loadedTextures.Add("drzewo/glossy", Content.Load<Texture2D>("drzewo/glossy"));
-			
-			loadedTextures.Add("trent/diffuse", Content.Load<Texture2D>("trent_fire/low_material_Base_color"));
-			loadedTextures.Add("trent/normal", Content.Load<Texture2D>("trent_fire/low_material_Normal_DirectX"));
-			//loadedTextures.Add("trent/ao", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Mixed_AO"));
-			//loadedTextures.Add("trent/roughness", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Coat_roughness"));
-			
-			models.Add(Content.Load<Model>("pModels/Rock1"));
-			models.Add(Content.Load<Model>("pModels/Branch"));
-			models.Add(Content.Load<Model>("pModels/BushBig"));
-			models.Add(Content.Load<Model>("pModels/BushBig"));
-			models.Add(Content.Load<Model>("pModels/BushBig"));
-			models.Add(Content.Load<Model>("pModels/BushBig"));
-			models.Add(Content.Load<Model>("pModels/BushSmall"));
-			models.Add(Content.Load<Model>("pModels/BushSmall"));
-			models.Add(Content.Load<Model>("pModels/BushSmall"));
-			//models.Add(Content.Load<Model>("pModels/Log"));
-			models.Add(Content.Load<Model>("pModels/Stump"));
-			
-			models.Add(Content.Load<Model>("brzewno1/brzewno"));
-			models.Add(Content.Load<Model>("brzewno3/brzewno3"));
-			textures.Add(loadedTextures["leafTex"]);
-			textures.Add(loadedTextures["deimos"]);
+        loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
+        loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
+        loadedTextures.Add("simpleGreen", Content.Load<Texture2D>("simpleGreen"));
+        loadedTextures.Add("simpleBlack", Content.Load<Texture2D>("simpleBlack"));
+        loadedTextures.Add("gabTex", Content.Load<Texture2D>("Textures/gab_tex"));
+        loadedTextures.Add("gabNo", Content.Load<Texture2D>("Textures/gab_no"));
+        loadedTextures.Add("gabRo", Content.Load<Texture2D>("Textures/gab_ro"));
+        loadedTextures.Add("gabAo", Content.Load<Texture2D>("Textures/gab_ao"));
 
-			treeModels.Add(Content.Load<Model>("pModels/tree1"));
-			treeModels.Add(Content.Load<Model>("pModels/Tree2"));
-			treeTextures.Add(Content.Load<Texture2D>("Textures/tree1_diffuse"));
-			treeTextures.Add(Content.Load<Texture2D>("Textures/tree2_diffuse"));
-			//treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
+        loadedTextures.Add("eye", Content.Load<Texture2D>("Textures/eye_tex"));
 
-			content = Content;
-		
+        loadedTextures.Add("leafTex", Content.Load<Texture2D>("Textures/leaf_diffuse"));
 
+        loadedTextures.Add("brzewno1/diffuse", Content.Load<Texture2D>("brzewno1/diffuse"));
+        loadedTextures.Add("brzewno1/normal", Content.Load<Texture2D>("brzewno1/normal"));
+        loadedTextures.Add("brzewno1/ao", Content.Load<Texture2D>("brzewno1/ao"));
+        loadedTextures.Add("brzewno1/glossy", Content.Load<Texture2D>("brzewno1/glossy"));
 
-		}
+        loadedTextures.Add("brzewno3/diffuse", Content.Load<Texture2D>("brzewno3/diffuse"));
+        loadedTextures.Add("brzewno3/normal", Content.Load<Texture2D>("brzewno3/normal"));
+        loadedTextures.Add("brzewno3/ao", Content.Load<Texture2D>("brzewno3/ao"));
+        loadedTextures.Add("brzewno3/glossy", Content.Load<Texture2D>("brzewno3/glossy"));
 
-		public override void Setup()
-	{
-			environmentObject = new EnvironmentObject();
-			environmentObject.Generate("Map1", content, 2, 30,3);
+        loadedTextures.Add("drzewo/diffuse", Content.Load<Texture2D>("drzewo/diffuse"));
+        loadedTextures.Add("drzewo/normal", Content.Load<Texture2D>("drzewo/normal"));
+        loadedTextures.Add("drzewo/ao", Content.Load<Texture2D>("drzewo/ao"));
+        loadedTextures.Add("drzewo/glossy", Content.Load<Texture2D>("drzewo/glossy"));
 
-			ProceduralGrass newProc = new ProceduralGrass(models,textures,treeModels,treeTextures,content, environmentObject);
-			Task task1 = Task.Run(() => newProc.precomputeNoise());
-			
-			GameObject go = new GameObject("Camera");
-			go.transform.position = new Vector3(250, 3f, 250);
-			CameraComponent cam = new CameraComponent();
-			cam.SetMain();
-			go.AddComponent(cam);
-			//go.AddComponent(new SphereColliderComponent(3f));
-			this.AddChild(go);
+        loadedTextures.Add("trent/diffuse", Content.Load<Texture2D>("trent_fire/low_material_Base_color"));
+        loadedTextures.Add("trent/normal", Content.Load<Texture2D>("trent_fire/low_material_Normal_DirectX"));
+        //loadedTextures.Add("trent/ao", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Mixed_AO"));
+        //loadedTextures.Add("trent/roughness", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Coat_roughness"));
 
-			go = new GameObject("ground");
-			go.transform.position = new Vector3(250, 0, 250);
-			go.transform.scale = new Vector3(500, 1, 500);
-			//go.model = loadedModels["plane"];
-			go.texture = loadedTextures["simpleGreen"];
-			go.AddComponent(new PlaneColliderComponent(new Vector3(0,1,0), true));
-			this.AddChild(go);
-			Task.WhenAll(task1).Wait(); //:O
-			
-			newProc.GenerateObjects();
-			List<GameObject> goList = newProc.createdObjects;
+        models.Add(Content.Load<Model>("pModels/Rock1"));
+        models.Add(Content.Load<Model>("pModels/Branch"));
+        models.Add(Content.Load<Model>("pModels/BushBig"));
+        models.Add(Content.Load<Model>("pModels/BushBig"));
+        models.Add(Content.Load<Model>("pModels/BushBig"));
+        models.Add(Content.Load<Model>("pModels/BushBig"));
+        models.Add(Content.Load<Model>("pModels/BushSmall"));
+        models.Add(Content.Load<Model>("pModels/BushSmall"));
+        models.Add(Content.Load<Model>("pModels/BushSmall"));
+        //models.Add(Content.Load<Model>("pModels/Log"));
+        models.Add(Content.Load<Model>("pModels/Stump"));
 
-			for (int a = 0; a < goList.Count; a++)
-			{
-				this.AddChild(goList[a]);
-			}
-			
+        models.Add(Content.Load<Model>("brzewno1/brzewno"));
+        models.Add(Content.Load<Model>("brzewno3/brzewno3"));
+        textures.Add(loadedTextures["leafTex"]);
+        textures.Add(loadedTextures["deimos"]);
 
-			for (int i = 0; i < 5; i++)
-			{
-				AddPlanet();
+        treeModels.Add(Content.Load<Model>("pModels/tree1"));
+        treeModels.Add(Content.Load<Model>("pModels/Tree2"));
+        treeTextures.Add(Content.Load<Texture2D>("Textures/tree1_diffuse"));
+        treeTextures.Add(Content.Load<Texture2D>("Textures/tree2_diffuse"));
+        //treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
 
-			}
+        content = Content;
+    }
 
-			GameObject goTest = new GameObject("Deimos");
+    public override void Setup()
+    {
+        environmentObject = new EnvironmentObject();
+        environmentObject.Generate("Map1", content, 2, 30, 3);
 
+        ProceduralGrass newProc =
+            new ProceduralGrass(models, textures, treeModels, treeTextures, content, environmentObject);
+        Task task1 = Task.Run(() => newProc.precomputeNoise());
 
-			goTest.transform.position = new Vector3(150, 2.5f, 150);
-			goTest.model = loadedModels["levelTest"];
-			goTest.texture = loadedTextures["deimos"];
-			goTest.AddComponent(new SphereColliderComponent(3.5f, true));
+        GameObject go = new GameObject("Camera");
+        go.transform.position = new Vector3(250, 3f, 250);
+        CameraComponent cam = new CameraComponent();
+        cam.SetMain();
+        go.AddComponent(cam);
+        //go.AddComponent(new SphereColliderComponent(3f));
+        this.AddChild(go);
+
+        go = new GameObject("ground");
+        go.transform.position = new Vector3(250, 0, 250);
+        go.transform.scale = new Vector3(500, 1, 500);
+        //go.model = loadedModels["plane"];
+        go.texture = loadedTextures["simpleGreen"];
+        go.AddComponent(new PlaneColliderComponent(new Vector3(0, 1, 0), true));
+        this.AddChild(go);
+        Task.WhenAll(task1).Wait(); //:O
+
+        newProc.GenerateObjects();
+        List<GameObject> goList = newProc.createdObjects;
+
+        for (int a = 0; a < goList.Count; a++)
+        {
+            this.AddChild(goList[a]);
+        }
 
 
-			this.AddChild(goTest);
+        for (int i = 0; i < 5; i++)
+        {
+            AddPlanet();
+        }
 
-		go = new GameObject("Testak");
-			go.transform.position = new Vector3(5, 2.5f, -5);
-			go.model = loadedModels["deimos"];
-			go.texture = loadedTextures["deimos"];
-			
+        GameObject goTest = new GameObject("Deimos");
+
+
+        goTest.transform.position = new Vector3(150, 2.5f, 150);
+        goTest.model = loadedModels["levelTest"];
+        goTest.texture = loadedTextures["deimos"];
+        goTest.AddComponent(new SphereColliderComponent(3.5f, true));
+
+
+        this.AddChild(goTest);
+
+        go = new GameObject("Testak");
+        go.transform.position = new Vector3(5, 2.5f, -5);
+        go.model = loadedModels["deimos"];
+        go.texture = loadedTextures["deimos"];
+
 
         //go.AddComponent(new DebugMoveComponent()); //<-- Dodawanie componentów
         go.AddComponent(new SphereColliderComponent(3.5f));
 
-			this.AddChild(go);
+        this.AddChild(go);
 
 
-			GameObject go2 = new GameObject("Square4");
-			go2.transform.position = new Vector3(0, 5, 0);
-			go2.transform.scale = new Vector3(0.75f);
-			go2.model = loadedModels["deimos"];
-			go2.texture = loadedTextures["deimos"];
-			go.AddChild(go2);
+        GameObject go2 = new GameObject("Square4");
+        go2.transform.position = new Vector3(0, 5, 0);
+        go2.transform.scale = new Vector3(0.75f);
+        go2.model = loadedModels["deimos"];
+        go2.texture = loadedTextures["deimos"];
+        go.AddChild(go2);
 
-			GameObject gab = new GameObject("gab");
-			gab.transform.position = new Vector3(250, 15, 220);
+        gab = new GameObject("gab");
+        gab.transform.position = new Vector3(250, 15, 220);
 
             gab.transform.scale = new Vector3(1f);
 			gab.model = loadedModels["cube"];
@@ -296,38 +314,81 @@ class ProceduralTest : Scene
 			}
 
 
-			rhythymGui = new GUI("Content/RhythymGui.xml", content);
-			EngineManager.currentGui = rhythymGui;
+        this.AddChild(gab);
+        GameObject TPcam = new GameObject("cam");
+        var tpcCamComp = new CameraComponent();
+        TPcam.AddComponent(tpcCamComp);
+        TPcam.transform.position = new Vector3(0, 5, -10);
+        this.TPCamera = new Camera(tpcCamComp);
 
-	}
+        gab.AddChild(TPcam);
 
-		
+        GameObject eye1 = new GameObject("eye1");
+        eye1.transform.position = new Vector3(-0.25f * 2, 0.209f, 0.427f * 2);
+        eye1.transform.scale = new Vector3(0.4f);
+        eye1.model = loadedModels["sphere"];
+        eye1.texture = loadedTextures["eye"];
+        gab.AddChild(eye1);
 
-		void AddPlanet()
-		{
-			Random rand = new Random();
-			GameObject go = new GameObject("Deimos");
-			float randX = 0, randZ = 0;
-			while (new Vector3(randX, 0, randZ).Length() < 5)
-			{
-				randX = (float)rand.NextDouble() * 50 - 25;
-				randZ = (float)rand.NextDouble() * 50 - 25;
-			}
+        GameObject pupil1 = new GameObject("pupil1");
+        pupil1.transform.position = new Vector3(0, 0, 0.427f * 2);
+        pupil1.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
+        pupil1.model = loadedModels["sphere"];
+        pupil1.texture = loadedTextures["simpleBlack"];
+        eye1.AddChild(pupil1);
+
+        GameObject brow1 = new GameObject("brow1");
+        brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, 0.427f * 2);
+        brow1.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
+        brow1.transform.rotation = new Vector3(0f, 0, -20f);
+        brow1.model = loadedModels["cube"];
+        brow1.texture = loadedTextures["simpleBlack"];
+        gab.AddChild(brow1);
+
+        GameObject eye2 = new GameObject("eye2");
+        eye2.transform.position = new Vector3(0.25f * 2, 0.209f, 0.427f * 2);
+        eye2.transform.scale = new Vector3(0.4f);
+        eye2.model = loadedModels["sphere"];
+        eye2.texture = loadedTextures["eye"];
+        gab.AddChild(eye2);
+
+        GameObject pupil2 = new GameObject("pupil1");
+        pupil2.transform.position = new Vector3(0, 0, 0.427f * 2);
+        pupil2.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
+        pupil2.model = loadedModels["sphere"];
+        pupil2.texture = loadedTextures["simpleBlack"];
+        eye2.AddChild(pupil2);
+
+        GameObject brow2 = new GameObject("brow1");
+        brow2.transform.position = new Vector3(0.25f * 2, 0.5f, 0.427f * 2);
+        brow2.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
+        brow2.transform.rotation = new Vector3(0f, 0, 20f);
+        brow2.model = loadedModels["cube"];
+        brow2.texture = loadedTextures["simpleBlack"];
+        gab.AddChild(brow2);
+
+        GameObject prevGeb = gab;
+        for (int i = 0; i < 10; i++)
+        {
+            GameObject gogus = CreateGebus(new Vector3(150 + i * 2, 2, 150 + i * 2));
+            gogus.GetComponent<Follower>().Target = prevGeb;
+            if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
+            this.AddChild(gogus);
+            prevGeb = gogus;
+        }
 
 
-			go.transform.position = new Vector3(randX, 2.5f, randZ);
-			go.model = loadedModels["deimos"];
-			go.texture = loadedTextures["deimos"];
-			go.AddComponent(new SphereColliderComponent(3.5f,true));
-			
+        rhythymGui = new GUI("Content/RhythymGui.xml", content);
+        EngineManager.currentGui = rhythymGui;
 
-			this.AddChild(go);
+        enemy = new GameObject("euzebiusz wiercibok");
+        enemy.AddComponent(new Follower(enemy, 5.0f));
+        enemy.GetComponent<Follower>().gameObject = enemy;
+        enemy.model = loadedModels["sphere"];
+        enemy.texture = loadedTextures["deimos"];
+        this.AddChild(enemy);
+    }
 
-		}
-		
-		GameObject CreateGebus(Vector3 pos)
-		{
-			GameObject go = new GameObject("Gebus");
 
 			go.transform.position = pos;
 			go.transform.scale = new Vector3(0.75f);
@@ -338,24 +399,69 @@ class ProceduralTest : Scene
 			go.GetComponent<DebugMoveComponent>().move = false;
 			go.AddComponent(new Follower(go, 3f));
 
-			return go;
 
-		}
-		private bool turnedOn = false;
-		public override void Update()
-		{
-			kState = Keyboard.GetState();
-			if (kState.IsKeyDown(Keys.M) && !turnedOn)
-			{
-				bossRhythym.Start(content,spriteBatch);
-				turnedOn = true;
-			}
-			if(turnedOn)
-				bossRhythym.Update();
-			rhythymGui.progressBars[0].progress = bossRhythym.health;
-			rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
-			rhythymGui.texts[1].text = bossRhythym.combo.ToString();
-			base.Update();
-		}
-	
+        go.transform.position = new Vector3(randX, 2.5f, randZ);
+        go.model = loadedModels["deimos"];
+        go.texture = loadedTextures["deimos"];
+        go.AddComponent(new SphereColliderComponent(3.5f, true));
+
+
+        this.AddChild(go);
+    }
+
+    public override void Update()
+    {
+        kState = Keyboard.GetState();
+
+        if (SquaredDistanceBetweenEnemyAndPlayer() <
+            enemy.GetComponent<Follower>().SocialDistance * 3.0f)
+        {
+            _playerInsideEnemyFOV = true;
+            enemy.GetComponent<Follower>().Target = gab;
+        }
+
+        if ((EnemyReachedPlayer() || kState.IsKeyDown(Keys.M)) && !turnedOn)
+        {
+            bossRhythym.Start(content, spriteBatch);
+            turnedOn = true;
+        }
+
+        if (turnedOn)
+            bossRhythym.Update();
+        rhythymGui.progressBars[0].progress = bossRhythym.health;
+        rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
+        rhythymGui.texts[1].text = bossRhythym.combo.ToString();
+
+
+        base.Update();
+    }
+
+    GameObject CreateGebus(Vector3 pos)
+    {
+        GameObject go = new GameObject("Gebus");
+
+        go.transform.position = pos;
+        go.transform.scale = new Vector3(0.75f);
+        go.model = loadedModels["sphere"];
+        go.texture = loadedTextures["gabTex"];
+        go.AddComponent(new SphereColliderComponent(0.75f, false));
+        go.AddComponent(new DebugMoveComponent());
+        go.GetComponent<DebugMoveComponent>().move = false;
+        go.AddComponent(new Follower(go, 2f));
+
+        return go;
+    }
+
+    private bool turnedOn = false;
+
+    private float SquaredDistanceBetweenEnemyAndPlayer()
+    {
+        return Vector3.DistanceSquared(enemy.transform.position, gab.transform.position);
+    }
+
+    private bool EnemyReachedPlayer()
+    {
+        return SquaredDistanceBetweenEnemyAndPlayer() < enemy.GetComponent<Follower>().SocialDistance *
+            enemy.GetComponent<Follower>().SocialDistance;
+    }
 }

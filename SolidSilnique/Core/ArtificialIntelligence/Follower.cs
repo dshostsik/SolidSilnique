@@ -104,7 +104,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// </summary>
         public Vector3 GetFollowDirectionVector()
         {
-            if (null == _target) throw new TargetNotSetException("Target is null.\nMaybe you forgot to set it?");
+            if (null == _target) return Vector3.Zero;
 
             Vector3 direction = _target.transform.position - this.gameObject.transform.position;
             direction.Y = 0.0f;
