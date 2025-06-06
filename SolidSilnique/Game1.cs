@@ -83,6 +83,7 @@ namespace SolidSilnique
 
         private Shader shader;
         private Shader shadowShader;
+        private Shader postShader;
 
         public bool useCulling = false;
 
@@ -195,6 +196,11 @@ namespace SolidSilnique
                 GraphicsDevice,
                 this,
                 "ShadeTheSceneRightNow");
+            
+            postShader = new Shader("Shaders/postProcessShader",
+                GraphicsDevice,
+                this,
+                "PostProcess");
 
 
             manager = new LightsManagerComponent(shader);
@@ -399,7 +405,7 @@ namespace SolidSilnique
             //if (useCulling)
             //PerformCulledDraw();
             //else
-            EngineManager.Draw(shadowShader, _view, _projection, manager);
+            EngineManager.Draw(shadowShader, _view, _projection, manager,postShader);
 
             float t = (float)gameTime.TotalGameTime.TotalSeconds;
             _leafSystem.Draw(GraphicsDevice, _view, _projection, t);

@@ -140,7 +140,7 @@ namespace SolidSilnique.Core
         }
         
         
-        public static void Draw( Shader shadowShader, Matrix view, Matrix projection, LightsManagerComponent manager)
+        public static void Draw( Shader shadowShader, Matrix view, Matrix projection, LightsManagerComponent manager,Shader PostProcessShader )
         {
             scene.Draw();
 
@@ -150,8 +150,10 @@ namespace SolidSilnique.Core
 				_staticShadowMapRenderTarget = BakeStaticShadows(shadowShader, manager);
 			}
 			
-
-
+            RenderTarget2D output = new RenderTarget2D(graphics, 1920,
+	            1080, false,
+	            SurfaceFormat.Single, DepthFormat.Depth24);
+			graphics.SetRenderTarget(output);
 
 			shader.SetUniform("LightViewProj", lightViewProjection);
 			shader.SetTexture("shadowMap", _staticShadowMapRenderTarget);
@@ -318,6 +320,10 @@ namespace SolidSilnique.Core
 
             
             UiRenderer.End();
+            
+            PostProcessShader.SetTexture("PrevRendered",output);
+            
+            
         }
     
 		
