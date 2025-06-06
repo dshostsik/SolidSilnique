@@ -71,10 +71,13 @@ public class BossRhythymUI
         Color[] colors = new Color[2];
         colors[0] = Color.Black;
         colors[1] = Color.White;
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[0], new Vector2(896, 40), colors[buttonsPressed[0]])); // I
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[1], new Vector2(460, 476), colors[buttonsPressed[1]])); // <
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[2], new Vector2(896, 912), colors[buttonsPressed[2]])); // K
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(1332, 476), colors[buttonsPressed[3]])); // >
+        //EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[0], new Vector2(896, 476), colors[buttonsPressed[0]])); // I
+        
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[0], new Vector2(896, 476-80), colors[buttonsPressed[0]])); // I
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[1], new Vector2(896-80, 476), colors[buttonsPressed[1]])); // <
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[2], new Vector2(896, 476+80), colors[buttonsPressed[2]])); // K
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(896+80, 476), colors[buttonsPressed[3]])); // >
+        
         if (CheckNotZero(buttonsPressed) > 0)
         {
             for (int i = 0; i < 4; i++)

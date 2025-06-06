@@ -160,7 +160,7 @@ namespace SolidSilnique
             Window.AllowUserResizing = true;
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
             _graphics.IsFullScreen = false;
-            Window.IsBorderless = true;
+            //Window.IsBorderless = true;
             // _graphics.HardwareModeSwitch = true;
             //_graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             //_graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
