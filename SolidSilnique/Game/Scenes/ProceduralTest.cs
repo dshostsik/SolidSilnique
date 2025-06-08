@@ -269,8 +269,9 @@ class ProceduralTest : Scene
 
         enemy = new GameObject("euzebiusz wiercibok");
         enemy.AddComponent(new SphereColliderComponent(3.5f, false));
-        enemy.AddComponent(new Follower(enemy, 3.0f));
-        enemy.GetComponent<Follower>().Target = null;
+        enemy.AddComponent(new Follower(enemy, 20f));
+        enemy.AddComponent(new DebugMoveComponent());
+        enemy.GetComponent<DebugMoveComponent>().move = false;
         enemy.model = loadedModels["trent"];
         enemy.texture = loadedTextures["trent/diffuse"];
         enemy.normalMap = loadedTextures["trent/normal"];
@@ -334,7 +335,7 @@ class ProceduralTest : Scene
         go.transform.scale = new Vector3(0.75f);
         go.model = loadedModels["sphere"];
         go.texture = loadedTextures["gabTex"];
-        go.AddComponent(new SphereColliderComponent(0.75f, false));
+        go.AddComponent(new SphereColliderComponent(1f, false));
         go.AddComponent(new DebugMoveComponent());
         go.GetComponent<DebugMoveComponent>().move = false;
         go.AddComponent(new Follower(go, 2f));

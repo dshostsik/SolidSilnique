@@ -28,7 +28,8 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         private float _socialDistance;
 
         /// <summary>
-        /// Reference to a target <see cref="GameObject"/> that will be followed by Self.<p>Default value is <c>null</c>. Make sure that you set it before calling <see cref="GetFollowDirectionVector"/> method.</p>
+        /// Reference to a target <see cref="GameObject"/> that will be followed by Self. <p>Default value is <c>null</c>. Make sure that you set it before calling <see cref="GetFollowDirectionVector"/> method.</p>
+        /// If <c>null</c> is passed, <see cref="SocialDistance"/> will be set to 0.0f.
         /// </summary>
         public GameObject? Target
         {
@@ -91,10 +92,12 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// </summary>
         /// <param name="self">A self-object that should follow <see cref="Target"/></param>
         /// <param name="socialDistanceMultiplier">Multiplier for the distance between <see cref="Self"/> and <see cref="Target"/>. The default value is 1.5f</param>
+        /// <exception cref="ArgumentException"> if <see cref="GameObject"/> does not contain <see cref="SphereColliderComponent"/></exception>
         public Follower(GameObject self, float socialDistanceMultiplier = 1.5f)
         {
             gameObject = self;
             _socialDistanceMultiplier = socialDistanceMultiplier;
+            _socialDistance = gameObject.GetComponent<SphereColliderComponent>()?.boundingSphere.Radius * _socialDistanceMultiplier ?? throw new ArgumentException("Game object must contain SphereColliderComponent");
         }
 
         /// <summary>
