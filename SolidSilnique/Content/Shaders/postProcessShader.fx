@@ -8,8 +8,8 @@
 #define PS_SHADERMODEL ps_3_0
 #else
 #define SV_POSITION    POSITION
-#define VS_SHADERMODEL vs_4_0_level_9_1
-#define PS_SHADERMODEL ps_4_0_level_9_1
+#define VS_SHADERMODEL vs_5_0
+#define PS_SHADERMODEL ps_5_0
 #endif
 
 //-------------------------------------
@@ -33,19 +33,24 @@ float4 LE_Blur(VS_OUTPUT input, float4 pixel)
     texOffset.y = 1.0 / 1080.0;
     
     // Fixed array initialization
-    float weight[5];
-    weight[0] = 0.227027;
-    weight[1] = 0.1945946;
-    weight[2] = 0.1216216;
-    weight[3] = 0.054054;
-    weight[4] = 0.016216;
+    float weight[10];
+    weight[0] = 0.198596;
+    weight[1] = 0.175713;
+    weight[2] = 0.121788;
+    weight[3] = 0.066052;
+    weight[4] = 0.028074;
+    weight[5] = 0.009336;
+    weight[6] = 0.002432;
+    weight[7] = 0.000496;
+    weight[8] = 0.000079;
+    weight[9] = 0.000010;
     
     // Initialize result with the center pixel
     float3 result = pixel.rgb * weight[0];
     float totalWeight = weight[0];
     
     
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 10; i++)
         {
         // Horizontal blur
             float2 offsetH = float2(texOffset.x * i, 0.0);
@@ -78,18 +83,21 @@ float4 PS_Main(VS_OUTPUT input) : SV_TARGET
     
     float pixelAVG = (pixelColor.r + pixelColor.g + pixelColor.b) / 3.0;
     
-    if (pixelAVG >= 0.7)
-    {
-        resultPixel = pixelColor;
-        resultPixel = LE_Blur(input, resultPixel);
-    }
-    else
-    {
-        resultPixel = float4(0, 0, 0, 1);
-    }
     
-    resultPixel = resultPixel + pixelColor;
-    return resultPixel;
+    if (pixelAVG >= 0.7)
+        {
+            resultPixel = pixelColor;
+            resultPixel = LE_Blur(input, resultPixel);
+        }
+        else
+        {
+            resultPixel = float4(0, 0, 0, 1);
+        }
+        
+        resultPixel = resultPixel + pixelColor;
+        float3 gammunia =  pow(resultPixel.rgb, float3(1.0 / 1.2,1.0 / 1.2,1.0 / 1.2));
+        resultPixel = float4(gammunia.r,gammunia.g,gammunia.b,1);
+        return resultPixel;
 }
 
 //-------------------------------------
