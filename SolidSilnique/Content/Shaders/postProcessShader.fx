@@ -1,4 +1,3 @@
-// postProcessShader.fx
 
 //-------------------------------------
 // Semantic macros for XNA/MonoGame
@@ -17,52 +16,80 @@
 //   UNIFORMS (Parameters from C#)
 //-------------------------------------
 Texture2D PrevRendered;
-SamplerState PrevRenderedSampler;
+sampler PrevRenderedSampler;
 
-// A simple tint (set to float4(1,1,1,1) from C# if you don’t want any change)
-float4 BrightnessTint;
-
-//-------------------------------------
-//   SPRITEBATCH‐COMPATIBLE VS INPUT/OUTPUT
-//-------------------------------------
-struct VS_INPUT
-{
-    float4 Position : POSITION0; // Already pre‐transformed to clip‐space
-    float4 Color : COLOR0; // Vertex color / tint
-    float2 TexCoord : TEXCOORD0; // 0..1
-};
+// A simple tint (set to float4(1,1,1,1) from C# if you don't want any change)
 
 struct VS_OUTPUT
 {
-    float4 Position : SV_POSITION;
     float4 Color : COLOR0;
     float2 TexCoord : TEXCOORD0;
 };
 
-//-------------------------------------
-//   VERTEX SHADER (passthrough for SpriteBatch)
-//-------------------------------------
-VS_OUTPUT VS_Main(VS_INPUT input)
+float4 LE_Blur(VS_OUTPUT input, float4 pixel)
 {
-    VS_OUTPUT output;
-    // SpriteBatch already gives us clip‐space positions, so just pass through:
-    output.Position = input.Position;
-    output.Color = input.Color;
-    output.TexCoord = input.TexCoord;
-    return output;
+    float2 texOffset;
+    texOffset.x = 1.0 / 1920.0;
+    texOffset.y = 1.0 / 1080.0;
+    
+    // Fixed array initialization
+    float weight[5];
+    weight[0] = 0.227027;
+    weight[1] = 0.1945946;
+    weight[2] = 0.1216216;
+    weight[3] = 0.054054;
+    weight[4] = 0.016216;
+    
+    // Initialize result with the center pixel
+    float3 result = pixel.rgb * weight[0];
+    float totalWeight = weight[0];
+    
+    
+        for (int i = 0; i < 5; i++)
+        {
+        // Horizontal blur
+            float2 offsetH = float2(texOffset.x * i, 0.0);
+            result += PrevRendered.Sample(PrevRenderedSampler, input.TexCoord + offsetH).rgb * weight[i];
+            result += PrevRendered.Sample(PrevRenderedSampler, input.TexCoord - offsetH).rgb * weight[i];
+        
+        // Vertical blur
+            float2 offsetV = float2(0.0, texOffset.y * i);
+            result += PrevRendered.Sample(PrevRenderedSampler, input.TexCoord + offsetV).rgb * weight[i];
+            result += PrevRendered.Sample(PrevRenderedSampler, input.TexCoord - offsetV).rgb * weight[i];
+        
+            totalWeight += weight[i] * 4.0;
+        }
+    
+        
+    
+    // Normalize the result
+    result /= totalWeight;
+    
+    return float4(result, pixel.a);
 }
 
 //-------------------------------------
-//   PIXEL SHADER (just copies the texture for now)
+//   PIXEL SHADER
 //-------------------------------------
 float4 PS_Main(VS_OUTPUT input) : SV_TARGET
 {
-    // Sample the “PrevRendered” render‐target
-    float4 col = PrevRendered.Sample(PrevRenderedSampler, input.TexCoord);
-
-    // Multiply by a tint (use this later when you do bloom‐brightening)
-    col.rgb *= BrightnessTint.rgb;
-    return col;
+    float4 pixelColor = PrevRendered.Sample(PrevRenderedSampler, input.TexCoord);
+    float4 resultPixel;
+    
+    float pixelAVG = (pixelColor.r + pixelColor.g + pixelColor.b) / 3.0;
+    
+    if (pixelAVG >= 0.8)
+    {
+        resultPixel = pixelColor;
+        resultPixel = LE_Blur(input, resultPixel);
+    }
+    else
+    {
+        resultPixel = float4(0, 0, 0, 1);
+    }
+    
+    resultPixel = resultPixel + pixelColor;
+    return pixelColor;
 }
 
 //-------------------------------------
@@ -72,7 +99,6 @@ technique PostProcess
 {
     pass P0
     {
-        VertexShader = compile VS_SHADERMODEL VS_Main();
         PixelShader = compile PS_SHADERMODEL PS_Main();
     }
 }

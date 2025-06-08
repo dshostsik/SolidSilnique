@@ -149,6 +149,7 @@ namespace SolidSilnique.Core
         {
             if (_sceneRenderTarget == null)
             {
+	            Console.WriteLine("Asmogoldus");
                 _sceneRenderTarget = new RenderTarget2D(
                     graphics,
                     1920, 1080,
@@ -156,7 +157,18 @@ namespace SolidSilnique.Core
                     SurfaceFormat.Color,
                     DepthFormat.Depth24);
             }
+            
+        
+            // Debug information about the shader
+            Console.WriteLine("Shader loaded successfully!");
+            Console.WriteLine($"Number of parameters: {_postProcessEffect.Parameters.Count}");
+            Console.WriteLine("Available parameters:");
+            foreach (var param in _postProcessEffect.Parameters)
+            {
+	            Console.WriteLine($"- {param.Name} (Type: {param.ParameterType})");
+            }
 
+            Console.WriteLine("\nAvailable techniques:");
             graphics.SetRenderTarget(_sceneRenderTarget);
             graphics.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
 
@@ -293,24 +305,30 @@ namespace SolidSilnique.Core
             UiRenderer.End();
             var vp = graphics.Viewport;
             graphics.SetRenderTarget(null);
-             graphics.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
+            graphics.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
+           
+            _postProcessEffect.Parameters["PrevRenderedSampler+PrevRendered"].SetValue(_sceneRenderTarget);
+           
+            
+            
+// Begin SpriteBatch with the post-processing shader
+            _postSpriteBatch.Begin(
+	            SpriteSortMode.Immediate,
+	            BlendState.Opaque,
+	            SamplerState.LinearClamp,
+	            DepthStencilState.None,
+	            RasterizerState.CullNone,
+	            PostProcessShader.Effect
+            );
 
-            //PostProcessShader.Effect.Parameters["PrevRendered"]?.SetValue(_sceneRenderTarget);
-            //PostProcessShader.Effect.Parameters["BrightnessTint"]?.SetValue(Vector4.One);
-
-            _postSpriteBatch.Begin();
-            //     SpriteSortMode.Immediate,
-            //   BlendState.Opaque,
-            //   null, null, null,
-            //   PostProcessShader.Effect);
-
-            //var vp = graphics.Viewport;
+// Draw the scene render target
             _postSpriteBatch.Draw(
-                _sceneRenderTarget,
-                new Rectangle(0, 0, vp.Width, vp.Height),
-                Color.White);
+	            _sceneRenderTarget,
+	            new Rectangle(0, 0, vp.Width, vp.Height),
+	            Color.White
+            );
+
             _postSpriteBatch.End();
-            //graphics.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
         }
     
 		
