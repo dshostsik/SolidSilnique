@@ -209,7 +209,7 @@ namespace SolidSilnique
             _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
                 GraphicsDevice.Viewport.AspectRatio,
                 0.1f,
-                500f);
+                800f);
 
 
             testDirectionalLight = new DirectionalLight(new Vector3(1, -1, 0));

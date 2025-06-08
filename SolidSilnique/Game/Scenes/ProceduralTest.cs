@@ -120,7 +120,7 @@ class ProceduralTest : Scene
     public override void Setup()
     {
         environmentObject = new EnvironmentObject();
-        environmentObject.Generate("Map1", content, 2, 30, 3);
+        environmentObject.Generate("Map1", content, 3, 60, 3);
 
         ProceduralGrass newProc =
             new ProceduralGrass(models, textures, treeModels, treeTextures, content, environmentObject);
@@ -251,37 +251,16 @@ class ProceduralTest : Scene
 
 
 
+        
+
         GameObject Tower = new GameObject("tower");
-        Tower.transform.position = new Vector3(0,80,0);
-        Tower.transform.scale = new Vector3(20,80,20);
-        Tower.transform.rotation = new Vector3(0f, 0, 0f);
-        Tower.model = loadedModels["tower"];
-        Tower.texture = loadedTextures["eye"];
-        this.AddChild(Tower);
-
-         Tower = new GameObject("tower");
-        Tower.transform.position = new Vector3(0, 80, 512);
-        Tower.transform.scale = new Vector3(20, 80, 20);
-        Tower.transform.rotation = new Vector3(0f, 0, 0f);
-        Tower.model = loadedModels["tower"];
-        Tower.texture = loadedTextures["eye"];
-        this.AddChild(Tower);
-
-         Tower = new GameObject("tower");
-        Tower.transform.position = new Vector3(512, 80, 512);
-        Tower.transform.scale = new Vector3(20, 80, 20);
-        Tower.transform.rotation = new Vector3(0f, 0, 0f);
-        Tower.model = loadedModels["tower"];
-        Tower.texture = loadedTextures["eye"];
-        this.AddChild(Tower);
-
-         Tower = new GameObject("tower");
         Tower.transform.position = new Vector3(512, 80, 0);
         Tower.transform.scale = new Vector3(20, 80, 20);
         Tower.transform.rotation = new Vector3(0f, 0, 0f);
         Tower.model = loadedModels["tower"];
         Tower.texture = loadedTextures["eye"];
         this.AddChild(Tower);
+
 
         GameObject prevGeb = gab;
 			for (int i = 0; i < 10; i++)

@@ -315,8 +315,8 @@ namespace SolidSilnique.Core
 			int z = (int)(point.Z / cellSize);
 
 			// ogranicz tak, by mieć miejsce na x+1, z+1
-			x = Math.Clamp(x, 0, meshMap.GetLength(1) - 1);
-			z = Math.Clamp(z, 0, meshMap.GetLength(0) - 1);
+			x = Math.Clamp(x, 0, meshMap.GetLength(1) - 2);
+			z = Math.Clamp(z, 0, meshMap.GetLength(0) - 2);
 
 			float localX = (point.X % cellSize) / cellSize;
 			float localZ = (point.Z % cellSize) / cellSize;
