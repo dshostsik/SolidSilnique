@@ -78,7 +78,7 @@ float4 PS_Main(VS_OUTPUT input) : SV_TARGET
     
     float pixelAVG = (pixelColor.r + pixelColor.g + pixelColor.b) / 3.0;
     
-    if (pixelAVG >= 0.8)
+    if (pixelAVG >= 0.7)
     {
         resultPixel = pixelColor;
         resultPixel = LE_Blur(input, resultPixel);
@@ -89,7 +89,7 @@ float4 PS_Main(VS_OUTPUT input) : SV_TARGET
     }
     
     resultPixel = resultPixel + pixelColor;
-    return pixelColor;
+    return resultPixel;
 }
 
 //-------------------------------------
