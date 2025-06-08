@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using GUIRESOURCES;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core.Diagnostics;
+using SolidSilnique.Core.Animation;
+using static System.Formats.Asn1.AsnWriter;
 
 
 namespace SolidSilnique.GameContent;
@@ -260,6 +262,31 @@ class ProceduralTest : Scene
         Tower.model = loadedModels["tower"];
         Tower.texture = loadedTextures["eye"];
         this.AddChild(Tower);
+
+
+        var cube = new GameObject("AnimatedCube");
+        cube.model = loadedModels["deimos"];
+        cube.texture = loadedTextures["deimos"];
+        cube.transform.scale = new Vector3(1, 1, 1);
+
+        var clip = new AnimationClip();
+        // position: from (0,0,0) to (0,5,0) over 2s
+        clip.PositionCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(0, 0, 0)));
+        clip.PositionCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(0, 5, 0)));
+        // rotation: yaw 0→360° over 2s
+        clip.RotationCurve.AddKey(new Keyframe<Vector3>(0f, Vector3.Zero));
+        clip.RotationCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(0, 360, 0)));
+        // scale: pulse 1→2→1
+        clip.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, Vector3.One));
+        clip.ScaleCurve.AddKey(new Keyframe<Vector3>(1f, Vector3.One * 2f));
+        clip.ScaleCurve.AddKey(new Keyframe<Vector3>(2f, Vector3.One));
+
+        var animator = new AnimatorComponent(clip, loop: true);
+        cube.AddComponent(animator);
+        animator.Play();
+
+        // add to scene
+        this.AddChild(cube);
 
 
         GameObject prevGeb = gab;

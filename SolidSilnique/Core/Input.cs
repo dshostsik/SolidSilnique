@@ -49,6 +49,9 @@ namespace SolidSilnique.Core
         public event Action<string> ActionHeld;
         public event Action<MouseButton> MouseClicked;
         public event Action<float, float> MouseMoved;
+        private static readonly Point _fixedCenter = new Point(1920 / 2, 1080 / 2);
+        public bool gMode;
+        public bool move = true;
 
         public Input(Game1 game)
         {

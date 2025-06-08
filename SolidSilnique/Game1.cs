@@ -306,7 +306,7 @@ namespace SolidSilnique
             _leafSystem.LoadContent(GraphicsDevice, Content, leaftex);
 
             _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 20f, gravity: new Vector3(0, -0.2f, 0))
-            {
+            {    
                 _game = this
             };
             Texture2D leaftex2 = Content.Load<Texture2D>("Textures/leaf_diffuse");
@@ -454,15 +454,19 @@ namespace SolidSilnique
         {
             var cam = EngineManager.scene.mainCamera;
             float dt = Time.deltaTime;
-            switch (action)
+            if(_input.gMode == false)
             {
-                case "Forward": cam.move(Camera.directions.FORWARD, dt); break;
-                case "Backward": cam.move(Camera.directions.BACKWARD, dt); break;
-                case "Left": cam.move(Camera.directions.LEFT, dt); break;
-                case "Right": cam.move(Camera.directions.RIGHT, dt); break;
-                case "Up": cam.move(Camera.directions.UP, dt); break;
-                    
+                switch (action)
+                {
+                    case "Forward": cam.move(Camera.directions.FORWARD, dt); break;
+                    case "Backward": cam.move(Camera.directions.BACKWARD, dt); break;
+                    case "Left": cam.move(Camera.directions.LEFT, dt); break;
+                    case "Right": cam.move(Camera.directions.RIGHT, dt); break;
+                    case "Up": cam.move(Camera.directions.UP, dt); break;
+
+                }
             }
+            
         }
 
         private void OnMouseMoved(float dx, float dy)
