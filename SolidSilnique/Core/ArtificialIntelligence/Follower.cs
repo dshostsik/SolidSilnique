@@ -79,8 +79,8 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             get => _socialDistance;
             set
             {
-                if (null == _target) throw new TargetNotSetException("Target is null.\nMaybe you forgot to set it?");
-                if (value < _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius)
+                // if (null == _target) throw new TargetNotSetException("Target is null.\nMaybe you forgot to set it?");
+                if ((null != _target) && value < _target.GetComponent<SphereColliderComponent>().boundingSphere.Radius)
                     throw new ArgumentException(
                         "Invalid argument!\nSocial distance must be greater or equal to radius, try again!\nOtherwise you'd have caused a bug of infinite following interrupted by collisions");
                 _socialDistance = value;
