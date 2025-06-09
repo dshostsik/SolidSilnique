@@ -57,7 +57,8 @@ class ProceduralTest : Scene
         loadedModels.Add("brzewno3/brzewno", Content.Load<Model>("brzewno3/brzewno3"));
         //loadedModels.Add("drzewo/drzewo", Content.Load<Model>("drzewo/drzewo"));
         loadedModels.Add("trent", Content.Load<Model>("trent"));
-
+        loadedModels.Add("dodik", Content.Load<Model>("dodik"));
+        
         loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
         loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
         loadedTextures.Add("simpleGreen", Content.Load<Texture2D>("simpleGreen"));
@@ -88,6 +89,8 @@ class ProceduralTest : Scene
 
         loadedTextures.Add("trent/diffuse", Content.Load<Texture2D>("trent_fire/low_material_Base_color"));
         loadedTextures.Add("trent/normal", Content.Load<Texture2D>("trent_fire/low_material_Normal_DirectX"));
+        
+        loadedTextures.Add("dodik_texture", Content.Load<Texture2D>("dodik_texture"));
         //loadedTextures.Add("trent/ao", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Mixed_AO"));
         //loadedTextures.Add("trent/roughness", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Coat_roughness"));
 
@@ -191,8 +194,8 @@ class ProceduralTest : Scene
         gab.transform.position = new Vector3(250, 15, 220);
 
         gab.transform.scale = new Vector3(1f);
-        gab.model = loadedModels["cube"];
-        gab.texture = loadedTextures["gabTex"];
+        gab.model = loadedModels["dodik"];
+        //gab.texture = loadedTextures["dodik_texture"];
         //gab.normalMap = loadedTextures["gabNo"];
         //gab.roughnessMap = loadedTextures["gabRo"];
         //gab.aoMap = loadedTextures["gabAo"];
