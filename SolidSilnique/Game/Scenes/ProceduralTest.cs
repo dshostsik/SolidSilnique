@@ -263,7 +263,11 @@ class ProceduralTest : Scene
             prevGeb = gogus;
         }
 
-
+        GameObject ziutek = CreateMovableObject("ziutek", 200,  200);
+        ziutek.GetComponent<SphereColliderComponent>().boundingSphere.Radius = 2.0f;
+        //ziutek.GetComponent<Follower>().Target = gab;
+        this.AddChild(ziutek);
+        
         rhythymGui = new GUI("Content/RhythymGui.xml", content);
         EngineManager.currentGui = rhythymGui;
 
@@ -339,21 +343,24 @@ class ProceduralTest : Scene
         go.AddComponent(new DebugMoveComponent());
         go.GetComponent<DebugMoveComponent>().move = false;
         go.AddComponent(new Follower(go, 2f));
-
         return go;
     }
 
     /// <summary>
     /// Creates a simple object with a given name and position that moves.<p>Default model and textures are "deimos"</p>
     /// </summary>
-    /// <param name="name">Name of the <see cref="GameObject"/></param>
+    /// <param name="nameOfObject">Name of the <see cref="GameObject"/></param>
     /// <param name="x">X position in the world</param>
     /// <param name="z">Z position in the world</param>
     /// <returns>new <see cref="GameObject"/> that moves</returns>
-    GameObject CreateMovableObject(String name, float x, float z)
+    GameObject CreateMovableObject(String nameOfObject, float x, float z)
     {
-        GameObject go = new GameObject(name);
+        GameObject go = new GameObject(nameOfObject);
         go.transform.position = new Vector3(x, 0, z);
+        Vector3 pos = go.transform.position;
+        pos.Y = environmentObject.GetHeight(pos);
+        go.transform.position = pos;
+        
         go.model = loadedModels["deimos"];
         go.texture = loadedTextures["deimos"];
         go.AddComponent(new SphereColliderComponent(1f, false));
@@ -365,19 +372,23 @@ class ProceduralTest : Scene
     /// <summary>
     /// Creates a simple object with a given name and position that can follow another object.<p>Default model and textures are "deimos"</p>
     /// </summary>
-    /// <param name="name">Name of the <see cref="GameObject"/></param>
+    /// <param name="nameOfObject">Name of the <see cref="GameObject"/></param>
     /// <param name="x">X position in the world</param>
     /// <param name="z">Z position in the world</param>
     /// <returns>new <see cref="GameObject"/> that moves</returns>
-    GameObject CreateFollowingObject(String name, float x, float z)
+    GameObject CreateFollowingObject(String nameOfObject, float x, float z)
     {
-        GameObject go = new GameObject(name);
+        GameObject go = new GameObject(nameOfObject);
         go.transform.position = new Vector3(x, 0, z);
+        Vector3 pos = go.transform.position;
+        pos.Y = environmentObject.GetHeight(pos);
+        go.transform.position = pos;
+        go.transform.scale = new Vector3(0.75f);
         go.model = loadedModels["deimos"];
         go.texture = loadedTextures["deimos"];
         go.AddComponent(new SphereColliderComponent(1f, false));
         go.AddComponent(new DebugMoveComponent());
-        go.GetComponent<DebugMoveComponent>().move = false;
+        //go.GetComponent<DebugMoveComponent>().move = false;
         go.AddComponent(new Follower(go, 2f));
         return go;
     }
@@ -385,16 +396,19 @@ class ProceduralTest : Scene
     /// <summary>
     /// Creates a simple object with a given name and position that can follow another object.<p>Default model and textures are "deimos"</p>
     /// </summary>
-    /// <param name="name">Name of the <see cref="GameObject"/></param>
+    /// <param name="nameOfObject">Name of the <see cref="GameObject"/></param>
     /// <param name="x">X position in the world</param>
     /// <param name="z">Z position in the world</param>
     /// <returns>new <see cref="GameObject"/> that moves</returns>
-    GameObject CreateStaticObject(String name, float x, float z)
+    GameObject CreateStaticObject(String nameOfObject, float x, float z)
     {
-        GameObject go = new GameObject(name);
-        go.transform.position = new Vector3(x, 0, z);
+        GameObject go = new GameObject(nameOfObject);
         go.model = loadedModels["deimos"];
         go.texture = loadedTextures["deimos"];
+        go.transform.position = new Vector3(x, 0, z);
+        Vector3 pos = go.transform.position;
+        pos.Y = environmentObject.GetHeight(pos);
+        go.transform.position = pos;
         go.AddComponent(new SphereColliderComponent(1f, true));
         return go;
     }
