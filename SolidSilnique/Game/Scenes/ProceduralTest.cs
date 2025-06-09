@@ -353,7 +353,7 @@ class ProceduralTest : Scene
     /// <param name="x">X position in the world</param>
     /// <param name="z">Z position in the world</param>
     /// <returns>new <see cref="GameObject"/> that moves</returns>
-    GameObject CreateMovableObject(String nameOfObject, float x, float z)
+    private GameObject CreateMovableObject(string nameOfObject, float x, float z)
     {
         GameObject go = new GameObject(nameOfObject);
         go.transform.position = new Vector3(x, 0, z);
@@ -376,7 +376,7 @@ class ProceduralTest : Scene
     /// <param name="x">X position in the world</param>
     /// <param name="z">Z position in the world</param>
     /// <returns>new <see cref="GameObject"/> that follows another object, WHICH SHOULD BE SET LATER</returns>
-    GameObject CreateFollowingObject(String nameOfObject, float x, float z)
+    private GameObject CreateFollowingObject(string nameOfObject, float x, float z)
     {
         GameObject go = new GameObject(nameOfObject);
         go.transform.position = new Vector3(x, 0, z);
@@ -400,7 +400,7 @@ class ProceduralTest : Scene
     /// <param name="x">X position in the world</param>
     /// <param name="z">Z position in the world</param>
     /// <returns>new <see cref="GameObject"/> that doesn't move</returns>
-    GameObject CreateStaticObject(String nameOfObject, float x, float z)
+    private GameObject CreateStaticObject(string nameOfObject, float x, float z)
     {
         GameObject go = new GameObject(nameOfObject);
         go.model = loadedModels["deimos"];
