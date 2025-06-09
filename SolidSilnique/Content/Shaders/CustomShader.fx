@@ -85,7 +85,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     float3 B = cross(N, T);
     output.TBN = float3x3(T, B, N);
     
-    output.globalUVs = float2(input.aPos.x, input.aPos.z) / 768.0f;
+    output.globalUVs = float2(input.aPos.x, input.aPos.z) / 7680.0f;
     
     return output;
 }
