@@ -81,6 +81,7 @@ namespace SolidSilnique.Core
             EvaluateHeldActions();
             EvaluateMouseClicks();
             EvaluateMouseMovement();
+            EvaluateGamePadLook(gameTime);
         }
 
         private void EvaluateActions()
@@ -123,8 +124,8 @@ namespace SolidSilnique.Core
             // Try to cast to Game1 so we can check its mouseFree flag
             var game1 = _game as Game1;
 
-            if (game1 != null && game1.mouseFree)
-                return;
+            if (EngineManager.mouseFree)
+              return;
 
             // Always compute delta relative to window center
             var center = _game.Window.ClientBounds.Center;
@@ -182,7 +183,7 @@ namespace SolidSilnique.Core
             // Up = Space or GamePad
             var up = new ActionBinding();
             up.Keys.Add(Keys.Space);
-            up.Buttons.Add(Buttons.A);
+            //up.Buttons.Add(Buttons.A);
             Add("Up", up);
 
             // Shoot = F or RightTrigger
@@ -191,19 +192,44 @@ namespace SolidSilnique.Core
             shoot.Conditions.Add((kb, gp) => gp.Triggers.Right > 0.1f);
             Add("Shoot", shoot);
 
+            var Mount = new ActionBinding();
+            Mount.Keys.Add(Keys.F5);
+            Mount.Buttons.Add(Buttons.Start);
+            Add("SwitchCamera", Mount);
+
             // Toggles and camera switch
             Add("ToggleCulling", new ActionBinding { Keys = { Keys.P } });
             Add("ToggleWireframe", new ActionBinding { Keys = { Keys.B } });
             Add("ToggleCelShadingOn", new ActionBinding { Keys = { Keys.F2 } });
             Add("ToggleCelShadingOff", new ActionBinding { Keys = { Keys.F1 } });
-            Add("SwitchCamera", new ActionBinding { Keys = { Keys.F5 } });
+            
             Add("ToggleMouseFree", new ActionBinding { Keys = { Keys.CapsLock } });
+            
         }
 
         /// <summary>Returns whether an action is currently down (for polling if you prefer).</summary>
         public bool IsActionDown(string action) =>
             _bindings.ContainsKey(action) &&
             _bindings[action].IsPressed(_kbState, _gpState);
-    } 
+        private void EvaluateGamePadLook(GameTime gameTime)
+    {
+        if (!_gpState.IsConnected) return;
+        if (EngineManager.mouseFree)      return;
+
+       // deadzone check
+        const float dead = 0.2f;
+        float rx = _gpState.ThumbSticks.Right.X;
+        float ry = _gpState.ThumbSticks.Right.Y;
+        if (Math.Abs(rx) < dead && Math.Abs(ry) < dead) return;
+
+        // convert to pixels (or degrees) per frame
+        float dtMs = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+        const float sens = 0.3f; // tweak this until it's comfortable
+        float dx = rx * sens * dtMs;
+        float dy = -ry * sens * dtMs; // invert Y so up on stick looks up
+
+        MouseMoved?.Invoke(dx, dy);
+    }
+} 
 }
 
