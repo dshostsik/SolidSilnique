@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -24,6 +25,7 @@ public class BossRhythymUI
     public int combo = 0;
     bool turnedOff = false;
     KeyboardState kState = new KeyboardState();
+    private GamePadState gpState;
     ContentManager content;
     AtomicSoundTrack audio;
     SpriteBatch spriteBatch;
@@ -53,6 +55,7 @@ public class BossRhythymUI
     {
         
         kState = Keyboard.GetState();
+        gpState = GamePad.GetState(PlayerIndex.One);
         if (turnedOff)
         {
             return;
@@ -205,25 +208,25 @@ public class BossRhythymUI
 
     void readInput()
     {
-        if (kState.IsKeyDown(Keys.J))
+        if (kState.IsKeyDown(Keys.J) || gpState.IsButtonDown(Buttons.X))
         {
             buttonsPressed[1] = 1;
             accuracyPressed[1] = audio.songTime();
         }  
              
-              if  (kState.IsKeyDown(Keys.I))
+              if  (kState.IsKeyDown(Keys.I) || gpState.IsButtonDown(Buttons.Y))
              { 
                         buttonsPressed[0] = 1         ;
                 accuracyPressed[0] = audio.songTime();
             }
             
-            if (kState.IsKeyDown(Keys.K))
+            if (kState.IsKeyDown(Keys.K) || gpState.IsButtonDown(Buttons.A))
             {
                 buttonsPressed[2] = 1; 
                 accuracyPressed[2] = audio.songTime();
             }
             
-            if (kState.IsKeyDown(Keys.L))
+            if (kState.IsKeyDown(Keys.L) || gpState.IsButtonDown(Buttons.B))
             {
                 buttonsPressed[3] = 1; 
                 accuracyPressed[3] = audio.songTime();
