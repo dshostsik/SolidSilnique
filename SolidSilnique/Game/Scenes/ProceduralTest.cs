@@ -347,7 +347,7 @@ class ProceduralTest : Scene
     }
 
     /// <summary>
-    /// Creates a simple object with a given name and position that moves.<p>Default model and textures are "deimos"</p>
+    /// Creates a simple object with a given name and position that moves.<p> Default model and textures are "deimos"</p>
     /// </summary>
     /// <param name="nameOfObject">Name of the <see cref="GameObject"/></param>
     /// <param name="x">X position in the world</param>
@@ -370,12 +370,12 @@ class ProceduralTest : Scene
     }
 
     /// <summary>
-    /// Creates a simple object with a given name and position that can follow another object.<p>Default model and textures are "deimos"</p>
+    /// Creates a simple object with a given name and position that can follow another object, WHICH SHOULD BE SET LATER.<p> Default model and textures are "deimos"</p>
     /// </summary>
     /// <param name="nameOfObject">Name of the <see cref="GameObject"/></param>
     /// <param name="x">X position in the world</param>
     /// <param name="z">Z position in the world</param>
-    /// <returns>new <see cref="GameObject"/> that moves</returns>
+    /// <returns>new <see cref="GameObject"/> that follows another object, WHICH SHOULD BE SET LATER</returns>
     GameObject CreateFollowingObject(String nameOfObject, float x, float z)
     {
         GameObject go = new GameObject(nameOfObject);
@@ -394,12 +394,12 @@ class ProceduralTest : Scene
     }
 
     /// <summary>
-    /// Creates a simple object with a given name and position that can follow another object.<p>Default model and textures are "deimos"</p>
+    /// Creates a simple object with a given name and position that just stands still.<p> Default model and textures are "deimos"</p>
     /// </summary>
     /// <param name="nameOfObject">Name of the <see cref="GameObject"/></param>
     /// <param name="x">X position in the world</param>
     /// <param name="z">Z position in the world</param>
-    /// <returns>new <see cref="GameObject"/> that moves</returns>
+    /// <returns>new <see cref="GameObject"/> that doesn't move</returns>
     GameObject CreateStaticObject(String nameOfObject, float x, float z)
     {
         GameObject go = new GameObject(nameOfObject);
