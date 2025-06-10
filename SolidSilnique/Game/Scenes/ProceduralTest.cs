@@ -39,7 +39,7 @@ class ProceduralTest : Scene
     private GameObject gab;
     private GameObject enemy;
     private int _enemyHP = 100;
-    private bool _playerInsideEnemyFOV = false;
+    private bool turnedOn = false;
 
     public ProceduralTest()
     {
