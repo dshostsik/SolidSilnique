@@ -311,6 +311,18 @@
 /processorParam:TextureFormat=Compressed
 /build:cone.fbx
 
+#begin Convert_fur_to_mesh.jpg
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Convert_fur_to_mesh.jpg
+
 #begin cube.fbx
 /importer:FbxImporter
 /processor:ModelProcessor
@@ -1465,6 +1477,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/normal_map.png
+
+#begin Textures/purple.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/purple.png
 
 #begin Textures/redNote.png
 /importer:TextureImporter

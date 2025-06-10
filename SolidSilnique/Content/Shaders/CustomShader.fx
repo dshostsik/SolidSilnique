@@ -142,15 +142,20 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     float4 spotlight_specularColor[defaultLength];
     //-------------------------------------
 
+//---------TEXTURES-----------
 sampler2D texture_diffuse1;
 sampler2D texture_normal1;
 sampler2D texture_roughness1;
 sampler2D texture_ao1;
+//----------------------------
 //bool useNormalMap;
 
+//-----------FLAGS------------
 int useRoughnessMap;
 int useAOMap;
 int useNormalMap;
+//----------------------------
+
 float3 viewPos;
 
 matrix LightViewProj;
@@ -220,6 +225,10 @@ float4 blend(float4 baseTexture, sampler2D blendTexture, sampler2D maskTex, floa
 float4 MainPS(VertexShaderOutput input) : SV_TARGET
 {
     float4 textureVector = tex2D(texture_diffuse1, input.TexCoords);
+    
+    if (textureVector.a <= 0.1f) {
+        discard;
+    }
     
     if (useLayering > 0)
     {

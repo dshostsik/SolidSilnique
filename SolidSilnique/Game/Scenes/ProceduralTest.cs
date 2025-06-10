@@ -91,7 +91,7 @@ class ProceduralTest : Scene
         loadedTextures.Add("trent/diffuse", Content.Load<Texture2D>("trent_fire/low_material_Base_color"));
         loadedTextures.Add("trent/normal", Content.Load<Texture2D>("trent_fire/low_material_Normal_DirectX"));
         
-        loadedTextures.Add("dodik_texture", Content.Load<Texture2D>("dodik_texture"));
+        loadedTextures.Add("dodik_texture", Content.Load<Texture2D>("Textures/purple"));
         //loadedTextures.Add("trent/ao", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Mixed_AO"));
         //loadedTextures.Add("trent/roughness", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Coat_roughness"));
 
@@ -192,7 +192,7 @@ class ProceduralTest : Scene
 
         gab.transform.scale = new Vector3(1f);
         gab.model = loadedModels["dodik"];
-        //gab.texture = loadedTextures["dodik_texture"];
+        gab.texture = loadedTextures["dodik_texture"];
         //gab.normalMap = loadedTextures["gabNo"];
         //gab.roughnessMap = loadedTextures["gabRo"];
         //gab.aoMap = loadedTextures["gabAo"];

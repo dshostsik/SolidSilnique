@@ -62,10 +62,12 @@ namespace SolidSilnique.Core
         public static Input InputManager;
         public static bool mouseFree = false;
 
+        private static SpriteBatch UiRenderer;
 
         public static void Start()
         {
             scene.Start();
+            UiRenderer = new SpriteBatch(graphics);
             GenerateInstanceData();
         }
 
@@ -317,7 +319,7 @@ namespace SolidSilnique.Core
             }
 			DrawInstanceData();
 
-            SpriteBatch UiRenderer = new SpriteBatch(graphics);
+            
             UiRenderer.Begin();
             while(renderQueueUI.Count > 0)
             {
