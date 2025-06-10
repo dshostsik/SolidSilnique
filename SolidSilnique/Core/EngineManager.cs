@@ -59,6 +59,10 @@ namespace SolidSilnique.Core
         private static Matrix lightViewProjection;
         private static Matrix _lightProjection =  Matrix.CreateOrthographic(512 * 1.41f, 512*1.41f, -128f, 128);
 
+        public static Input InputManager;
+        public static bool mouseFree = false;
+
+
         public static void Start()
         {
             scene.Start();
@@ -69,8 +73,22 @@ namespace SolidSilnique.Core
         {
             Time.deltaTimeMs = gameTime.ElapsedGameTime.Milliseconds;
             Time.deltaTime = Time.deltaTimeMs / 1000.0f;
-
             scene.Update();
+        }
+
+        public static void InitializeInput(Game1 game)
+        {
+            InputManager = new Input(game);
+
+            // Subscribe all the handlers here instead of in Game1
+            InputManager.ActionPressed += OnActionPressed;
+            InputManager.ActionHeld += OnActionHeld;
+            InputManager.MouseMoved += OnMouseMoved;
+            InputManager.MouseClicked += OnMouseClicked;
+        }
+        public static void ProcessInput(GameTime gameTime)
+        {
+            InputManager?.Process(gameTime);
         }
 
         private static RenderTarget2D BakeStaticShadows(Shader shadowShader, LightsManagerComponent manager)
@@ -503,7 +521,70 @@ namespace SolidSilnique.Core
 
 
 		}
-	}
+        private static void OnActionPressed(string action)
+        {
+            var cam = scene.mainCamera;
+            switch (action)
+            {
+
+                case "Up": cam.move(Camera.directions.UP, Time.deltaTime); break;
+                case "Shoot": cam.cameraComponent.Shoot(); break;
+                case "ToggleCulling":
+                    useCulling = !useCulling;
+                    break;
+                case "ToggleWireframe":
+                    useWireframe = !useWireframe;
+                    break;
+                case "ToggleCelShadingOn":
+                    celShadingEnabled = true;
+                    break;
+                case "ToggleCelShadingOff":
+                    celShadingEnabled = false;
+                    break;
+                case "SwitchCamera":
+                    if (scene.TPCamera != null)
+                    {
+                        var tmp = scene.mainCamera;
+                        InputManager.gMode = !InputManager.gMode;
+                        scene.mainCamera = scene.TPCamera;
+                        scene.TPCamera = tmp;
+                    }
+                    break;
+                case "ToggleMouseFree":
+                    mouseFree = !mouseFree;
+                    break;
+            }
+        }
+
+        private static void OnActionHeld(string action)
+        {
+            var cam = scene.mainCamera;
+            float dt = Time.deltaTime;
+            if(InputManager.gMode == false)
+            {
+                switch (action)
+                {
+                    case "Forward": cam.move(Camera.directions.FORWARD, dt); break;
+                    case "Backward": cam.move(Camera.directions.BACKWARD, dt); break;
+                    case "Left": cam.move(Camera.directions.LEFT, dt); break;
+                    case "Right": cam.move(Camera.directions.RIGHT, dt); break;
+                    case "Up": cam.move(Camera.directions.UP, dt); break;
+                }
+            }
+            
+        }
+
+        private static void OnMouseMoved(float dx, float dy)
+        {
+            if (!mouseFree)
+                scene.mainCamera.mouseMovement(dx, dy, Time.deltaTimeMs);
+        }
+
+        private static void OnMouseClicked(MouseButton button)
+        {
+            // optional: handle clicks if you need to
+        }
+    }
 
             
 }

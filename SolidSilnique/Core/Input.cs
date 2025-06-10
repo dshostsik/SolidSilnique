@@ -49,6 +49,9 @@ namespace SolidSilnique.Core
         public event Action<string> ActionHeld;
         public event Action<MouseButton> MouseClicked;
         public event Action<float, float> MouseMoved;
+        private static readonly Point _fixedCenter = new Point(1920 / 2, 1080 / 2);
+        public bool gMode;
+        public bool move = true;
 
         public Input(Game1 game)
         {
@@ -78,6 +81,7 @@ namespace SolidSilnique.Core
             EvaluateHeldActions();
             EvaluateMouseClicks();
             EvaluateMouseMovement();
+            EvaluateGamePadLook(gameTime);
         }
 
         private void EvaluateActions()
@@ -117,21 +121,27 @@ namespace SolidSilnique.Core
 
         private void EvaluateMouseMovement()
         {
-            var center = _game.Window.ClientBounds.Center;
-
+            // Try to cast to Game1 so we can check its mouseFree flag
             var game1 = _game as Game1;
 
+            if (EngineManager.mouseFree)
+              return;
+
+            // Always compute delta relative to window center
+            var center = _game.Window.ClientBounds.Center;
             float dx = _msState.X - center.X;
             float dy = _msState.Y - center.Y;
-            if (dx != 0 || dy != 0)
-            {
-                MouseMoved?.Invoke(dx, dy);
-                // recenter for next delta
-                if (game1 != null && game1.mouseFree)
-                    return;
-                Mouse.SetPosition(center.X, center.Y);
 
-            }
+            // Fire the MouseMoved event even if (dx, dy) is (0,0)
+            MouseMoved?.Invoke(dx, dy);
+
+            // Recenter cursor every frame so that next frame produces a fresh delta
+            Mouse.SetPosition(center.X, center.Y);
+        }
+
+        private void EvaluatePadLook()
+        {
+
         }
 
         private void InitializeDefaultBindings()
@@ -170,10 +180,10 @@ namespace SolidSilnique.Core
             right.Conditions.Add((kb, gp) => gp.ThumbSticks.Left.X > 0.3f);
             Add("Right", right);
 
-            // Up = Space or GamePad A
+            // Up = Space or GamePad
             var up = new ActionBinding();
             up.Keys.Add(Keys.Space);
-            up.Buttons.Add(Buttons.A);
+            //up.Buttons.Add(Buttons.A);
             Add("Up", up);
 
             // Shoot = F or RightTrigger
@@ -182,19 +192,44 @@ namespace SolidSilnique.Core
             shoot.Conditions.Add((kb, gp) => gp.Triggers.Right > 0.1f);
             Add("Shoot", shoot);
 
+            var Mount = new ActionBinding();
+            Mount.Keys.Add(Keys.F5);
+            Mount.Buttons.Add(Buttons.Start);
+            Add("SwitchCamera", Mount);
+
             // Toggles and camera switch
             Add("ToggleCulling", new ActionBinding { Keys = { Keys.P } });
             Add("ToggleWireframe", new ActionBinding { Keys = { Keys.B } });
             Add("ToggleCelShadingOn", new ActionBinding { Keys = { Keys.F2 } });
             Add("ToggleCelShadingOff", new ActionBinding { Keys = { Keys.F1 } });
-            Add("SwitchCamera", new ActionBinding { Keys = { Keys.F5 } });
+            
             Add("ToggleMouseFree", new ActionBinding { Keys = { Keys.CapsLock } });
+            
         }
 
         /// <summary>Returns whether an action is currently down (for polling if you prefer).</summary>
         public bool IsActionDown(string action) =>
             _bindings.ContainsKey(action) &&
             _bindings[action].IsPressed(_kbState, _gpState);
-    } 
+        private void EvaluateGamePadLook(GameTime gameTime)
+    {
+        if (!_gpState.IsConnected) return;
+        if (EngineManager.mouseFree)      return;
+
+       // deadzone check
+        const float dead = 0.2f;
+        float rx = _gpState.ThumbSticks.Right.X;
+        float ry = _gpState.ThumbSticks.Right.Y;
+        if (Math.Abs(rx) < dead && Math.Abs(ry) < dead) return;
+
+        // convert to pixels (or degrees) per frame
+        float dtMs = (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+        const float sens = 0.3f; // tweak this until it's comfortable
+        float dx = rx * sens * dtMs;
+        float dy = -ry * sens * dtMs; // invert Y so up on stick looks up
+
+        MouseMoved?.Invoke(dx, dy);
+    }
+} 
 }
 

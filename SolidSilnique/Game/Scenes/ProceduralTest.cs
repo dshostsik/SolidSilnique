@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using GUIRESOURCES;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core.Diagnostics;
+using SolidSilnique.Core.Animation;
+using static System.Formats.Asn1.AsnWriter;
 
 
 namespace SolidSilnique.GameContent;
@@ -37,8 +39,7 @@ class ProceduralTest : Scene
     private GameObject gab;
     private GameObject enemy;
     private int _enemyHP = 100;
-    
-    private bool turnedOn = false;
+    private bool _playerInsideEnemyFOV = false;
 
     public ProceduralTest()
     {
@@ -116,14 +117,15 @@ class ProceduralTest : Scene
         treeTextures.Add(Content.Load<Texture2D>("Textures/tree1_diffuse"));
         treeTextures.Add(Content.Load<Texture2D>("Textures/tree2_diffuse"));
         //treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
-
+        loadedModels.Add("tower", Content.Load<Model>("Models/tower"));
+        loadedModels.Add("eMonster1", Content.Load<Model>("Models/monstr"));
         content = Content;
     }
 
     public override void Setup()
     {
         environmentObject = new EnvironmentObject();
-        environmentObject.Generate("Map1", content, 2, 30, 3);
+        environmentObject.Generate("Map1", content, 3, 60, 3);
 
         ProceduralGrass newProc =
             new ProceduralGrass(models, textures, treeModels, treeTextures, content, environmentObject);
@@ -154,11 +156,6 @@ class ProceduralTest : Scene
             this.AddChild(goList[a]);
         }
 
-
-        for (int i = 0; i < 5; i++)
-        {
-            AddPlanet();
-        }
 
         GameObject goTest = new GameObject("Deimos");
 
@@ -256,15 +253,54 @@ class ProceduralTest : Scene
         brow2.texture = loadedTextures["simpleBlack"];
         gab.AddChild(brow2);
 
+
+
+
+        
+
+        GameObject Tower = new GameObject("tower");
+        Tower.transform.position = new Vector3(512, 80, 0);
+        Tower.transform.scale = new Vector3(20, 80, 20);
+        Tower.transform.rotation = new Vector3(0f, 0, 0f);
+        Tower.model = loadedModels["tower"];
+        Tower.texture = loadedTextures["eye"];
+        this.AddChild(Tower);
+
+
+        var cube = new GameObject("AnimatedCube");
+        cube.model = loadedModels["deimos"];
+        cube.texture = loadedTextures["deimos"];
+        cube.transform.scale = new Vector3(1, 1, 1);
+
+        var clip = new AnimationClip();
+        // position: from (0,0,0) to (0,5,0) over 2s
+        clip.PositionCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(0, 0, 0)));
+        clip.PositionCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(0, 5, 0)));
+        // rotation: yaw 0→360° over 2s
+        clip.RotationCurve.AddKey(new Keyframe<Vector3>(0f, Vector3.Zero));
+        clip.RotationCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(0, 360, 0)));
+        // scale: pulse 1→2→1
+        clip.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, Vector3.One));
+        clip.ScaleCurve.AddKey(new Keyframe<Vector3>(1f, Vector3.One * 2f));
+        clip.ScaleCurve.AddKey(new Keyframe<Vector3>(2f, Vector3.One));
+
+        var animator = new AnimatorComponent(clip, loop: true);
+        cube.AddComponent(animator);
+        animator.Play();
+
+        // add to scene
+        this.AddChild(cube);
+
+
         GameObject prevGeb = gab;
-        for (int i = 0; i < 10; i++)
-        {
-            GameObject gogus = CreateGebus(new Vector3(150 + i * 2, 2, 150 + i * 2));
-            gogus.GetComponent<Follower>().Target = prevGeb;
-            if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
-            this.AddChild(gogus);
-            prevGeb = gogus;
-        }
+			for (int i = 0; i < 10; i++)
+			{
+				GameObject gogus = CreateGebus(new Vector3(150 + i*2, 2, 150 + i*2));
+				gogus.GetComponent<Follower>().Target = prevGeb;
+				if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
+				this.AddChild(gogus);
+				prevGeb = gogus;
+			}
 
         GameObject ziutek = CreateMovableObject("ziutek", 200,  200);
         ziutek.GetComponent<SphereColliderComponent>().boundingSphere.Radius = 2.0f;
@@ -284,28 +320,9 @@ class ProceduralTest : Scene
         enemy.normalMap = loadedTextures["trent/normal"];
         enemy.transform.position = new Vector3(100, 0, 100);
         this.AddChild(enemy);
-    }
-
-
-    void AddPlanet()
-    {
-        Random rand = new Random();
-        GameObject go = new GameObject("Deimos");
-        float randX = 0, randZ = 0;
-        while (new Vector3(randX, 0, randZ).Length() < 5)
-        {
-            randX = (float)rand.NextDouble() * 50 - 25;
-            randZ = (float)rand.NextDouble() * 50 - 25;
-        }
-
-
-        go.transform.position = new Vector3(randX, 2.5f, randZ);
-        go.model = loadedModels["deimos"];
-        go.texture = loadedTextures["deimos"];
-        go.AddComponent(new SphereColliderComponent(3.5f, true));
-
 
         this.AddChild(go);
+    
     }
 
     public override void Update()

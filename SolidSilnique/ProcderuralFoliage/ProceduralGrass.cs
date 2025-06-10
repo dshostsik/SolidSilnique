@@ -117,7 +117,7 @@ public class ProceduralGrass
             useInstancing = false,
             isStatic = true,
         };
-        float randX = i * 5, randZ = j * 5;
+        float randX = i * 3, randZ = j * 3;
 
         randX += DisNoise[i, j] / 60f;
         randZ -= DisNoise[i, j] / 60f;
@@ -159,9 +159,11 @@ public class ProceduralGrass
         if (computedNoise[i,j] < Blue)
         {
             GameObject go = new GameObject("NotTree") { 
-                isStatic = true
+                isStatic = true,
+                useInstancing = true
+
             };
-            float randX = i * 5, randZ = j * 5;
+            float randX = i * 3, randZ = j * 3;
 
             randX += DisNoise[i, j] / 60f;
             randZ -= DisNoise[i, j] / 60f;

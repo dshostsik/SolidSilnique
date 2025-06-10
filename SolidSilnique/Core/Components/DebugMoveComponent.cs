@@ -12,7 +12,12 @@ namespace SolidSilnique.Core.Components
 	{
 
 		public bool move = true;
-		public override void Start()
+
+        private const float MoveSpeed = 10f;
+        private const float RotationSpeed = 30f;
+        private const float GravitySpeed = 5f;
+
+        public override void Start()
 		{
 
 		}
@@ -20,17 +25,29 @@ namespace SolidSilnique.Core.Components
 		public override void Update()
 		{
 
-			float hor = Convert.ToInt32(Keyboard.GetState().IsKeyDown(Keys.Left)) - Convert.ToInt32(Keyboard.GetState().IsKeyDown(Keys.Right));
-			float vert = Convert.ToInt32(Keyboard.GetState().IsKeyDown(Keys.Up)) - Convert.ToInt32(Keyboard.GetState().IsKeyDown(Keys.Down));
-			if (!move)
-			{
-				hor = 0;
-				vert = 0;
-			}
-			gameObject.transform.rotation += new Vector3(0, hor, 0) * Time.deltaTime * 30;
-			gameObject.transform.position += gameObject.transform.Forward * -vert * Time.deltaTime * 10;
-			gameObject.transform.position += Vector3.Down * Time.deltaTime * 5;
+            var kb = Keyboard.GetState();
+            float hor = (kb.IsKeyDown(Keys.Left) ? -1f : 0f) + (kb.IsKeyDown(Keys.Right) ? +1f : 0f);
+            float vert = (kb.IsKeyDown(Keys.Up) ? +1f : 0f) + (kb.IsKeyDown(Keys.Down) ? -1f : 0f);
 
-		}
+            var gp = GamePad.GetState(PlayerIndex.One);
+            if (gp.IsConnected)
+            {
+                hor += gp.ThumbSticks.Left.X;
+                vert += gp.ThumbSticks.Left.Y;
+            }
+
+            if (!move)
+            {
+                hor = 0f;
+                vert = 0f;
+            }
+
+            gameObject.transform.rotation +=
+                new Vector3(0, -hor, 0) * Time.deltaTime * RotationSpeed;
+
+            gameObject.transform.position += gameObject.transform.Forward * -vert * Time.deltaTime * MoveSpeed;
+            gameObject.transform.position += Vector3.Down * Time.deltaTime * GravitySpeed;
+
+        }
 	}
 }

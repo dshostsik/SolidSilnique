@@ -18,30 +18,31 @@ public class HitNoteVisual
     {
         this.noteTime = noteTime;
         this.noteButton = noteButton;
-        positionX = 1080-64;
-        positionY = 720-64;
+        positionX = 896;
+        positionY = 476;
         noteVisible = false;
-        /*
+       
         switch (noteButton)
         {
             case 0:
-                
+                positionX = 896;
+                positionY =  -40;
                 break;
             case 1:
-                positionX = 1080;
-                positionY = 720 + 64;
+                positionX = 460-80;
+                positionY = 476;
                 break;
             case 2:
-                positionX = 1080 - 64;
-                positionY = 720 + 64;
+                positionX = 896;
+                positionY = 912+80;
                 break;
             case 3:
-                positionX = 1080 + 64;
-                positionY = 720 + 64;
+                positionX = 1332+80;
+                positionY = 476;
                 break;
                 
         }
-*/
+
         noteTexture = TextureNotes[noteButton];
     }
     
@@ -59,16 +60,16 @@ public class HitNoteVisual
             {
                 
                 case 0:
-                    positionY -=  (int)(gameTime * 1152);
+                    positionY +=  (int)(gameTime * 872);
                     break;
                 case 1:
-                    positionX -=  (int)(gameTime * 1152);
+                    positionX +=  (int)(gameTime * 872);
                     break;
                 case 2:
-                    positionY +=  (int)(gameTime * 1152);
+                    positionY -=  (int)(gameTime * 872);
                     break;
                 case 3:
-                    positionX +=  (int)(gameTime * 1152);
+                    positionX -=  (int)(gameTime * 872);
                     break;
                 
             }  
