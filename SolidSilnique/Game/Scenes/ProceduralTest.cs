@@ -122,7 +122,7 @@ class ProceduralTest : Scene
     public override void Setup()
     {
         environmentObject = new EnvironmentObject();
-        environmentObject.Generate("Map1", content, 3, 60, 3);
+        environmentObject.Generate("Map1", content, 3, 60, 3, 8);
 
         ProceduralGrass newProc =
             new ProceduralGrass(models, textures, treeModels, treeTextures, content, environmentObject);
@@ -147,7 +147,7 @@ class ProceduralTest : Scene
 
         newProc.GenerateObjects();
         List<GameObject> goList = newProc.createdObjects;
-
+		Console.WriteLine(goList.Count);
         for (int a = 0; a < goList.Count; a++)
         {
             this.AddChild(goList[a]);

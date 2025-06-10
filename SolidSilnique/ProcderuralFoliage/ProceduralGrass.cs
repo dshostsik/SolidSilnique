@@ -114,7 +114,7 @@ public class ProceduralGrass
         
         Random random = new Random();
         GameObject go = new GameObject("Tree") { 
-            useInstancing = false,
+            useInstancing = true,
             isStatic = true,
         };
         float randX = i * 3, randZ = j * 3;

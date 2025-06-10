@@ -33,8 +33,8 @@ namespace SolidSilnique.Core.Components
 			boundingSphere.Center = gameObject.transform.position;
 			if(isStatic) return;
 			CheckCollisionWithSphere();
-			CheckCollisionWithPlane();
-			CheckCollisionWithTree();
+			//CheckCollisionWithPlane();
+			//CheckCollisionWithTree();
 			CheckCollisionWithEnviro();
 		}
 
