@@ -1,5 +1,4 @@
-
-//-------------------------------------
+﻿//-------------------------------------
 // Semantic macros for XNA/MonoGame
 //-------------------------------------
 #if OPENGL
@@ -17,6 +16,8 @@
 //-------------------------------------
 Texture2D PrevRendered;
 sampler PrevRenderedSampler;
+Texture2D PrevRenderedColor;
+sampler PrevRenderedSamplerColor;
 
 // A simple tint (set to float4(1,1,1,1) from C# if you don't want any change)
 
@@ -54,13 +55,13 @@ float4 LE_Blur(VS_OUTPUT input, float4 pixel)
         {
         // Horizontal blur
             float2 offsetH = float2(texOffset.x * i, 0.0);
-            result += PrevRendered.Sample(PrevRenderedSampler, input.TexCoord + offsetH).rgb * weight[i];
-            result += PrevRendered.Sample(PrevRenderedSampler, input.TexCoord - offsetH).rgb * weight[i];
+            result += PrevRenderedColor.Sample(PrevRenderedSamplerColor, input.TexCoord + offsetH).rgb * weight[i];
+            result += PrevRenderedColor.Sample(PrevRenderedSamplerColor, input.TexCoord - offsetH).rgb * weight[i];
         
         // Vertical blur
             float2 offsetV = float2(0.0, texOffset.y * i);
-            result += PrevRendered.Sample(PrevRenderedSampler, input.TexCoord + offsetV).rgb * weight[i];
-            result += PrevRendered.Sample(PrevRenderedSampler, input.TexCoord - offsetV).rgb * weight[i];
+            result += PrevRenderedColor.Sample(PrevRenderedSamplerColor, input.TexCoord + offsetV).rgb * weight[i];
+            result += PrevRenderedColor.Sample(PrevRenderedSamplerColor, input.TexCoord - offsetV).rgb * weight[i];
         
             totalWeight += weight[i] * 4.0;
         }
@@ -81,18 +82,9 @@ float4 PS_Main(VS_OUTPUT input) : SV_TARGET
     float4 pixelColor = PrevRendered.Sample(PrevRenderedSampler, input.TexCoord);
     float4 resultPixel;
     
-    float pixelAVG = (pixelColor.r + pixelColor.g + pixelColor.b) / 3.0;
+    resultPixel = 
     
     
-    if (pixelAVG >= 0.7)
-        {
-            resultPixel = pixelColor;
-            
-        }
-        else
-        {
-            resultPixel = float4(0, 0, 0, 1);
-        }
         
         
         return resultPixel;

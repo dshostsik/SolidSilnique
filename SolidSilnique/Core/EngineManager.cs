@@ -304,7 +304,7 @@ namespace SolidSilnique.Core
             }
             UiRenderer.End();
             var vp = graphics.Viewport;
-            graphics.SetRenderTarget(null);
+            
             graphics.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
            
             _postProcessEffect.Parameters["PrevRenderedSampler+PrevRendered"].SetValue(_sceneRenderTarget);
@@ -320,7 +320,8 @@ namespace SolidSilnique.Core
 	            RasterizerState.CullNone,
 	            PostProcessShader.Effect
             );
-
+            graphics.SetRenderTarget(null);
+            
 // Draw the scene render target
             _postSpriteBatch.Draw(
 	            _sceneRenderTarget,
