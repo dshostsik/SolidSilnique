@@ -305,10 +305,10 @@ namespace SolidSilnique.Core
             UiRenderer.End();
             var vp = graphics.Viewport;
             
-            graphics.Clear(ClearOptions.Target, Color.Black, 1.0f, 0);
+            
            
             _postProcessEffect.Parameters["PrevRenderedSampler+PrevRendered"].SetValue(_sceneRenderTarget);
-           
+            _postProcessEffect.Parameters["PrevRenderedSamplerColor+PrevRenderedColor"].SetValue(_sceneRenderTarget);
             
             
 // Begin SpriteBatch with the post-processing shader
@@ -320,7 +320,7 @@ namespace SolidSilnique.Core
 	            RasterizerState.CullNone,
 	            PostProcessShader.Effect
             );
-            graphics.SetRenderTarget(null);
+            
             
 // Draw the scene render target
             _postSpriteBatch.Draw(
@@ -328,8 +328,34 @@ namespace SolidSilnique.Core
 	            new Rectangle(0, 0, vp.Width, vp.Height),
 	            Color.White
             );
-
+			
             _postSpriteBatch.End();
+            PostProcessShader.SwapTechnique("Bloom");
+            _postProcessEffect.Parameters["PrevRenderedSampler+PrevRendered"].SetValue(_sceneRenderTarget);
+            
+            graphics.SetRenderTarget(null);
+            
+            _postSpriteBatch.Begin(
+	            SpriteSortMode.Immediate,
+	            BlendState.Opaque,
+	            SamplerState.LinearClamp,
+	            DepthStencilState.None,
+	            RasterizerState.CullNone,
+	            PostProcessShader.Effect
+            );
+            
+            
+// Draw the scene render target
+            _postSpriteBatch.Draw(
+	            _sceneRenderTarget,
+	            new Rectangle(0, 0, vp.Width, vp.Height),
+	            Color.White
+            );
+			
+            _postSpriteBatch.End();
+            
+            
+            
         }
     
 		

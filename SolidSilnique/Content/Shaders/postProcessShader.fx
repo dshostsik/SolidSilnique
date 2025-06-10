@@ -17,7 +17,8 @@
 //-------------------------------------
 Texture2D PrevRendered;
 sampler PrevRenderedSampler;
-
+Texture2D PrevRenderedColor;
+sampler PrevRenderedSamplerColor;
 // A simple tint (set to float4(1,1,1,1) from C# if you don't want any change)
 
 struct VS_OUTPUT
@@ -84,7 +85,7 @@ float4 PS_Main(VS_OUTPUT input) : SV_TARGET
     float pixelAVG = (pixelColor.r + pixelColor.g + pixelColor.b) / 3.0;
     
     
-    if (pixelAVG >= 0.7)
+    if (pixelAVG >= 0.8)
         {
             resultPixel = pixelColor;
             
@@ -98,6 +99,20 @@ float4 PS_Main(VS_OUTPUT input) : SV_TARGET
         return resultPixel;
 }
 
+float4 Blooming(VS_OUTPUT input) : SV_TARGET
+{
+    float4 pixelColor = PrevRendered.Sample(PrevRenderedSampler, input.TexCoord);
+    float4 resultPixel;
+    
+    float pixelAVG = (pixelColor.r + pixelColor.g + pixelColor.b) / 3.0;
+    
+    pixelColor = LE_Blur(input,pixelColor);
+    
+    resultPixel = lerp(pixelColor,PrevRenderedColor.Sample(PrevRenderedSamplerColor, input.TexCoord),0.5); 
+        
+        return resultPixel;
+}
+
 //-------------------------------------
 //   TECHNIQUE FOR SPRITEBATCH
 //-------------------------------------
@@ -106,5 +121,12 @@ technique PostProcess
     pass P0
     {
         PixelShader = compile PS_SHADERMODEL PS_Main();
+    }
+}
+technique Bloom
+{
+    pass P0
+    {
+        PixelShader = compile PS_SHADERMODEL Blooming();
     }
 }
