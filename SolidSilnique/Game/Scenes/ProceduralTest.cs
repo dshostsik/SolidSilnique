@@ -338,13 +338,13 @@ class ProceduralTest : Scene
             enemy.GetComponent<Follower>().Target = gab;
         }*/
 
-        if ((EnemyReachedPlayer() || kState.IsKeyDown(Keys.M)) && !turnedOn)
+        if ((EnemyReachedPlayer() || kState.IsKeyDown(Keys.M)) && !_playerInsideEnemyFOV)
         {
             bossRhythym.Start(content, spriteBatch);
-            turnedOn = true;
+            _playerInsideEnemyFOV = true;
         }
 
-        if (turnedOn)
+        if (_playerInsideEnemyFOV)
             bossRhythym.Update();
         rhythymGui.progressBars[0].progress = bossRhythym.health;
         rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
