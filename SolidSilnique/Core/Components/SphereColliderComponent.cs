@@ -68,16 +68,23 @@ namespace SolidSilnique.Core.Components
 
 		public void CheckCollisionWithTree()
 		{
-			foreach (var instance in TreeColliderComponent.instances)
+			for (int i = -1; i <= 1; i++)
 			{
+				for (int j = -1; j <= 1; j++) {
+					var instances = TreeColliderComponent.getGridList(gameObject.transform.position + new Vector3(i * TreeColliderComponent.gridCellSize, 0, j * TreeColliderComponent.gridCellSize));
+					foreach (var instance in instances)
+					{
 
-				Vector3 sepVector = PhysicsManager.SphereToTreeCollision(this, instance.GetComponent<TreeColliderComponent>());
-				if (sepVector != Vector3.Zero)
-				{
-					gameObject.transform.position += sepVector;
-					boundingSphere.Center = gameObject.transform.position;
+						Vector3 sepVector = PhysicsManager.SphereToTreeCollision(this, instance.GetComponent<TreeColliderComponent>());
+						if (sepVector != Vector3.Zero)
+						{
+							gameObject.transform.position += sepVector;
+							boundingSphere.Center = gameObject.transform.position;
+						}
+					}
 				}
 			}
+			
 		}
 
 		public void CheckCollisionWithEnviro()
