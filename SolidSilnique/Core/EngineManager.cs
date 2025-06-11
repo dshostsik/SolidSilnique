@@ -152,7 +152,7 @@ namespace SolidSilnique.Core
         {
             if (_sceneRenderTarget == null)
             {
-	            Console.WriteLine("Asmogoldus");
+	            
                 _sceneRenderTarget = new RenderTarget2D(
                     graphics,
                     1920, 1080,
@@ -162,16 +162,7 @@ namespace SolidSilnique.Core
             }
             
         
-            // Debug information about the shader
-            Console.WriteLine("Shader loaded successfully!");
-            Console.WriteLine($"Number of parameters: {_postProcessEffect.Parameters.Count}");
-            Console.WriteLine("Available parameters:");
-            foreach (var param in _postProcessEffect.Parameters)
-            {
-	            Console.WriteLine($"- {param.Name} (Type: {param.ParameterType})");
-            }
-
-            Console.WriteLine("\nAvailable techniques:");
+            
             graphics.SetRenderTarget(_sceneRenderTarget);
             graphics.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
 
@@ -309,18 +300,7 @@ namespace SolidSilnique.Core
                 scene.environmentObject.Draw(_frustum);
             DrawInstanceData();
 
-            var UiRenderer = new SpriteBatch(graphics);
-            UiRenderer.Begin();
-            while (renderQueueUI.Count > 0)
-            {
-                var element = renderQueueUI.Dequeue();
-                UiRenderer.Draw(element.Item1, element.Item2, element.Item3);
-            }
-            if (currentGui != null)
-            {
-                currentGui.Draw(UiRenderer);
-            }
-            UiRenderer.End();
+           
             var vp = graphics.Viewport;
             
             
@@ -329,7 +309,7 @@ namespace SolidSilnique.Core
             _postProcessEffect.Parameters["PrevRenderedSamplerColor+PrevRenderedColor"].SetValue(_sceneRenderTarget);
             
             
-// Begin SpriteBatch with the post-processing shader
+
             _postSpriteBatch.Begin(
 	            SpriteSortMode.Immediate,
 	            BlendState.Opaque,
@@ -340,7 +320,7 @@ namespace SolidSilnique.Core
             );
             
             
-// Draw the scene render target
+
             _postSpriteBatch.Draw(
 	            _sceneRenderTarget,
 	            new Rectangle(0, 0, vp.Width, vp.Height),
@@ -363,7 +343,7 @@ namespace SolidSilnique.Core
             );
             
             
-// Draw the scene render target
+
             _postSpriteBatch.Draw(
 	            _sceneRenderTarget,
 	            new Rectangle(0, 0, vp.Width, vp.Height),
@@ -372,7 +352,18 @@ namespace SolidSilnique.Core
 			
             _postSpriteBatch.End();
             
-            
+            var UiRenderer = new SpriteBatch(graphics);
+            UiRenderer.Begin();
+            while (renderQueueUI.Count > 0)
+            {
+	            var element = renderQueueUI.Dequeue();
+	            UiRenderer.Draw(element.Item1, element.Item2, element.Item3);
+            }
+            if (currentGui != null)
+            {
+	            currentGui.Draw(UiRenderer);
+            }
+            UiRenderer.End();
             
         }
     

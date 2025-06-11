@@ -33,7 +33,7 @@ float4 LE_Blur(VS_OUTPUT input, float4 pixel)
     texOffset.x = 1.0 / 1920.0;
     texOffset.y = 1.0 / 1080.0;
     
-    // Fixed array initialization
+    
     float weight[10];
     weight[0] = 0.198596;
     weight[1] = 0.175713;
@@ -46,7 +46,7 @@ float4 LE_Blur(VS_OUTPUT input, float4 pixel)
     weight[8] = 0.000079;
     weight[9] = 0.000010;
     
-    // Initialize result with the center pixel
+    
     float3 result = pixel.rgb * weight[0];
     float totalWeight = weight[0];
     
@@ -68,7 +68,7 @@ float4 LE_Blur(VS_OUTPUT input, float4 pixel)
     
         
     
-    // Normalize the result
+    
     result /= totalWeight;
     
     return float4(result, pixel.a);

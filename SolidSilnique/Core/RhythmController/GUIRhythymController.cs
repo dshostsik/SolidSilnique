@@ -14,10 +14,10 @@ public class GUIRhythymController
     public GUIRhythymController(List<Note> notesList,ContentManager contentManager)
     {
         
-        textures.Add(contentManager.Load<Texture2D>("Textures/redNote"));
-        textures.Add(contentManager.Load<Texture2D>("Textures/blueNote"));
-        textures.Add(contentManager.Load<Texture2D>("Textures/yellowNote"));
-        textures.Add(contentManager.Load<Texture2D>("Textures/violetNote"));
+        textures.Add(contentManager.Load<Texture2D>("Textures/note"));
+        textures.Add(contentManager.Load<Texture2D>("Textures/note"));
+        textures.Add(contentManager.Load<Texture2D>("Textures/note"));
+        textures.Add(contentManager.Load<Texture2D>("Textures/note"));
         for (int i = 0; i < notesList.Count; i++)
         {
             hitNoteVisuals.Add(new HitNoteVisual((float)notesList[i].Time, notesList[i].Button,textures));

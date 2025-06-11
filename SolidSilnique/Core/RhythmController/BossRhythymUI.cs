@@ -13,7 +13,6 @@ using static NotesLoader;
 public class BossRhythymUI
 {
     float offset = 0.32f;
-    private Stack<int> buttons = new Stack<int>();
     private List<float> accuracy = new List<float>();
     private List<Note> loadedNotes = new List<Note>();
     private List<float> offsets = new List<float>();
@@ -38,6 +37,10 @@ public class BossRhythymUI
         textures.Add(content.Load<Texture2D>("Textures/BlueNoteActive"));
         textures.Add(content.Load<Texture2D>("Textures/YellowNoteActive"));
         textures.Add(content.Load<Texture2D>("Textures/GreenNoteActive"));
+        textures.Add(content.Load<Texture2D>("Textures/RedActive"));
+        textures.Add(content.Load<Texture2D>("Textures/BlueActive"));
+        textures.Add(content.Load<Texture2D>("Textures/YellowActive"));
+        textures.Add(content.Load<Texture2D>("Textures/GreenActive"));
         
         audio = new AtomicSoundTrack("master house",
             content, 0.1f);
@@ -57,11 +60,9 @@ public class BossRhythymUI
         {
             return;
         }
+
         songTime += Time.deltaTime;
-        if (audio.songTime() < 0)
-        {
-            Console.WriteLine("o kurwa");
-        }
+        
         
         visuals.updateGUIRhythym(loadedNotes,buttonsPressed,songTime);
         visuals.drawNotes(spriteBatch);
@@ -71,12 +72,14 @@ public class BossRhythymUI
         Color[] colors = new Color[2];
         colors[0] = Color.Black;
         colors[1] = Color.White;
+        
+        
         //EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[0], new Vector2(896, 476), colors[buttonsPressed[0]])); // I
         
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[0], new Vector2(896, 476-80), colors[buttonsPressed[0]])); // I
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[1], new Vector2(896-80, 476), colors[buttonsPressed[1]])); // <
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[2], new Vector2(896, 476+80), colors[buttonsPressed[2]])); // K
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(896+80, 476), colors[buttonsPressed[3]])); // >
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[buttonsPressed[0] * 4+0], new Vector2(896, 476-80 + 32), Color.White)); // I
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[buttonsPressed[1] * 4+1], new Vector2(896-80 + 32, 476), Color.White)); // <
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[buttonsPressed[2] * 4+2], new Vector2(896, 476+80 - 32), Color.White)); // K
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[buttonsPressed[3] * 4+3], new Vector2(896+80 - 32, 476), Color.White)); // >
         
         if (CheckNotZero(buttonsPressed) > 0)
         {
@@ -132,23 +135,23 @@ public class BossRhythymUI
         int limit = 4;
         if (loadedNotes.Count < 4)
         {
-            Console.WriteLine(loadedNotes.Count);
+            
             limit = loadedNotes.Count;
         }
         for (int i = 0; i < limit; i++)
         {
             
             
-            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time -3.5) < 2f)
+            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time-0.8) < 1.2f)
             {
                 offsets.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time));
-                
-                accuracy.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
-                EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(1300, 720-64), Color.White));
-                
                 Console.WriteLine(songTime - loadedNotes[i].Time);
+                accuracy.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
+                
+                
+                
                 Console.WriteLine(loadedNotes[i].Button);
-                Console.WriteLine("przerwa");
+                
                 
                 combo++;
                 if (health < 96)
