@@ -1105,6 +1105,30 @@
 /processorParam:TextureFormat=Color
 /build:Textures/BlueActive.png
 
+#begin Textures/BlueActive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/BlueActive.png
+
+#begin Textures/BlueNotActive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/BlueNotActive.png
+
 #begin Textures/blueNote.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1116,18 +1140,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/blueNote.png
-
-#begin Textures/BlueNoteActive.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/BlueNoteActive.png
 
 #begin Textures/default_ao.png
 /importer:TextureImporter
@@ -1249,7 +1261,7 @@
 /processorParam:TextureFormat=Color
 /build:Textures/GreenActive.png
 
-#begin Textures/GreenNoteActive.png
+#begin Textures/GreenActive.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -1259,7 +1271,19 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Textures/GreenNoteActive.png
+/build:Textures/GreenActive.png
+
+#begin Textures/GreenNotActive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/GreenNotActive.png
 
 #begin Textures/gun_normal.png
 /importer:TextureImporter
@@ -1321,6 +1345,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/note.png
 
+#begin Textures/Note.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/Note.png
+
 #begin Textures/RedActive.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1333,6 +1369,30 @@
 /processorParam:TextureFormat=Color
 /build:Textures/RedActive.png
 
+#begin Textures/RedActive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/RedActive.png
+
+#begin Textures/RedNotActive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/RedNotActive.png
+
 #begin Textures/redNote.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1344,18 +1404,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/redNote.png
-
-#begin Textures/RedNoteActive.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/RedNoteActive.png
 
 #begin Textures/test_ao.png
 /importer:TextureImporter
@@ -1501,6 +1549,18 @@
 /processorParam:TextureFormat=Color
 /build:Textures/YellowActive.png
 
+#begin Textures/YellowNotActive.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Textures/YellowNotActive.png
+
 #begin Textures/yellowNote.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -1512,18 +1572,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Textures/yellowNote.png
-
-#begin Textures/YellowNoteActive.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:Textures/YellowNoteActive.png
 
 #begin trawa2.fbx
 /importer:FbxImporter

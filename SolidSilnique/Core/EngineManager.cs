@@ -61,6 +61,7 @@ namespace SolidSilnique.Core
         private static Matrix _lightProjection =  Matrix.CreateOrthographic(512 * 1.41f, 512*1.41f, -128f, 128);
 
         private static RenderTarget2D _sceneRenderTarget;
+        private static RenderTarget2D tempRenderTarget;
         public static SpriteBatch _postSpriteBatch;
         public static Effect _postProcessEffect;
 
@@ -159,6 +160,13 @@ namespace SolidSilnique.Core
                     false,
                     SurfaceFormat.Color,
                     DepthFormat.Depth24);
+                
+                tempRenderTarget = new RenderTarget2D(
+	                graphics,
+	                1920, 1080,
+	                false,
+	                SurfaceFormat.Color,
+	                DepthFormat.Depth24);
             }
             
         
@@ -304,12 +312,12 @@ namespace SolidSilnique.Core
             var vp = graphics.Viewport;
             
             
-           
+            
             _postProcessEffect.Parameters["PrevRenderedSampler+PrevRendered"].SetValue(_sceneRenderTarget);
-            _postProcessEffect.Parameters["PrevRenderedSamplerColor+PrevRenderedColor"].SetValue(_sceneRenderTarget);
             
-            
-
+            PostProcessShader.SwapTechnique("PostProcess");
+            graphics.SetRenderTarget(tempRenderTarget);
+			
             _postSpriteBatch.Begin(
 	            SpriteSortMode.Immediate,
 	            BlendState.Opaque,
@@ -329,8 +337,8 @@ namespace SolidSilnique.Core
 			
             _postSpriteBatch.End();
             PostProcessShader.SwapTechnique("Bloom");
-            _postProcessEffect.Parameters["PrevRenderedSampler+PrevRendered"].SetValue(_sceneRenderTarget);
-            
+            _postProcessEffect.Parameters["PrevRenderedSampler+PrevRendered"].SetValue(tempRenderTarget);
+            _postProcessEffect.Parameters["PrevRenderedSamplerColor+PrevRenderedColor"].SetValue(_sceneRenderTarget);
             graphics.SetRenderTarget(null);
             
             _postSpriteBatch.Begin(
@@ -345,7 +353,7 @@ namespace SolidSilnique.Core
             
 
             _postSpriteBatch.Draw(
-	            _sceneRenderTarget,
+	            tempRenderTarget,
 	            new Rectangle(0, 0, vp.Width, vp.Height),
 	            Color.White
             );
@@ -364,6 +372,8 @@ namespace SolidSilnique.Core
 	            currentGui.Draw(UiRenderer);
             }
             UiRenderer.End();
+            
+           
             
         }
     
