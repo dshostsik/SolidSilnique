@@ -74,7 +74,8 @@ namespace SolidSilnique.Core
             Time.deltaTimeMs = gameTime.ElapsedGameTime.Milliseconds;
             Time.deltaTime = Time.deltaTimeMs / 1000.0f;
             scene.Update();
-        }
+			EngineManager.scene.mainCamera.UpdateCameraVectors();
+		}
 
         public static void InitializeInput(Game1 game)
         {

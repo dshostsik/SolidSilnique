@@ -287,7 +287,7 @@ namespace SolidSilnique
             EngineManager.scene.LoadContent(Content);
             EngineManager.scene.Setup();
 
-            EngineManager.scene.mainCamera.mouseMovement(0, 0, 0);
+            EngineManager.scene.mainCamera.UpdateCameraVectors();
             
 
             EngineManager.Start();

@@ -160,7 +160,7 @@ public class ProceduralGrass
         {
             GameObject go = new GameObject("NotTree") { 
                 isStatic = true,
-                useInstancing = true
+                useInstancing = false
 
 			};
             float randX = i * 3, randZ = j * 3;

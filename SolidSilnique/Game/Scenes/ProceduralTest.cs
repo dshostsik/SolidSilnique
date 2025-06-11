@@ -133,7 +133,7 @@ class ProceduralTest : Scene
         CameraComponent cam = new CameraComponent();
         cam.SetMain();
         go.AddComponent(cam);
-        //go.AddComponent(new SphereColliderComponent(3f));
+        go.AddComponent(new TPPCameraComponent());
         this.AddChild(go);
 
         go = new GameObject("ground");
@@ -199,12 +199,18 @@ class ProceduralTest : Scene
 
 			this.AddChild(gab);
 			GameObject TPcam = new GameObject("cam");
-			var tpcCamComp = new CameraComponent();
-			TPcam.AddComponent(tpcCamComp);
-			TPcam.transform.position = new Vector3(0,5, -10);
+			TPcam.AddComponent(new TPPCameraComponent());
+		    gab.AddChild(TPcam);
+
+		    GameObject TPcamCam = new GameObject("camcam");
+		    var tpcCamComp = new CameraComponent();
+		    TPcamCam.AddComponent(tpcCamComp);
+
+
+		    TPcamCam.transform.position = new Vector3(0,0, 10);
 			this.TPCamera = new Camera(tpcCamComp);
+            TPcam.AddChild(TPcamCam);
 			
-			gab.AddChild(TPcam);
 
 			GameObject eye1 = new GameObject("eye1");
 			eye1.transform.position = new Vector3(-0.25f*2, 0.209f, 0.427f * 2);
