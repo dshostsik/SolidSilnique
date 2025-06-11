@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 using GUIRESOURCES;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core.Diagnostics;
+using SolidSilnique.Core.Animation;
+using static System.Formats.Asn1.AsnWriter;
+using Microsoft.Xna.Framework.Audio;
 
 
 namespace SolidSilnique.GameContent;
@@ -120,7 +123,7 @@ class ProceduralTest : Scene
     public override void Setup()
     {
         environmentObject = new EnvironmentObject();
-        environmentObject.Generate("Map1", content, 2, 30, 3);
+        environmentObject.Generate("Map1", content, 3, 60, 3, 8);
 
         ProceduralGrass newProc =
             new ProceduralGrass(models, textures, treeModels, treeTextures, content, environmentObject);
@@ -131,7 +134,7 @@ class ProceduralTest : Scene
         CameraComponent cam = new CameraComponent();
         cam.SetMain();
         go.AddComponent(cam);
-        //go.AddComponent(new SphereColliderComponent(3f));
+        go.AddComponent(new TPPCameraComponent());
         this.AddChild(go);
 
         go = new GameObject("ground");
@@ -145,7 +148,7 @@ class ProceduralTest : Scene
 
         newProc.GenerateObjects();
         List<GameObject> goList = newProc.createdObjects;
-
+		Console.WriteLine(goList.Count);
         for (int a = 0; a < goList.Count; a++)
         {
             this.AddChild(goList[a]);
@@ -193,16 +196,22 @@ class ProceduralTest : Scene
 			//gab.aoMap = loadedTextures["gabAo"];
 			gab.AddComponent(new DebugMoveComponent());
 			gab.AddComponent(new SphereColliderComponent(1));
-			
+        
 
-			this.AddChild(gab);
+        this.AddChild(gab);
 			GameObject TPcam = new GameObject("cam");
-			var tpcCamComp = new CameraComponent();
-			TPcam.AddComponent(tpcCamComp);
-			TPcam.transform.position = new Vector3(0,5, -10);
+			TPcam.AddComponent(new TPPCameraComponent());
+		    gab.AddChild(TPcam);
+
+		    GameObject TPcamCam = new GameObject("camcam");
+		    var tpcCamComp = new CameraComponent();
+		    TPcamCam.AddComponent(tpcCamComp);
+
+
+		    TPcamCam.transform.position = new Vector3(0,0, 10);
 			this.TPCamera = new Camera(tpcCamComp);
+            TPcam.AddChild(TPcamCam);
 			
-			gab.AddChild(TPcam);
 
 			GameObject eye1 = new GameObject("eye1");
 			eye1.transform.position = new Vector3(-0.25f*2, 0.209f, 0.427f * 2);
@@ -251,46 +260,62 @@ class ProceduralTest : Scene
 
 
 
+        
+
         GameObject Tower = new GameObject("tower");
-        Tower.transform.position = new Vector3(0,80,0);
-        Tower.transform.scale = new Vector3(20,80,20);
-        Tower.transform.rotation = new Vector3(0f, 0, 0f);
-        Tower.model = loadedModels["tower"];
-        Tower.texture = loadedTextures["eye"];
-        this.AddChild(Tower);
-
-         Tower = new GameObject("tower");
-        Tower.transform.position = new Vector3(0, 80, 512);
-        Tower.transform.scale = new Vector3(20, 80, 20);
-        Tower.transform.rotation = new Vector3(0f, 0, 0f);
-        Tower.model = loadedModels["tower"];
-        Tower.texture = loadedTextures["eye"];
-        this.AddChild(Tower);
-
-         Tower = new GameObject("tower");
-        Tower.transform.position = new Vector3(512, 80, 512);
-        Tower.transform.scale = new Vector3(20, 80, 20);
-        Tower.transform.rotation = new Vector3(0f, 0, 0f);
-        Tower.model = loadedModels["tower"];
-        Tower.texture = loadedTextures["eye"];
-        this.AddChild(Tower);
-
-         Tower = new GameObject("tower");
         Tower.transform.position = new Vector3(512, 80, 0);
         Tower.transform.scale = new Vector3(20, 80, 20);
         Tower.transform.rotation = new Vector3(0f, 0, 0f);
         Tower.model = loadedModels["tower"];
         Tower.texture = loadedTextures["eye"];
+        var clip1 = new AnimationClip();
+        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(512, 80, 0)));
+        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(512, 80, 0)));
+        // scale: pulse 1→2→1
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(20, 60, 20)));
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(1f, new Vector3(20, 90, 20)));
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(20, 60, 20)));
+
+        var animator1 = new AnimatorComponent(clip1, loop: true);
+
+        Tower.AddComponent(animator1);
+        animator1.Play();
         this.AddChild(Tower);
 
+
+        var cube = new GameObject("AnimatedCube");
+        cube.model = loadedModels["deimos"];
+        cube.texture = loadedTextures["deimos"];
+        cube.transform.scale = new Vector3(1, 1, 1);
+
+        var clip = new AnimationClip();
+        // position: from (0,0,0) to (0,5,0) over 2s
+        clip.PositionCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(0, 0, 0)));
+        clip.PositionCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(0, 5, 0)));
+        // rotation: yaw 0→360° over 2s
+        clip.RotationCurve.AddKey(new Keyframe<Vector3>(0f, Vector3.Zero));
+        clip.RotationCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(0, 360, 0)));
+        // scale: pulse 1→2→1
+        clip.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, Vector3.One));
+        clip.ScaleCurve.AddKey(new Keyframe<Vector3>(1f, Vector3.One * 2f));
+        clip.ScaleCurve.AddKey(new Keyframe<Vector3>(2f, Vector3.One));
+
+        var animator = new AnimatorComponent(clip, loop: true);
+        cube.AddComponent(animator);
+        animator.Play();
+
+        // add to scene
+        this.AddChild(cube);
+
+
         GameObject prevGeb = gab;
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 3; i++)
 			{
-				GameObject gogus = CreateGebus(new Vector3(150 + i*2, 2, 150 + i*2));
-				gogus.GetComponent<Follower>().Target = prevGeb;
+				GameObject gogus = CreateGebus(new Vector3(250 + i*20, 80, 250 + i*20));
+				gogus.GetComponent<Follower>().Target = gab;
 				if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
 				this.AddChild(gogus);
-				prevGeb = gogus;
+				//prevGeb = gogus;
 			}
 
 
@@ -298,12 +323,12 @@ class ProceduralTest : Scene
         rhythymGui = new GUI("Content/RhythymGui.xml", content);
         EngineManager.currentGui = rhythymGui;
 
-        enemy = new GameObject("euzebiusz wiercibok");
+        /*enemy = new GameObject("euzebiusz wiercibok");
         enemy.AddComponent(new Follower(enemy, 5.0f));
         enemy.GetComponent<Follower>().gameObject = enemy;
         enemy.model = loadedModels["sphere"];
         enemy.texture = loadedTextures["deimos"];
-        this.AddChild(enemy);
+        this.AddChild(enemy);*/
 
         this.AddChild(go);
     
@@ -311,23 +336,36 @@ class ProceduralTest : Scene
 
     public override void Update()
     {
-        kState = Keyboard.GetState();
+        //kState = Keyboard.GetState();
 
-        if (SquaredDistanceBetweenEnemyAndPlayer() <
+       /* if (SquaredDistanceBetweenEnemyAndPlayer() <
             enemy.GetComponent<Follower>().SocialDistance * 3.0f)
         {
             _playerInsideEnemyFOV = true;
             enemy.GetComponent<Follower>().Target = gab;
-        }
+        }*/
 
-        if ((EnemyReachedPlayer() || kState.IsKeyDown(Keys.M)) && !turnedOn)
+        if ((Follower.enemyToFight != null && !turnedOn))
         {
+            bossRhythym.hasEnded = false;
             bossRhythym.Start(content, spriteBatch);
             turnedOn = true;
         }
 
         if (turnedOn)
+        {
             bossRhythym.Update();
+           
+        }
+
+        if (bossRhythym.hasEnded && turnedOn)
+        {
+            turnedOn = false;
+            Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
+            Follower.enemyToFight = null;
+
+        }
+
         rhythymGui.progressBars[0].progress = bossRhythym.health;
         rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
         rhythymGui.texts[1].text = bossRhythym.combo.ToString();
@@ -345,9 +383,20 @@ class ProceduralTest : Scene
         go.model = loadedModels["sphere"];
         go.texture = loadedTextures["gabTex"];
         go.AddComponent(new SphereColliderComponent(0.75f, false));
-        go.AddComponent(new DebugMoveComponent());
-        go.GetComponent<DebugMoveComponent>().move = false;
+        //go.AddComponent(new DebugMoveComponent());
+        //go.GetComponent<DebugMoveComponent>().move = false;
         go.AddComponent(new Follower(go, 2f));
+        var clip1 = new AnimationClip();
+        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0f, pos));
+        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(2f, pos));
+        // scale: pulse 1→2→1
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(0.75f)));
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(1f, new Vector3(1f)));
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(2f)));
+
+        var animator2 = new AnimatorComponent(clip1, loop: true);
+
+        go.AddComponent(animator2);
 
         return go;
     }
@@ -356,12 +405,12 @@ class ProceduralTest : Scene
 
     private float SquaredDistanceBetweenEnemyAndPlayer()
     {
-        return Vector3.DistanceSquared(enemy.transform.position, gab.transform.position);
+        return 0;// Vector3.DistanceSquared(enemy.transform.position, gab.transform.position);
     }
 
     private bool EnemyReachedPlayer()
     {
-        return SquaredDistanceBetweenEnemyAndPlayer() < enemy.GetComponent<Follower>().SocialDistance *
-            enemy.GetComponent<Follower>().SocialDistance;
+        return false;// SquaredDistanceBetweenEnemyAndPlayer() < enemy.GetComponent<Follower>().SocialDistance *
+            //enemy.GetComponent<Follower>().SocialDistance;
     }
 }

@@ -113,9 +113,9 @@ namespace SolidSilnique.Core
                 }
             }
 
-            cameraComponent.gameObject.transform.rotation = new Vector3(Pitch, -Yaw, 0);// + Right * Pitch;
+            //cameraComponent.gameObject.transform.rotation = new Vector3(Pitch, -Yaw, 0);// + Right * Pitch;
             //Console.WriteLine("Yaw: " + Yaw + " pitch: " + Pitch);
-            UpdateCameraVectors();
+            //UpdateCameraVectors();
         }
 
         public void processScroll(double yOffset)
@@ -125,7 +125,7 @@ namespace SolidSilnique.Core
             if (Zoom > 60.0f) Zoom = 60.0f;
         }
 
-        private void UpdateCameraVectors()
+        public void UpdateCameraVectors()
         {
             Vector3 front;
             front.X = MathF.Cos(MathHelper.ToRadians(Yaw)) * MathF.Cos(MathHelper.ToRadians(Pitch));

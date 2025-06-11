@@ -22,7 +22,6 @@ namespace SolidSilnique
 
         private GUI _gui;
 
-        private Input _input;
 
         //FPS Counter
         private readonly FrameCounter counter;
@@ -215,7 +214,7 @@ namespace SolidSilnique
             _projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4,
                 GraphicsDevice.Viewport.AspectRatio,
                 0.1f,
-                500f);
+                800f);
 
 
             testDirectionalLight = new DirectionalLight(new Vector3(1, -1, 0));
@@ -261,6 +260,7 @@ namespace SolidSilnique
             EngineManager.shader = shader;
             EngineManager.scene = new ProceduralTest();
 
+            EngineManager.InitializeInput(this);
 
             _skybox = new Skybox();
             _skybox.Setup(Content, _graphics, GraphicsDevice, _projection);
@@ -269,11 +269,6 @@ namespace SolidSilnique
             EngineManager.Skybox = _skybox;
             
 
-            _input = new Input(this);
-            _input.ActionHeld += OnActionHeld;
-            _input.MouseMoved += OnMouseMoved;
-            _input.ActionPressed += OnActionPressed;   // still available
-            _input.MouseClicked += OnMouseClicked;
             base.Initialize();
         }
 
@@ -300,7 +295,7 @@ namespace SolidSilnique
             EngineManager.scene.LoadContent(Content);
             EngineManager.scene.Setup();
 
-            EngineManager.scene.mainCamera.mouseMovement(0, 0, 0);
+            EngineManager.scene.mainCamera.UpdateCameraVectors();
             
 
             EngineManager.Start();
@@ -314,7 +309,7 @@ namespace SolidSilnique
             _leafSystem.LoadContent(GraphicsDevice, Content, leaftex);
 
             _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 20f, gravity: new Vector3(0, -0.2f, 0))
-            {
+            {    
                 _game = this
             };
             Texture2D leaftex2 = Content.Load<Texture2D>("Textures/leaf_diffuse");
@@ -380,9 +375,8 @@ namespace SolidSilnique
             //testDirectionalLight.Direction = Vector3.Transform(originalVector, rotation);
 
 
-            _input.Process(gameTime);
             counter.Update(gameTime);
-
+            EngineManager.ProcessInput(gameTime);
             EngineManager.Update(gameTime);
 
             base.Update(gameTime);
@@ -428,67 +422,7 @@ namespace SolidSilnique
             base.Draw(gameTime);
         }
 
-        private void OnActionPressed(string action)
-        {
-            var cam = EngineManager.scene.mainCamera;
-            switch (action)
-            {
-                case "Forward": cam.move(Camera.directions.FORWARD, Time.deltaTime); break;
-                case "Backward": cam.move(Camera.directions.BACKWARD, Time.deltaTime); break;
-                case "Left": cam.move(Camera.directions.LEFT, Time.deltaTime); break;
-                case "Right": cam.move(Camera.directions.RIGHT, Time.deltaTime); break;
-                case "Up": cam.move(Camera.directions.UP, Time.deltaTime); break;
-                case "Shoot": cam.cameraComponent.Shoot(); break;
-                case "ToggleCulling": EngineManager.useCulling = !EngineManager.useCulling; break;
-                case "ToggleWireframe": EngineManager.useWireframe = !EngineManager.useWireframe; break;
-                case "ToggleCelShadingOn": EngineManager.celShadingEnabled = true; break;
-                case "ToggleCelShadingOff": EngineManager.celShadingEnabled = false; break;
-                case "SwitchCamera":
-                    var scene = EngineManager.scene;
-                    if (scene.TPCamera != null)
-                    {
-                        var tmp = scene.mainCamera;
-                        scene.mainCamera = scene.TPCamera;
-                        scene.TPCamera = tmp;
-                    }
-                    break;
-                case "ToggleMouseFree":
-                    mouseFree = !mouseFree;
-                    break;
-            }
-        }
-
-        private void OnActionReleased(string action)
-        {
-            // handle key-up
-        }
-
-        private void OnActionHeld(string action)
-        {
-            var cam = EngineManager.scene.mainCamera;
-            float dt = Time.deltaTime;
-            switch (action)
-            {
-                case "Forward": cam.move(Camera.directions.FORWARD, dt); break;
-                case "Backward": cam.move(Camera.directions.BACKWARD, dt); break;
-                case "Left": cam.move(Camera.directions.LEFT, dt); break;
-                case "Right": cam.move(Camera.directions.RIGHT, dt); break;
-                case "Up": cam.move(Camera.directions.UP, dt); break;
-                    
-            }
-        }
-
-        private void OnMouseMoved(float dx, float dy)
-        {
-            if(!mouseFree)
-            {
-                EngineManager.scene.mainCamera.mouseMovement(dx, dy, Time.deltaTimeMs);
-                
-            }
-            
-        }
-
-        void OnMouseClicked(MouseButton a) { }
+        
 
 	}
 }

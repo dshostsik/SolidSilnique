@@ -40,7 +40,7 @@ namespace SolidSilnique.Core
 
 		LayerMaterial[] layerMaterials;
 
-		public void Generate(string mapName, ContentManager content, float cellSize = 1, float maxHeight = 10, int layers = 1,int chunksDensity = 4)
+		public void Generate(string mapName, ContentManager content, float cellSize = 1, float maxHeight = 10, int layers = 1,int chunksDensity = 16)
 		{
 			GraphicsDevice graphics = EngineManager.graphics;
 			this.cellSize = cellSize;
@@ -192,6 +192,7 @@ namespace SolidSilnique.Core
 		}
 
 		public void Draw(BoundingFrustum frustum) {
+			
 			GraphicsDevice graphics = EngineManager.graphics;
 			Shader shader = EngineManager.shader;
 
@@ -315,8 +316,8 @@ namespace SolidSilnique.Core
 			int z = (int)(point.Z / cellSize);
 
 			// ogranicz tak, by mieć miejsce na x+1, z+1
-			x = Math.Clamp(x, 0, meshMap.GetLength(1) - 1);
-			z = Math.Clamp(z, 0, meshMap.GetLength(0) - 1);
+			x = Math.Clamp(x, 0, meshMap.GetLength(1) - 2);
+			z = Math.Clamp(z, 0, meshMap.GetLength(0) - 2);
 
 			float localX = (point.X % cellSize) / cellSize;
 			float localZ = (point.Z % cellSize) / cellSize;

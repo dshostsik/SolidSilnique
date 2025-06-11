@@ -117,7 +117,7 @@ public class ProceduralGrass
             useInstancing = true,
             isStatic = true,
         };
-        float randX = i * 5, randZ = j * 5;
+        float randX = i * 3, randZ = j * 3;
 
         randX += DisNoise[i, j] / 60f;
         randZ -= DisNoise[i, j] / 60f;
@@ -144,7 +144,7 @@ public class ProceduralGrass
         go.model = loadedTrees[randomTreeModel];
         go.AddLOD(loadedTrees[randomTreeModel], 0f);
         go.AddLOD(loadedTrees[randomTreeModel], 100f);
-        go.AddLOD(null, 1200f);
+        go.AddLOD(null, 200f);
         
         go.texture = loadedTexturesTrees[randomTreeModel];
         go.AddComponent(new TreeColliderComponent(0.6f*scaleXZ,10));
@@ -160,10 +160,10 @@ public class ProceduralGrass
         {
             GameObject go = new GameObject("NotTree") { 
                 isStatic = true,
-                useInstancing = true
+                useInstancing = false
 
-            };
-            float randX = i * 5, randZ = j * 5;
+			};
+            float randX = i * 3, randZ = j * 3;
 
             randX += DisNoise[i, j] / 60f;
             randZ -= DisNoise[i, j] / 60f;
