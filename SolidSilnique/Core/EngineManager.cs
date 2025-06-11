@@ -64,6 +64,9 @@ namespace SolidSilnique.Core
         public static SpriteBatch _postSpriteBatch;
         public static Effect _postProcessEffect;
 
+        public static GraphicsDeviceManager GraphicsManager;
+        public static Skybox Skybox;
+
         public static void Start()
         {
             scene.Start();
@@ -172,6 +175,21 @@ namespace SolidSilnique.Core
             graphics.SetRenderTarget(_sceneRenderTarget);
             graphics.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
 
+            if (Skybox != null)
+                    {
+               var skyView = view;
+                skyView.Translation = Vector3.Zero;
+                var prevDepth = graphics.DepthStencilState;
+                graphics.DepthStencilState = DepthStencilState.None;
+                graphics.RasterizerState = RasterizerState.CullNone;
+
+
+                Skybox.Draw(GraphicsManager, view);
+
+                graphics.DepthStencilState = prevDepth;
+            }
+            graphics.DepthStencilState = DepthStencilState.Default;
+            graphics.RasterizerState = RasterizerState.CullCounterClockwise;
             scene.Draw();
 
             if (_iterationsCounter < 1)

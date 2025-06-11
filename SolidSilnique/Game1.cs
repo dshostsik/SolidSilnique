@@ -260,11 +260,13 @@ namespace SolidSilnique
             EngineManager.graphics = GraphicsDevice;
             EngineManager.shader = shader;
             EngineManager.scene = new ProceduralTest();
-            
+
 
             _skybox = new Skybox();
             _skybox.Setup(Content, _graphics, GraphicsDevice, _projection);
 
+            EngineManager.GraphicsManager = _graphics;
+            EngineManager.Skybox = _skybox;
             
 
             _input = new Input(this);
@@ -394,7 +396,7 @@ namespace SolidSilnique
             GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
             GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-            _skybox.Draw(_graphics, _view);
+            //_skybox.Draw(_graphics, _view);
 
             GraphicsDevice.DepthStencilState = DepthStencilState.Default;
             GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
@@ -408,7 +410,9 @@ namespace SolidSilnique
             //if (useCulling)
             //PerformCulledDraw();
             //else
+
             EngineManager.Draw(shadowShader, _view, _projection, manager,postShader);
+
 
             float t = (float)gameTime.TotalGameTime.TotalSeconds;
             _leafSystem.Draw(GraphicsDevice, _view, _projection, t);
