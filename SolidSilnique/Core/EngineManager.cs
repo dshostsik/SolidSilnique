@@ -248,6 +248,7 @@ namespace SolidSilnique.Core
                     
                     for (int i = 0; i < go.model.Meshes.Count; i++)
                     {
+                        var mesh = go.model.Meshes[i];
                         if (useCulling)
                         {
                             var sphere = mesh.BoundingSphere.Transform(model);
