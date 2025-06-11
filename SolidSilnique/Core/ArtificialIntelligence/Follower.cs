@@ -160,6 +160,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// </summary>
         public override void Update()
         {
+            gameObject.transform.position += Vector3.Down * Time.deltaTime * 9.81f;
             switch (state)
             {
                 case AIState.HOSTILE_PATROL:
@@ -187,7 +188,6 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         public void PatrolUpdate()
         {
 
-            gameObject.transform.position += Vector3.Down * Time.deltaTime * 9.81f;
 
             patrolTimeToChange += Time.deltaTime;
             if (patrolTimeToChange >= patrolTimer)
