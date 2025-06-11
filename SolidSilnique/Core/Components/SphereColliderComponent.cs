@@ -34,7 +34,7 @@ namespace SolidSilnique.Core.Components
 			if(isStatic) return;
 			CheckCollisionWithSphere();
 			//CheckCollisionWithPlane();
-			//CheckCollisionWithTree();
+			CheckCollisionWithTree();
 			CheckCollisionWithEnviro();
 		}
 
