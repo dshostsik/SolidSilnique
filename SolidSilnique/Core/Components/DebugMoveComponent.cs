@@ -14,7 +14,7 @@ namespace SolidSilnique.Core.Components
         public bool move = true;
 
         private const float MoveSpeed = 10f;
-        private const float RotationSpeed = 30f;
+        private const float RotationSpeed = 60f;
         private const float GravitySpeed = 5f;
 
         private int left, right, forward, backward = 0;

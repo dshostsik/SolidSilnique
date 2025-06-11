@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core.Diagnostics;
 using SolidSilnique.Core.Animation;
 using static System.Formats.Asn1.AsnWriter;
+using Microsoft.Xna.Framework.Audio;
 
 
 namespace SolidSilnique.GameContent;
@@ -195,9 +196,9 @@ class ProceduralTest : Scene
 			//gab.aoMap = loadedTextures["gabAo"];
 			gab.AddComponent(new DebugMoveComponent());
 			gab.AddComponent(new SphereColliderComponent(1));
-			
+        
 
-			this.AddChild(gab);
+        this.AddChild(gab);
 			GameObject TPcam = new GameObject("cam");
 			TPcam.AddComponent(new TPPCameraComponent());
 		    gab.AddChild(TPcam);
@@ -267,6 +268,18 @@ class ProceduralTest : Scene
         Tower.transform.rotation = new Vector3(0f, 0, 0f);
         Tower.model = loadedModels["tower"];
         Tower.texture = loadedTextures["eye"];
+        var clip1 = new AnimationClip();
+        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(512, 80, 0)));
+        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(512, 80, 0)));
+        // scale: pulse 1→2→1
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(20, 60, 20)));
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(1f, new Vector3(20, 90, 20)));
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(20, 60, 20)));
+
+        var animator1 = new AnimatorComponent(clip1, loop: true);
+
+        Tower.AddComponent(animator1);
+        animator1.Play();
         this.AddChild(Tower);
 
 
@@ -323,7 +336,7 @@ class ProceduralTest : Scene
 
     public override void Update()
     {
-        kState = Keyboard.GetState();
+        //kState = Keyboard.GetState();
 
        /* if (SquaredDistanceBetweenEnemyAndPlayer() <
             enemy.GetComponent<Follower>().SocialDistance * 3.0f)
@@ -332,14 +345,27 @@ class ProceduralTest : Scene
             enemy.GetComponent<Follower>().Target = gab;
         }*/
 
-        if ((EnemyReachedPlayer() || kState.IsKeyDown(Keys.M)) && !turnedOn)
+        if ((Follower.enemyToFight != null && !turnedOn))
         {
+            bossRhythym.hasEnded = false;
             bossRhythym.Start(content, spriteBatch);
             turnedOn = true;
         }
 
         if (turnedOn)
+        {
             bossRhythym.Update();
+           
+        }
+
+        if (bossRhythym.hasEnded && turnedOn)
+        {
+            turnedOn = false;
+            Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
+            Follower.enemyToFight = null;
+
+        }
+
         rhythymGui.progressBars[0].progress = bossRhythym.health;
         rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
         rhythymGui.texts[1].text = bossRhythym.combo.ToString();
@@ -360,6 +386,17 @@ class ProceduralTest : Scene
         //go.AddComponent(new DebugMoveComponent());
         //go.GetComponent<DebugMoveComponent>().move = false;
         go.AddComponent(new Follower(go, 2f));
+        var clip1 = new AnimationClip();
+        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0f, pos));
+        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(2f, pos));
+        // scale: pulse 1→2→1
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(0.75f)));
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(1f, new Vector3(1f)));
+        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(2f)));
+
+        var animator2 = new AnimatorComponent(clip1, loop: true);
+
+        go.AddComponent(animator2);
 
         return go;
     }
