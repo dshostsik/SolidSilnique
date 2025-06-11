@@ -290,13 +290,13 @@ class ProceduralTest : Scene
 
 
         GameObject prevGeb = gab;
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 3; i++)
 			{
-				GameObject gogus = CreateGebus(new Vector3(150 + i*2, 2, 150 + i*2));
-				gogus.GetComponent<Follower>().Target = prevGeb;
+				GameObject gogus = CreateGebus(new Vector3(250 + i*20, 80, 250 + i*20));
+				gogus.GetComponent<Follower>().Target = gab;
 				if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
 				this.AddChild(gogus);
-				prevGeb = gogus;
+				//prevGeb = gogus;
 			}
 
 
@@ -304,12 +304,12 @@ class ProceduralTest : Scene
         rhythymGui = new GUI("Content/RhythymGui.xml", content);
         EngineManager.currentGui = rhythymGui;
 
-        enemy = new GameObject("euzebiusz wiercibok");
+        /*enemy = new GameObject("euzebiusz wiercibok");
         enemy.AddComponent(new Follower(enemy, 5.0f));
         enemy.GetComponent<Follower>().gameObject = enemy;
         enemy.model = loadedModels["sphere"];
         enemy.texture = loadedTextures["deimos"];
-        this.AddChild(enemy);
+        this.AddChild(enemy);*/
 
         this.AddChild(go);
     
@@ -319,12 +319,12 @@ class ProceduralTest : Scene
     {
         kState = Keyboard.GetState();
 
-        if (SquaredDistanceBetweenEnemyAndPlayer() <
+       /* if (SquaredDistanceBetweenEnemyAndPlayer() <
             enemy.GetComponent<Follower>().SocialDistance * 3.0f)
         {
             _playerInsideEnemyFOV = true;
             enemy.GetComponent<Follower>().Target = gab;
-        }
+        }*/
 
         if ((EnemyReachedPlayer() || kState.IsKeyDown(Keys.M)) && !turnedOn)
         {
@@ -351,8 +351,8 @@ class ProceduralTest : Scene
         go.model = loadedModels["sphere"];
         go.texture = loadedTextures["gabTex"];
         go.AddComponent(new SphereColliderComponent(0.75f, false));
-        go.AddComponent(new DebugMoveComponent());
-        go.GetComponent<DebugMoveComponent>().move = false;
+        //go.AddComponent(new DebugMoveComponent());
+        //go.GetComponent<DebugMoveComponent>().move = false;
         go.AddComponent(new Follower(go, 2f));
 
         return go;
@@ -362,12 +362,12 @@ class ProceduralTest : Scene
 
     private float SquaredDistanceBetweenEnemyAndPlayer()
     {
-        return Vector3.DistanceSquared(enemy.transform.position, gab.transform.position);
+        return 0;// Vector3.DistanceSquared(enemy.transform.position, gab.transform.position);
     }
 
     private bool EnemyReachedPlayer()
     {
-        return SquaredDistanceBetweenEnemyAndPlayer() < enemy.GetComponent<Follower>().SocialDistance *
-            enemy.GetComponent<Follower>().SocialDistance;
+        return false;// SquaredDistanceBetweenEnemyAndPlayer() < enemy.GetComponent<Follower>().SocialDistance *
+            //enemy.GetComponent<Follower>().SocialDistance;
     }
 }

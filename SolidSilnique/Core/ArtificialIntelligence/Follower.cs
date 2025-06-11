@@ -2,11 +2,24 @@
 
 using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core.Components;
 using SolidSilnique.Core.Diagnostics;
 
 namespace SolidSilnique.Core.ArtificialIntelligence
 {
+
+    public enum AIState {
+        HOSTILE_PATROL,
+        HOSTILE_CHASE,
+        HOSTILE_RETURN,
+        FRIENDLY_FOLLOW,
+        FRIENDLY_LOST
+    
+    }
+
+
+
     /// <summary>
     /// Class that allows <see cref="GameObject"/> to follow a specified target.
     /// </summary>
@@ -22,6 +35,26 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// </summary>
         private float _socialDistanceMultiplier;
 
+        public AIState state = AIState.HOSTILE_PATROL;
+        public Vector3 spawnPoint;
+
+        //Patrol State
+        public float patrolTimer = 5f;
+        public float patrolTimeToChange = 0f;
+        public Vector3 patrolTargetOffset = Vector3.Zero;
+        public float patrolRadius = 20f;
+        public Random patrolRandom = new Random();
+        public Vector3 moveVec = Vector3.Zero;
+
+        //Chase State
+        public float aggroRange = 10f;
+        public float homeRange = 30f;
+
+        //Lost State
+        public float teleportRange = 30f;
+
+
+
         /// <summary>
         /// The distance between Self and <see cref="Target"/> . The default value is calculated based on <see cref="_socialDistanceMultiplier"/>
         /// </summary>
@@ -35,12 +68,12 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             get => _target;
             set
             {
-                if (null != value && this.gameObject.Equals(value))
+                if (null == value /*&& this.gameObject.Equals(value)*/)
                     throw new ArgumentException("Target cannot be set to itself.\nSet another object instead!");
                 _target = value;
                 if (null == _target)
                 {
-                    _socialDistance = 0.0f; 
+                    _socialDistance = 0.0f;
                     return;
                 }
                 var collider = _target.GetComponent<SphereColliderComponent>() ?? throw new ArgumentException("Game object must contain SphereColliderComponent");
@@ -117,6 +150,9 @@ namespace SolidSilnique.Core.ArtificialIntelligence
 
         public override void Start()
         {
+            spawnPoint = gameObject.transform.globalPosition;
+            spawnPoint -= Vector3.Up * spawnPoint.Y - Vector3.Up * EngineManager.scene.environmentObject.GetHeight(spawnPoint);
+            patrolTimeToChange = patrolTimer * (float)patrolRandom.NextDouble();
         }
 
         /// <summary>
@@ -124,7 +160,131 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         /// </summary>
         public override void Update()
         {
-            gameObject.transform.position += GetFollowDirectionVector() * Time.deltaTime * 10;
+            switch (state)
+            {
+                case AIState.HOSTILE_PATROL:
+                    PatrolUpdate();
+                    break;
+                case AIState.HOSTILE_CHASE:
+                    ChaseUpdate();
+                    break;
+                case AIState.HOSTILE_RETURN:
+                    ReturnUpdate();
+                    break;
+				case AIState.FRIENDLY_FOLLOW:
+					FollowUpdate();
+					break;
+				case AIState.FRIENDLY_LOST:
+					TeleportUpdate();
+					break;
+
+
+			}
+
+
         }
-    }
+
+        public void PatrolUpdate()
+        {
+
+            gameObject.transform.position += Vector3.Down * Time.deltaTime * 9.81f;
+
+            patrolTimeToChange += Time.deltaTime;
+            if (patrolTimeToChange >= patrolTimer)
+            {
+                patrolTimeToChange -= patrolTimer;
+                //Handle patrol point change
+                patrolTargetOffset = (Vector3.Left * ((float)patrolRandom.NextDouble() * patrolRadius - patrolRadius / 2)) + (Vector3.Forward * ((float)patrolRandom.NextDouble() * patrolRadius - patrolRadius / 2));
+            }
+
+            //GO TO
+            if (Vector3.DistanceSquared(spawnPoint + patrolTargetOffset, gameObject.transform.position) >= 0.25)
+            {
+                moveVec = -(gameObject.transform.position - (spawnPoint + patrolTargetOffset));
+                moveVec.Normalize();
+
+                gameObject.transform.position += moveVec * Time.deltaTime * 2;
+            }
+
+
+            //State Transition
+            // -> Chase state
+            if (Vector3.DistanceSquared(this.gameObject.transform.position, Target.transform.position) <= aggroRange * aggroRange)
+            {
+                state = AIState.HOSTILE_CHASE;
+            }
+
+        }
+
+        public void ChaseUpdate()
+        {
+            gameObject.transform.position += GetFollowDirectionVector() * Time.deltaTime * 5;
+
+            //State Transition
+            // -> Return state
+            if (Vector3.DistanceSquared(this.gameObject.transform.position, Target.transform.position) >= (aggroRange * 1.5) * (aggroRange * 1.5) || Vector3.DistanceSquared(this.gameObject.transform.position, spawnPoint) >= homeRange * homeRange)
+            {
+                state = AIState.HOSTILE_RETURN;
+            }
+            KeyboardState kState = Keyboard.GetState();
+            if (kState.IsKeyDown(Keys.V))
+            {
+                //State Transition
+                // -> Follow state - turn friendly
+                state = AIState.FRIENDLY_FOLLOW;
+				
+                //Tex change
+                gameObject.texture = EngineManager.scene.loadedTextures["simpleGreen"];
+
+			}
+
+        }
+
+
+        public void ReturnUpdate()
+        {
+
+            if ((Vector3.DistanceSquared(this.gameObject.transform.position, Target.transform.position) <= aggroRange * aggroRange * 0.75f * 0.75f))
+            {
+                //State Transition
+                // -> Chase state
+                state = AIState.HOSTILE_CHASE;
+            }
+            else if (Vector3.DistanceSquared(spawnPoint, gameObject.transform.position) >= homeRange * homeRange * 0.2f * 0.2f)
+            {
+                moveVec = -(gameObject.transform.position - (spawnPoint + patrolTargetOffset));
+                moveVec.Normalize();
+
+                gameObject.transform.position += moveVec * Time.deltaTime * 4;
+
+            }
+            else
+            {
+                //State Transition
+                // -> Patrol state
+                state = AIState.HOSTILE_PATROL;
+
+            }
+        }
+
+        public void FollowUpdate()
+        {
+			gameObject.transform.position += GetFollowDirectionVector() * Time.deltaTime * 8;
+			if ((Vector3.DistanceSquared(this.gameObject.transform.position, Target.transform.position) >= teleportRange * teleportRange))
+			{
+				//State Transition
+				// -> Teleport state
+				state = AIState.FRIENDLY_LOST;
+			}
+		}
+
+		public void TeleportUpdate()
+		{
+			moveVec = -(gameObject.transform.position - Target.transform.position);
+            gameObject.transform.position += moveVec * ((moveVec.Length() - SocialDistance) / moveVec.Length());
+			//State Transition
+			// -> Follow state
+			state = AIState.FRIENDLY_FOLLOW;
+		}
+	}
 }

@@ -28,8 +28,8 @@ public class TreeColliderComponent : Component
 
 
 		
-		int x = Math.Clamp((int)(pos.X / gridCellSize), 0, 100);
-		int z = Math.Clamp((int)(pos.Z / gridCellSize), 0, 100);
+		int x = Math.Clamp((int)(pos.X / gridCellSize), 0, 100-1);
+		int z = Math.Clamp((int)(pos.Z / gridCellSize), 0, 100-1);
 		List<GameObject> res = instancesGrid[z, x];
 
 		return res;
