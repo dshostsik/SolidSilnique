@@ -163,7 +163,7 @@ namespace SolidSilnique
             // _graphics.HardwareModeSwitch = true;
             //_graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             //_graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
-            _graphics.SynchronizeWithVerticalRetrace = true; //VSync
+            _graphics.SynchronizeWithVerticalRetrace = false; //VSync
             //_graphics.SynchronizeWithVerticalRetrace = false; // disabled VSync for uncapped FPS
             _graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             _graphics.ApplyChanges();
@@ -287,7 +287,7 @@ namespace SolidSilnique
             EngineManager.scene.LoadContent(Content);
             EngineManager.scene.Setup();
 
-            EngineManager.scene.mainCamera.mouseMovement(0, 0, 0);
+            EngineManager.scene.mainCamera.UpdateCameraVectors();
             
 
             EngineManager.Start();

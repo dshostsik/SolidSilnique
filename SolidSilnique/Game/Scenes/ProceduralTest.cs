@@ -39,7 +39,7 @@ class ProceduralTest : Scene
     private GameObject gab;
     private GameObject enemy;
     private int _enemyHP = 100;
-    private bool turnedOn = false;
+    private bool _playerInsideEnemyFOV = false;
 
     public ProceduralTest()
     {
@@ -125,7 +125,7 @@ class ProceduralTest : Scene
     public override void Setup()
     {
         environmentObject = new EnvironmentObject();
-        environmentObject.Generate("Map1", content, 3, 60, 3);
+        environmentObject.Generate("Map1", content, 3, 60, 3, 8);
 
         ProceduralGrass newProc =
             new ProceduralGrass(models, textures, treeModels, treeTextures, content, environmentObject);
@@ -136,7 +136,7 @@ class ProceduralTest : Scene
         CameraComponent cam = new CameraComponent();
         cam.SetMain();
         go.AddComponent(cam);
-        //go.AddComponent(new SphereColliderComponent(3f));
+        go.AddComponent(new TPPCameraComponent());
         this.AddChild(go);
 
         go = new GameObject("ground");
@@ -150,7 +150,7 @@ class ProceduralTest : Scene
 
         newProc.GenerateObjects();
         List<GameObject> goList = newProc.createdObjects;
-
+		Console.WriteLine(goList.Count);
         for (int a = 0; a < goList.Count; a++)
         {
             this.AddChild(goList[a]);
@@ -200,14 +200,20 @@ class ProceduralTest : Scene
         gab.AddComponent(new SphereColliderComponent(1));
 
 
-        this.AddChild(gab);
-        GameObject TPcam = new GameObject("cam");
-        var tpcCamComp = new CameraComponent();
-        TPcam.AddComponent(tpcCamComp);
-        TPcam.transform.position = new Vector3(0, 5, -10);
-        this.TPCamera = new Camera(tpcCamComp);
+			this.AddChild(gab);
+			GameObject TPcam = new GameObject("cam");
+			TPcam.AddComponent(new TPPCameraComponent());
+		    gab.AddChild(TPcam);
 
-        gab.AddChild(TPcam);
+		    GameObject TPcamCam = new GameObject("camcam");
+		    var tpcCamComp = new CameraComponent();
+		    TPcamCam.AddComponent(tpcCamComp);
+
+
+		    TPcamCam.transform.position = new Vector3(0,0, 10);
+			this.TPCamera = new Camera(tpcCamComp);
+            TPcam.AddChild(TPcamCam);
+			
 
         GameObject eye1 = new GameObject("eye1");
         eye1.transform.position = new Vector3(-0.25f * 2, 0.209f, 0.427f * 2);
@@ -293,13 +299,13 @@ class ProceduralTest : Scene
 
 
         GameObject prevGeb = gab;
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 3; i++)
 			{
-				GameObject gogus = CreateGebus(new Vector3(150 + i*2, 2, 150 + i*2));
-				gogus.GetComponent<Follower>().Target = prevGeb;
+				GameObject gogus = CreateGebus(new Vector3(250 + i*20, 80, 250 + i*20));
+				gogus.GetComponent<Follower>().Target = gab;
 				if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
 				this.AddChild(gogus);
-				prevGeb = gogus;
+				//prevGeb = gogus;
 			}
 
         GameObject ziutek = CreateMovableObject("ziutek", 200,  200);
@@ -310,16 +316,12 @@ class ProceduralTest : Scene
         rhythymGui = new GUI("Content/RhythymGui.xml", content);
         EngineManager.currentGui = rhythymGui;
 
-        enemy = new GameObject("euzebiusz wiercibok");
-        enemy.AddComponent(new SphereColliderComponent(3.5f, false));
-        enemy.AddComponent(new Follower(enemy, 20f));
-        enemy.AddComponent(new DebugMoveComponent());
-        enemy.GetComponent<DebugMoveComponent>().move = false;
-        enemy.model = loadedModels["trent"];
-        enemy.texture = loadedTextures["trent/diffuse"];
-        enemy.normalMap = loadedTextures["trent/normal"];
-        enemy.transform.position = new Vector3(100, 0, 100);
-        this.AddChild(enemy);
+        /*enemy = new GameObject("euzebiusz wiercibok");
+        enemy.AddComponent(new Follower(enemy, 5.0f));
+        enemy.GetComponent<Follower>().gameObject = enemy;
+        enemy.model = loadedModels["sphere"];
+        enemy.texture = loadedTextures["deimos"];
+        this.AddChild(enemy);*/
 
         this.AddChild(go);
     
@@ -329,11 +331,12 @@ class ProceduralTest : Scene
     {
         kState = Keyboard.GetState();
 
-        if (SquaredDistanceBetweenEnemyAndPlayer() <=
-            enemy.GetComponent<Follower>().SocialDistance * enemy.GetComponent<Follower>().SocialDistance * 3.0f)
+       /* if (SquaredDistanceBetweenEnemyAndPlayer() <
+            enemy.GetComponent<Follower>().SocialDistance * 3.0f)
         {
+            _playerInsideEnemyFOV = true;
             enemy.GetComponent<Follower>().Target = gab;
-        }
+        }*/
 
         if ((EnemyReachedPlayer() || kState.IsKeyDown(Keys.M)) && !turnedOn)
         {
@@ -359,9 +362,9 @@ class ProceduralTest : Scene
         go.transform.scale = new Vector3(0.75f);
         go.model = loadedModels["sphere"];
         go.texture = loadedTextures["gabTex"];
-        go.AddComponent(new SphereColliderComponent(1f, false));
-        go.AddComponent(new DebugMoveComponent());
-        go.GetComponent<DebugMoveComponent>().move = false;
+        go.AddComponent(new SphereColliderComponent(0.75f, false));
+        //go.AddComponent(new DebugMoveComponent());
+        //go.GetComponent<DebugMoveComponent>().move = false;
         go.AddComponent(new Follower(go, 2f));
         return go;
     }
@@ -435,14 +438,12 @@ class ProceduralTest : Scene
     
     private float SquaredDistanceBetweenEnemyAndPlayer()
     {
-        Vector3 dist = enemy.transform.position - gab.transform.position;
-        dist.Y = 0;
-        return dist.LengthSquared();
+        return 0;// Vector3.DistanceSquared(enemy.transform.position, gab.transform.position);
     }
 
     private bool EnemyReachedPlayer()
     {
-        return SquaredDistanceBetweenEnemyAndPlayer() <= (enemy.GetComponent<Follower>().SocialDistance *
-            enemy.GetComponent<Follower>().SocialDistance);
+        return false;// SquaredDistanceBetweenEnemyAndPlayer() < enemy.GetComponent<Follower>().SocialDistance *
+            //enemy.GetComponent<Follower>().SocialDistance;
     }
 }

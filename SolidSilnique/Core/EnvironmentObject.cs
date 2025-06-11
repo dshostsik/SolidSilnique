@@ -40,7 +40,7 @@ namespace SolidSilnique.Core
 
 		LayerMaterial[] layerMaterials;
 
-		public void Generate(string mapName, ContentManager content, float cellSize = 1, float maxHeight = 10, int layers = 1,int chunksDensity = 4)
+		public void Generate(string mapName, ContentManager content, float cellSize = 1, float maxHeight = 10, int layers = 1,int chunksDensity = 16)
 		{
 			GraphicsDevice graphics = EngineManager.graphics;
 			this.cellSize = cellSize;
@@ -192,6 +192,7 @@ namespace SolidSilnique.Core
 		}
 
 		public void Draw(BoundingFrustum frustum) {
+			
 			GraphicsDevice graphics = EngineManager.graphics;
 			Shader shader = EngineManager.shader;
 

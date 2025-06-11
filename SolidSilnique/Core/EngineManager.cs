@@ -76,7 +76,8 @@ namespace SolidSilnique.Core
             Time.deltaTimeMs = gameTime.ElapsedGameTime.Milliseconds;
             Time.deltaTime = Time.deltaTimeMs / 1000.0f;
             scene.Update();
-        }
+			EngineManager.scene.mainCamera.UpdateCameraVectors();
+		}
 
         public static void InitializeInput(Game1 game)
         {
@@ -176,7 +177,7 @@ namespace SolidSilnique.Core
 			shader.SetUniform("LightViewProj", lightViewProjection);
 			shader.SetTexture("shadowMap", _staticShadowMapRenderTarget);
             shader.SetUniform("shadowMapResolution", _testSettings);
-
+            shader.Effect.CurrentTechnique = shader.Effect.Techniques["BasicColorDrawingWithLights"];
 			// Normal rendering 
 			while (renderQueue.Count > 0)
             {
@@ -216,7 +217,7 @@ namespace SolidSilnique.Core
                     Matrix modelTransInv = Matrix.Transpose(Matrix.Invert(go.transform.getModelMatrix()));
                     shader.SetUniform("WorldTransInv", modelTransInv);
                     
-
+                    
                     for (int i = 0; i < go.model.Meshes.Count; i++)
                     {
                         ModelMesh mesh = go.model.Meshes[i];
@@ -291,7 +292,7 @@ namespace SolidSilnique.Core
                             }
                             else
                             {
-                                part.Effect.CurrentTechnique = shader.Effect.Techniques["BasicColorDrawingWithLights"];
+                                
                                 mesh.Draw();
                             }
                         }

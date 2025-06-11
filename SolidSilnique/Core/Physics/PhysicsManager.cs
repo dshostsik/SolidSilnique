@@ -70,8 +70,8 @@ namespace SolidSilnique.Core.Physics
 			{
 				
 				Vector3 otherCenter = new Vector3(b.gameObject.transform.position.X, MathF.Min(a.boundingSphere.Center.Y, b.HeightLimit+b.gameObject.transform.position.Y), b.gameObject.transform.position.Z);
-				float distance = Vector3.Distance(a.boundingSphere.Center, otherCenter);
-				if (distance < a.boundingSphere.Radius + b.Radius)
+				float distance = Vector3.DistanceSquared(a.boundingSphere.Center, otherCenter);
+				if (distance < (a.boundingSphere.Radius + b.Radius) * (a.boundingSphere.Radius + b.Radius))
 				{
 					//Separate
 

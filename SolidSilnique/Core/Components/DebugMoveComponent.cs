@@ -8,35 +8,39 @@ using System.Threading.Tasks;
 
 namespace SolidSilnique.Core.Components
 {
-	class DebugMoveComponent : Component
-	{
+    class DebugMoveComponent : Component
+    {
 
-		public bool move = true;
+        public bool move = true;
 
         private const float MoveSpeed = 10f;
         private const float RotationSpeed = 30f;
         private const float GravitySpeed = 5f;
 
-        public override void Start()
-		{
+        private int left, right, forward, backward = 0;
 
+        public override void Start()
+        {
+
+			EngineManager.InputManager.ActionHeld += OnActionHold;
+			EngineManager.InputManager.ActionReleased += OnActionRelease;
 		}
 
-		public override void Update()
-		{
+        public override void Update()
+        {
 
-            var kb = Keyboard.GetState();
-            float hor = (kb.IsKeyDown(Keys.Left) ? -1f : 0f) + (kb.IsKeyDown(Keys.Right) ? +1f : 0f);
-            float vert = (kb.IsKeyDown(Keys.Up) ? +1f : 0f) + (kb.IsKeyDown(Keys.Down) ? -1f : 0f);
+            
+            float hor = right - left;
+            float vert = forward - backward;
 
             var gp = GamePad.GetState(PlayerIndex.One);
             if (gp.IsConnected)
             {
-                hor += gp.ThumbSticks.Left.X;
-                vert += gp.ThumbSticks.Left.Y;
+                //hor += gp.ThumbSticks.Left.X;
+                //vert += gp.ThumbSticks.Left.Y;
             }
 
-            if (!move)
+            if (!move || !EngineManager.InputManager.gMode)
             {
                 hor = 0f;
                 vert = 0f;
@@ -49,5 +53,28 @@ namespace SolidSilnique.Core.Components
             gameObject.transform.position += Vector3.Down * Time.deltaTime * GravitySpeed;
 
         }
+
+
+        private void OnActionHold(string action)
+        {
+            switch (action)
+            {
+                case "Forward": forward = 1; break;
+                case "Backward": backward = 1; break;
+                case "Left": left = 1; break;
+                case "Right": right = 1; break;
+            }
+        }
+
+		private void OnActionRelease(string action)
+		{
+			switch (action)
+			{
+				case "Forward": forward = 0; break;
+				case "Backward": backward = 0; break;
+				case "Left": left = 0; break;
+				case "Right": right = 0; break;
+			}
+		}
 	}
 }
