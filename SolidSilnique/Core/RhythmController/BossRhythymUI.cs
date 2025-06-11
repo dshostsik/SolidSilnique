@@ -34,10 +34,10 @@ public class BossRhythymUI
     {
         this.spriteBatch = spriteBatch;
         this.content = content;
-        textures.Add(content.Load<Texture2D>("Textures/redNote"));
-        textures.Add(content.Load<Texture2D>("Textures/blueNote"));
-        textures.Add(content.Load<Texture2D>("Textures/yellowNote"));
-        textures.Add(content.Load<Texture2D>("Textures/violetNote"));
+        textures.Add(content.Load<Texture2D>("Textures/RedNoteActive"));
+        textures.Add(content.Load<Texture2D>("Textures/BlueNoteActive"));
+        textures.Add(content.Load<Texture2D>("Textures/YellowNoteActive"));
+        textures.Add(content.Load<Texture2D>("Textures/GreenNoteActive"));
         
         audio = new AtomicSoundTrack("master house",
             content, 0.1f);
