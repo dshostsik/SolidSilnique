@@ -301,14 +301,14 @@ namespace SolidSilnique
             EngineManager.Start();
 
             // Initialize GPU leaf particles
-            _leafSystem = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 40f,gravity: new Vector3(0, 0, 0))
+            _leafSystem = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 1e6f, gravity: new Vector3(0, 0, 0))
             {
                 _game = this
             };
             Texture2D leaftex = Content.Load<Texture2D>("Textures/Dust");
             _leafSystem.LoadContent(GraphicsDevice, Content, leaftex);
 
-            _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 20f, gravity: new Vector3(0, -0.2f, 0))
+            _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 4000f, gravity: new Vector3(0, -0.2f, 0))
             {    
                 _game = this
             };
@@ -318,6 +318,8 @@ namespace SolidSilnique
             EngineManager._postSpriteBatch = new SpriteBatch(EngineManager.graphics);
             EngineManager._postProcessEffect = Content.Load<Effect>("Shaders/postProcessShader");
 
+            EngineManager.LeafSystem1 = _leafSystem;
+            EngineManager.LeafSystem2 = _leafSystem2;
         }
 
 
@@ -387,13 +389,13 @@ namespace SolidSilnique
             // TODO: Add your drawing code here
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
 
-            GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            //GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            //GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             //_skybox.Draw(_graphics, _view);
 
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+            //GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            //GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
 
             shader.SetUniform("View", _view);
@@ -407,10 +409,9 @@ namespace SolidSilnique
 
             EngineManager.Draw(shadowShader, _view, _projection, manager,postShader);
 
+            
+            //float t = (float)gameTime.TotalGameTime.TotalSeconds;
 
-            float t = (float)gameTime.TotalGameTime.TotalSeconds;
-            _leafSystem.Draw(GraphicsDevice, _view, _projection, t);
-            _leafSystem2.Draw(GraphicsDevice, _view, _projection, t);
 
 
 

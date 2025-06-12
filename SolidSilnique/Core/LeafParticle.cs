@@ -32,12 +32,20 @@ namespace SolidSilnique.Core
         private float _lifeTime = 20f;
         private Vector3 _gravity = new Vector3(0, -0.1f, 0);
 
+        private float _accumulatedTime;
+        //private readonly bool _infiniteLifetime;
+        private float _timeAccumulator = 0f;
+
         public LeafParticle(int maxParticles, float lifeTime, Vector3 gravity)
         {
             _particleCount = maxParticles;
             _lifeTime = lifeTime;
+            //_infiniteLifetime = (lifeTime <= 0f);
             _gravity = gravity;
             _vertices = new ParticleVertex[_particleCount * 6]; // 4 vertices per particle
+            var rnd = new Random();
+            _timeAccumulator = (float)rnd.NextDouble() * _lifeTime;
+
         }
 
         public void LoadContent(GraphicsDevice gd, ContentManager content, Texture2D particle)
@@ -104,15 +112,22 @@ namespace SolidSilnique.Core
             //content.Load<Texture2D>("Textures/Dust")
         }
 
+
+        
         public void Draw(GraphicsDevice gd, Matrix view, Matrix proj, float totalTime)
         {
+            _accumulatedTime += totalTime;
             gd.RasterizerState = RasterizerState.CullNone;
             gd.DepthStencilState = DepthStencilState.DepthRead;
             gd.BlendState = BlendState.AlphaBlend;
 
+            if (_accumulatedTime > _lifeTime)
+                _accumulatedTime -= _lifeTime;
+
+
             gd.SetVertexBuffer(_vb);
 
-            _shader.SetUniform("currentTime", totalTime);
+            _shader.SetUniform("currentTime", _accumulatedTime);
             _shader.SetUniform("lifeTime", _lifeTime);
             _shader.SetUniform("gravity", _gravity);
             _shader.SetUniform("View", view);

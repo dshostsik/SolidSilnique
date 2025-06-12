@@ -85,7 +85,7 @@ float4 PS_Main(VS_OUTPUT input) : SV_TARGET
     float pixelAVG = (pixelColor.r + pixelColor.g + pixelColor.b) / 3.0;
     
     
-    if (pixelAVG >= 0.4)
+    if (pixelAVG >= 0.8)
         {
             resultPixel = pixelColor;
             
@@ -110,7 +110,7 @@ float4 Blooming(VS_OUTPUT input) : SV_TARGET
     
       resultPixel =   pixelColor + PrevRenderedColor.Sample(PrevRenderedSamplerColor, input.TexCoord);
       
-      float gamma = 2.2;
+      float gamma = 1.2;
       resultPixel = pow(resultPixel,(1/gamma));
       resultPixel.a = 1;
       //pixelColor += resultPixel * 0.01;
