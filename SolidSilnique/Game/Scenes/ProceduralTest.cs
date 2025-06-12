@@ -321,8 +321,8 @@ class ProceduralTest : Scene
         this.AddChild(boss);
 
 
-		TPCamera.cameraComponent.SetMain();
-        EngineManager.InputManager.gMode = true;
+		//TPCamera.cameraComponent.SetMain();
+        //EngineManager.InputManager.gMode = true;
 
 	}
 

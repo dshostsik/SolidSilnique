@@ -306,7 +306,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             //State Transition
             // -> Follow state - turn friendly
             state = AIState.FRIENDLY_FOLLOW;
-            gameObject.albedo = Color.White;
+            gameObject.children[0].albedo = Color.White;
 
 
         }
