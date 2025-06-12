@@ -165,7 +165,7 @@ namespace SolidSilnique.Core
 
 			DrawInstanceData(shadowShader, "Shadows");
 
-
+            
 			// using (var stream = new FileStream("shadowMap.png", FileMode.Create))
 			// {
 			//     output.SaveAsPng(stream, output.Width, output.Height);
