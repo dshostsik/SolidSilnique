@@ -15,6 +15,7 @@ public class BossRhythymUI
 {
     float offset = 0.32f;
     public bool hasEnded = false;
+    private Stack<int> buttons = new Stack<int>();
     private List<float> accuracy = new List<float>();
     private List<Note> loadedNotes = new List<Note>();
     private List<float> offsets = new List<float>();

@@ -200,7 +200,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         public void PatrolUpdate()
         {
 
-
+            
 
             patrolTimeToChange += Time.deltaTime;
             if (patrolTimeToChange >= patrolTimer)
