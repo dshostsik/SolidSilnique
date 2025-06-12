@@ -176,7 +176,7 @@ namespace SolidSilnique.Core
 
             // Up = Space or GamePad
             var up = new ActionBinding();
-            up.Keys.Add(Keys.Space);
+            //up.Keys.Add(Keys.Space);
             //up.Buttons.Add(Buttons.A);
             Add("Up", up);
 
