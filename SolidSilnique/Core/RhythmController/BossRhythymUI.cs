@@ -33,7 +33,7 @@ public class BossRhythymUI
     private GUIRhythymController visuals;
     List<Texture2D> textures = new List<Texture2D>();
     private Texture2D goodHitTexture;
-
+    private Texture2D badHitTexture;
 
     private class Feedback
     {
@@ -45,7 +45,7 @@ public class BossRhythymUI
     }
     private readonly List<Feedback> _feedbacks = new();
 
-    private const float FeedbackDur = 0.5f;
+    private const float FeedbackDur = 0.2f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public void Start(ContentManager content,SpriteBatch spriteBatch)
@@ -61,6 +61,7 @@ public class BossRhythymUI
         textures.Add(content.Load<Texture2D>("Textures/GreenActive"));
         textures.Add(content.Load<Texture2D>("Textures/RedActive"));
         goodHitTexture = content.Load<Texture2D>("Visuals/Perfect");
+        badHitTexture = content.Load<Texture2D>("Visuals/X");
 
         audio = new AtomicSoundTrack("master house",
             content, 0.1f);
@@ -193,7 +194,7 @@ public class BossRhythymUI
                 _feedbacks.Add(new Feedback
                 {
                     Texture = goodHitTexture,
-                    Position = new Vector2(960, 100),  // tweak as desired
+                    Position = new Vector2(960, 100),
                     Color = Color.White,
                     StartTime = songTime,
                     Duration = FeedbackDur
@@ -222,7 +223,14 @@ public class BossRhythymUI
         {
             if (loadedNotes[i].Time < songTime - 1.5f)
             {
-                
+                _feedbacks.Add(new Feedback
+                {
+                    Texture = badHitTexture,
+                    Position = new Vector2(960, 100),
+                    Color = Color.White,
+                    StartTime = songTime,
+                    Duration = FeedbackDur
+                });
                 combo = 0;
                 loadedNotes.RemoveAt(i);
                 if (health >= 5)

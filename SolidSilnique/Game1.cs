@@ -113,9 +113,9 @@ namespace SolidSilnique
             _graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
             IsFixedTimeStep = false;
-            Mouse.SetCursor(MouseCursor.Crosshair);
+            //Mouse.SetCursor(MouseCursor.Crosshair);
             counter = new FrameCounter();
             scrollWheelValue = 0;
         }
