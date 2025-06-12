@@ -93,22 +93,26 @@ class ProceduralTest : Scene
         //loadedTextures.Add("trent/ao", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Mixed_AO"));
         //loadedTextures.Add("trent/roughness", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Coat_roughness"));
 
-        models.Add(Content.Load<Model>("pModels/Rock1"));
-        models.Add(Content.Load<Model>("pModels/Branch"));
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        models.Add(Content.Load<Model>("pModels/BushSmall"));
-        models.Add(Content.Load<Model>("pModels/BushSmall"));
-        models.Add(Content.Load<Model>("pModels/BushSmall"));
-        //models.Add(Content.Load<Model>("pModels/Log"));
-        models.Add(Content.Load<Model>("pModels/Stump"));
+        models.Add(Content.Load<Model>("pModels/Rock1")); textures.Add(loadedTextures["deimos"]);
+		//models.Add(Content.Load<Model>("pModels/Branch")); textures.Add(loadedTextures["deimos"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
+		models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
+		models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
+		//models.Add(Content.Load<Model>("pModels/Log")); textures.Add(loadedTextures["deimos"]);
+		models.Add(Content.Load<Model>("pModels/Stump")); textures.Add(loadedTextures["deimos"]);
 
-        models.Add(Content.Load<Model>("brzewno1/brzewno"));
-        models.Add(Content.Load<Model>("brzewno3/brzewno3"));
-        textures.Add(loadedTextures["leafTex"]);
-        textures.Add(loadedTextures["deimos"]);
+		//models.Add(Content.Load<Model>("brzewno1/brzewno"));
+		//models.Add(Content.Load<Model>("brzewno3/brzewno3"));
+		//textures.Add(loadedTextures["leafTex"]);
+        //textures.Add(loadedTextures["deimos"]);
 
         treeModels.Add(Content.Load<Model>("pModels/tree1"));
         treeModels.Add(Content.Load<Model>("pModels/Tree2"));
@@ -137,56 +141,26 @@ class ProceduralTest : Scene
         go.AddComponent(new TPPCameraComponent());
         this.AddChild(go);
 
-        go = new GameObject("ground");
-        go.transform.position = new Vector3(250, 0, 250);
-        go.transform.scale = new Vector3(500, 1, 500);
-        //go.model = loadedModels["plane"];
-        go.texture = loadedTextures["simpleGreen"];
-        go.AddComponent(new PlaneColliderComponent(new Vector3(0, 1, 0), true));
-        this.AddChild(go);
+        
         Task.WhenAll(task1).Wait(); //:O
 
         newProc.GenerateObjects();
         List<GameObject> goList = newProc.createdObjects;
-		Console.WriteLine(goList.Count);
+
         for (int a = 0; a < goList.Count; a++)
         {
             this.AddChild(goList[a]);
         }
 
 
-        GameObject goTest = new GameObject("Deimos");
+        
 
 
-        goTest.transform.position = new Vector3(150, 2.5f, 150);
-        goTest.model = loadedModels["levelTest"];
-        goTest.texture = loadedTextures["deimos"];
-        goTest.AddComponent(new SphereColliderComponent(3.5f, true));
 
-
-        this.AddChild(goTest);
-
-        go = new GameObject("Testak");
-        go.transform.position = new Vector3(5, 2.5f, -5);
-        go.model = loadedModels["deimos"];
-        go.texture = loadedTextures["deimos"];
-
-
-        //go.AddComponent(new DebugMoveComponent()); //<-- Dodawanie componentów
-        go.AddComponent(new SphereColliderComponent(3.5f));
-
-        this.AddChild(go);
-
-
-        GameObject go2 = new GameObject("Square4");
-        go2.transform.position = new Vector3(0, 5, 0);
-        go2.transform.scale = new Vector3(0.75f);
-        go2.model = loadedModels["deimos"];
-        go2.texture = loadedTextures["deimos"];
-        go.AddChild(go2);
+        
 
         gab = new GameObject("gab");
-        gab.transform.position = new Vector3(250, 15, 220);
+        gab.transform.position = new Vector3(180, 15, 730);
 
             gab.transform.scale = new Vector3(1f);
 			gab.model = loadedModels["cube"];
@@ -214,21 +188,21 @@ class ProceduralTest : Scene
 			
 
 			GameObject eye1 = new GameObject("eye1");
-			eye1.transform.position = new Vector3(-0.25f*2, 0.209f, 0.427f * 2);
+			eye1.transform.position = new Vector3(-0.25f*2, 0.209f, -0.427f * 2);
 			eye1.transform.scale = new Vector3(0.4f);
 			eye1.model = loadedModels["sphere"];
 			eye1.texture = loadedTextures["eye"];
 			gab.AddChild(eye1);
 
 			GameObject pupil1 = new GameObject("pupil1");
-				pupil1.transform.position = new Vector3(0, 0, 0.427f * 2);
+				pupil1.transform.position = new Vector3(0, 0, -0.427f * 2);
 				pupil1.transform.scale = new Vector3(0.4f,0.4f,0.2f);
 				pupil1.model = loadedModels["sphere"];
 				pupil1.texture = loadedTextures["simpleBlack"];
 				eye1.AddChild(pupil1);
 
 		GameObject brow1 = new GameObject("brow1");
-		brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, 0.427f * 2);
+		brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, -0.427f * 2);
 		brow1.transform.scale = new Vector3(0.45f, 0.2f,0.4f);
 		brow1.transform.rotation = new Vector3(0f,0,-20f);
 		brow1.model = loadedModels["cube"];
@@ -236,21 +210,21 @@ class ProceduralTest : Scene
 		gab.AddChild(brow1);
 
 		GameObject eye2 = new GameObject("eye2");
-			eye2.transform.position = new Vector3(0.25f*2, 0.209f, 0.427f*2);
+			eye2.transform.position = new Vector3(0.25f*2, 0.209f, -0.427f*2);
 			eye2.transform.scale = new Vector3(0.4f);
 			eye2.model = loadedModels["sphere"];
 			eye2.texture = loadedTextures["eye"];
 			gab.AddChild(eye2);
 
 		GameObject pupil2 = new GameObject("pupil1");
-		pupil2.transform.position = new Vector3(0, 0, 0.427f * 2);
+		pupil2.transform.position = new Vector3(0, 0, -0.427f * 2);
 		pupil2.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
 		pupil2.model = loadedModels["sphere"];
 		pupil2.texture = loadedTextures["simpleBlack"];
 		eye2.AddChild(pupil2);
 
 		GameObject brow2 = new GameObject("brow1");
-		brow2.transform.position = new Vector3(0.25f * 2, 0.5f, 0.427f * 2);
+		brow2.transform.position = new Vector3(0.25f * 2, 0.5f, -0.427f * 2);
 		brow2.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
 		brow2.transform.rotation = new Vector3(0f, 0, 20f);
 		brow2.model = loadedModels["cube"];

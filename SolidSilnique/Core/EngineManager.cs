@@ -21,7 +21,7 @@ namespace SolidSilnique.Core
         Low = 1024,
         Medium = 2048,
         High = 4096,
-        Ultra = 8192
+        Ultra = 8192*2
     }
 
     static class EngineManager
@@ -58,7 +58,7 @@ namespace SolidSilnique.Core
         private static RenderTarget2D _staticShadowMapRenderTarget;
         private static int _iterationsCounter = 0;
         private static Matrix lightViewProjection;
-        private static Matrix _lightProjection =  Matrix.CreateOrthographic(512 * 1.41f, 512*1.41f, -128f, 128);
+        private static Matrix _lightProjection =  Matrix.CreateOrthographic(768 * 1.41f, 768*1.41f, -512, 512);
 
         private static RenderTarget2D _sceneRenderTarget;
         private static RenderTarget2D tempRenderTarget;
@@ -104,8 +104,8 @@ namespace SolidSilnique.Core
 
         private static RenderTarget2D BakeStaticShadows(Shader shadowShader, LightsManagerComponent manager)
         {
-            
-            RenderTarget2D output = new RenderTarget2D(graphics, _testSettings,
+			//sh.SetUniform("useInstancingShadows", 0);
+			RenderTarget2D output = new RenderTarget2D(graphics, _testSettings,
                 _testSettings, false,
                 SurfaceFormat.Single, DepthFormat.Depth24);
             shadowsQueue = new Queue<GameObject>(renderQueue);
@@ -120,18 +120,26 @@ namespace SolidSilnique.Core
 
             shadowShader.SwapTechnique("ShadeTheSceneRightNow");
             shadowShader.SetUniform("LightViewProj", lightViewProjection);
-            //shader.SetUniform("Dimensions", new Vector2(output.Width, output.Height));
-            if(scene.environmentObject != null)
+			//shader.SetUniform("Dimensions", new Vector2(output.Width, output.Height));
+			graphics.RasterizerState = new RasterizerState
+			{
+				CullMode = CullMode.None,
+				DepthBias = (1 / _testSettings) * 1024 * 1e+17f,
+				SlopeScaleDepthBias = 4f
+			};
+
+			if (scene.environmentObject != null)
             {
-				graphics.RasterizerState = RasterizerState.CullCounterClockwise;
-	            //scene.environmentObject.DrawAllBuffersToShader(shadowShader);
+				//graphics.RasterizerState = RasterizerState.CullNone;
+	            scene.environmentObject.DrawAllBuffersToShader(shadowShader);
             }
 
             
 
 
-			graphics.RasterizerState = RasterizerState.CullCounterClockwise;
-            while (shadowsQueue.Count > 0)
+			
+
+			while (shadowsQueue.Count > 0)
             {
                 GameObject go = shadowsQueue.Dequeue();
                 if (go.model == null || !go.isStatic)
@@ -154,14 +162,15 @@ namespace SolidSilnique.Core
                     shadowMesh.Draw();
                 }
             }
-			
-            
-            
-            // using (var stream = new FileStream("shadowMap.png", FileMode.Create))
-            // {
-            //     output.SaveAsPng(stream, output.Width, output.Height);
-            // }
-            graphics.RasterizerState = RasterizerState.CullCounterClockwise;
+
+			DrawInstanceData(shadowShader, "Shadows");
+
+
+			// using (var stream = new FileStream("shadowMap.png", FileMode.Create))
+			// {
+			//     output.SaveAsPng(stream, output.Width, output.Height);
+			// }
+			graphics.RasterizerState = RasterizerState.CullCounterClockwise;
             graphics.SetRenderTarget(null);
             //-------------------------------------
             
@@ -335,7 +344,7 @@ namespace SolidSilnique.Core
 
             if (scene.environmentObject != null)
                 scene.environmentObject.Draw(_frustum);
-            DrawInstanceData();
+            DrawInstanceData(shader);
             graphics.DepthStencilState = DepthStencilState.DepthRead;
 
             // Compute the current song/time or frame time; if you have a static Time.totalGameTime:
@@ -540,10 +549,10 @@ namespace SolidSilnique.Core
 
 		}
 
-			static void DrawInstanceData()
+			static void DrawInstanceData(Shader sh, string affix = "")
 		{
 
-            shader.SetUniform("useInstancing", 1);
+            sh.SetUniform("useInstancing"+affix, 1);
 
             foreach (GameObject representative in InstancesQueue.Keys) {
 
@@ -572,7 +581,7 @@ namespace SolidSilnique.Core
                 setMaterial(representative);
 
 
-				foreach (EffectPass pass in shader.Effect.CurrentTechnique.Passes)
+				foreach (EffectPass pass in sh.Effect.CurrentTechnique.Passes)
 				{
 					pass.Apply();
 
@@ -591,7 +600,7 @@ namespace SolidSilnique.Core
 
 			}
 
-			shader.SetUniform("useInstancing", 0);
+			sh.SetUniform("useInstancing"+ affix, 0);
 
 
 

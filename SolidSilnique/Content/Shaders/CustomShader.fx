@@ -57,7 +57,7 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 	VertexShaderOutput output = (VertexShaderOutput)0;
     
     float4x4 newWorld = World;
-    
+     
     if (useInstancing != 0)
     {
         float4x4 instanceWorld = float4x4(
@@ -166,7 +166,7 @@ float ComputeShadows(float3 fragPos, float3 normal) {
     float shadowMapDepth = tex2D(shadowMap, shadowCoord.xy * float2(1,-1)).r;
     float currentDepth = shadowCoord.z;
     //float bias = max(0.2f * (1.f - dot(normal, dirlight_direction)), 0.001f);
-   shadow = 0; //currentDepth - 0.00001f < (shadowMapDepth) ? 0.5f : 1.0f;
+    shadow = 0; //currentDepth - 0.00001f < (shadowMapDepth) ? 0.5f : 1.0f;
     
     float2 texelSize = 1.0 / shadowMapResolution;
     for (int x = -1; x <= 1; ++x)
@@ -174,7 +174,7 @@ float ComputeShadows(float3 fragPos, float3 normal) {
         for (int y = -1; y <= 1; ++y)
         {
             float pcfDepth = tex2D(shadowMap, (shadowCoord.xy + float2(x, y) * texelSize) * float2(1, -1)).r;
-            shadow += currentDepth - 0.00001f < pcfDepth ? 0.5f : 0.9f;
+            shadow += currentDepth - 1e-6f < pcfDepth ? 0.5f : 0.9f;
         }
     }
     shadow /= 9.0;

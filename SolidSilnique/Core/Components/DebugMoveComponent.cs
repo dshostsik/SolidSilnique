@@ -31,7 +31,7 @@ namespace SolidSilnique.Core.Components
 
             
             float hor = right - left;
-            float vert = forward - backward;
+            float vert = backward - forward;
 
             var gp = GamePad.GetState(PlayerIndex.One);
             if (gp.IsConnected)

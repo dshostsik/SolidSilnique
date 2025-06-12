@@ -13,18 +13,51 @@ matrix World;
 float farPlane;
 float nearPlane;
 
+int useInstancingShadows;
+
+
+struct VertexShaderInput
+{
+    float4 aPos : POSITION0;
+    
+    float4 instanceRow0 : TEXCOORD10;
+    float4 instanceRow1 : TEXCOORD11;
+    float4 instanceRow2 : TEXCOORD12;
+    float4 instanceRow3 : TEXCOORD13;
+};
+
 struct VertexShaderOutput
 {
     float4 Position : SV_POSITION;
 	float z : TEXCOORD0;
 	float w : TEXCOORD1;
+	
+    float4 instanceRow0 : TEXCOORD10;
+    float4 instanceRow1 : TEXCOORD11;
+    float4 instanceRow2 : TEXCOORD12;
+    float4 instanceRow3 : TEXCOORD13;
 };
 
-VertexShaderOutput MainVS(float4 Position : POSITION)
-{
-	VertexShaderOutput output;
 
-	output.Position = mul(Position, mul(World, LightViewProj));
+
+VertexShaderOutput MainVS(in VertexShaderInput input)
+{
+    VertexShaderOutput output = (VertexShaderOutput) 0;
+	
+    float4x4 newWorld = World;
+    
+    if (useInstancingShadows != 0)
+    {
+        float4x4 instanceWorld = float4x4(
+            input.instanceRow0,
+            input.instanceRow1,
+            input.instanceRow2,
+            input.instanceRow3
+        );
+        newWorld = instanceWorld;
+    }
+
+    output.Position = mul(input.aPos, mul(newWorld, LightViewProj));
 	output.z = output.Position.z; 
 	output.w = output.Position.w;
 
