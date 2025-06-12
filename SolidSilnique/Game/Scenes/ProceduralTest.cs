@@ -44,10 +44,10 @@ class ProceduralTest : Scene
     public override void LoadContent(ContentManager Content)
     {
         //loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
-        loadedModels.Add("deimos", Content.Load<Model>("deimos"));
-        loadedModels.Add("plane", Content.Load<Model>("plane"));
+        //loadedModels.Add("deimos", Content.Load<Model>("deimos"));
+        //loadedModels.Add("plane", Content.Load<Model>("plane"));
         loadedModels.Add("cube", Content.Load<Model>("cube"));
-        loadedModels.Add("cone", Content.Load<Model>("cone"));
+        //loadedModels.Add("cone", Content.Load<Model>("cone"));
         loadedModels.Add("sphere", Content.Load<Model>("sphere"));
         loadedModels.Add("levelTest", Content.Load<Model>("level_ground"));
         loadedModels.Add("brzewno1/brzewno", Content.Load<Model>("brzewno1/brzewno"));
@@ -56,7 +56,7 @@ class ProceduralTest : Scene
         loadedModels.Add("trent", Content.Load<Model>("trent"));
 
         loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
-        loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
+        //loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
         loadedTextures.Add("simpleGreen", Content.Load<Texture2D>("simpleGreen"));
         loadedTextures.Add("simpleBlack", Content.Load<Texture2D>("simpleBlack"));
         loadedTextures.Add("gabTex", Content.Load<Texture2D>("Textures/gab_tex"));
@@ -253,7 +253,7 @@ class ProceduralTest : Scene
         this.AddChild(Tower);
 
 
-        var cube = new GameObject("AnimatedCube");
+        /*var cube = new GameObject("AnimatedCube");
         cube.model = loadedModels["deimos"];
         cube.texture = loadedTextures["deimos"];
         cube.transform.scale = new Vector3(1, 1, 1);
@@ -275,7 +275,7 @@ class ProceduralTest : Scene
         //animator.Play();
 
         // add to scene
-        this.AddChild(cube);
+        this.AddChild(cube);*/
 
 
         GameObject prevGeb = gab;
