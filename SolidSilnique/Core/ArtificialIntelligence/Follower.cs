@@ -2,7 +2,6 @@
 
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core.Components;
 using SolidSilnique.Core.Diagnostics;
 

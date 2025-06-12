@@ -10,7 +10,6 @@ using SolidSilnique.GameContent;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 // Use this to prevent conflicts with Microsoft.Xna.Framework.Graphics.DirectionalLight
 using DirectionalLight = SolidSilnique.Core.DirectionalLight;
-using System.Reflection.Metadata;
 
 namespace SolidSilnique
 {

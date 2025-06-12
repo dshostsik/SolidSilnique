@@ -5,16 +5,11 @@ using SolidSilnique.Core;
 using SolidSilnique.Core.ArtificialIntelligence;
 using SolidSilnique.Core.Components;
 using SolidSilnique.ProcderuralFoliage;
-using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using GUIRESOURCES;
 using Microsoft.Xna.Framework.Input;
-using SolidSilnique.Core.Diagnostics;
 using SolidSilnique.Core.Animation;
-using static System.Formats.Asn1.AsnWriter;
-using Microsoft.Xna.Framework.Audio;
 
 
 namespace SolidSilnique.GameContent;

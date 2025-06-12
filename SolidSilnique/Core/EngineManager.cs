@@ -1,18 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SolidSilnique.Core;
-using SolidSilnique.GameContent;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SolidSilnique.Core.Components;
 using GUIRESOURCES;
-using SolidSilnique.Core.Diagnostics;
-using System.Reflection;
-using System.Reflection.Metadata;
 
 namespace SolidSilnique.Core
 {

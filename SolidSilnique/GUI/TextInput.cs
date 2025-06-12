@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-
-namespace GUIRESOURCES;
+﻿namespace GUIRESOURCES;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 public class TextInput : GuiElement

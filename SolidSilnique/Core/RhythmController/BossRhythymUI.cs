@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net.NetworkInformation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core;
 using SolidSilnique.Core.RhythmController;
 using SolidSilnique.MonoAL;
-using static NotesLoader;
+
 public class BossRhythymUI
 {
     float offset = 0.32f;

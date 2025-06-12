@@ -5,11 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 using SolidSilnique.Core;
 using SolidSilnique.Core.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SolidSilnique.GameContent
 {
