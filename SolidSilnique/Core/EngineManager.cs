@@ -27,7 +27,7 @@ namespace SolidSilnique.Core
     static class EngineManager
     {
         public static Scene scene = null;
-        
+
         public static Queue<GameObject> renderQueue = [];
 		public static Dictionary<GameObject, VertexBufferBindingGroup> InstancesQueue = []; //representative, InstanceBuffer
         public static Queue<Tuple<Texture2D,Vector2,Color>> renderQueueUI = [];
@@ -70,6 +70,8 @@ namespace SolidSilnique.Core
         public static Input InputManager;
         public static bool mouseFree = false;
 
+        public static LeafParticle LeafSystem1;
+        public static LeafParticle LeafSystem2;
 
         public static void Start()
         {
@@ -192,6 +194,8 @@ namespace SolidSilnique.Core
             graphics.SetRenderTarget(_sceneRenderTarget);
             graphics.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
 
+            
+
             if (Skybox != null)
                     {
                var skyView = view;
@@ -205,6 +209,10 @@ namespace SolidSilnique.Core
 
                 graphics.DepthStencilState = prevDepth;
             }
+            
+
+            
+
             graphics.DepthStencilState = DepthStencilState.Default;
             graphics.RasterizerState = RasterizerState.CullCounterClockwise;
             scene.Draw();
@@ -328,8 +336,15 @@ namespace SolidSilnique.Core
             if (scene.environmentObject != null)
                 scene.environmentObject.Draw(_frustum);
             DrawInstanceData();
+            graphics.DepthStencilState = DepthStencilState.DepthRead;
 
-           
+            // Compute the current song/time or frame time; if you have a static Time.totalGameTime:
+            float t = Time.deltaTime;
+
+            // Draw each leaf system
+            LeafSystem1?.Draw(graphics, view, projection, t);
+            LeafSystem2?.Draw(graphics, view, projection, t);
+
             var vp = graphics.Viewport;
             
             
