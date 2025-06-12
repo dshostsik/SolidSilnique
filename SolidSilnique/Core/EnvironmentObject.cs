@@ -203,6 +203,7 @@ namespace SolidSilnique.Core
 			shader.SetTexture("texture_normal1", layerMaterials[0].normal);
 			shader.SetTexture("texture_roughness1", layerMaterials[0].roughness);
 			shader.SetTexture("texture_ao1", layerMaterials[0].ao);
+			shader.SetUniform("albedo", Color.White.ToVector4());
 
 			shader.SetUniform("useNormalMap", 0);
 			shader.SetUniform("useRoughnessMap", 1);

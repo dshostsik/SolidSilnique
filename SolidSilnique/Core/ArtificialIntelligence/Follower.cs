@@ -306,7 +306,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             //State Transition
             // -> Follow state - turn friendly
             state = AIState.FRIENDLY_FOLLOW;
-            gameObject.texture = EngineManager.scene.loadedTextures["simpleGreen"];
+            gameObject.albedo = Color.White;
 
 
         }

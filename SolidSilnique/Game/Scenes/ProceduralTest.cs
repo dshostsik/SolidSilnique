@@ -88,7 +88,7 @@ class ProceduralTest : Scene
         loadedTextures.Add("drzewo/ao", Content.Load<Texture2D>("drzewo/ao"));
         loadedTextures.Add("drzewo/glossy", Content.Load<Texture2D>("drzewo/glossy"));
 
-        loadedTextures.Add("trent/diffuse", Content.Load<Texture2D>("trent_fire/low_material_Base_color"));
+        loadedTextures.Add("trent", Content.Load<Texture2D>("trent_fire/low_material_Base_color"));
         loadedTextures.Add("trent/normal", Content.Load<Texture2D>("trent_fire/low_material_Normal_DirectX"));
         //loadedTextures.Add("trent/ao", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Mixed_AO"));
         //loadedTextures.Add("trent/roughness", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Coat_roughness"));
@@ -277,7 +277,7 @@ class ProceduralTest : Scene
 
         var animator = new AnimatorComponent(clip, loop: true);
         cube.AddComponent(animator);
-        animator.Play();
+        //animator.Play();
 
         // add to scene
         this.AddChild(cube);
@@ -293,9 +293,13 @@ class ProceduralTest : Scene
 				//prevGeb = gogus;
 			}
 
+		GameObject gigus = CreateGebus(new Vector3(180,15,700));
+		gigus.GetComponent<Follower>().Target = gab;
+        gigus.albedo = Color.Red;
+		this.AddChild(gigus);
 
-       
-        rhythymGui = new GUI("Content/RhythymGui.xml", content);
+
+		rhythymGui = new GUI("Content/RhythymGui.xml", content);
         EngineManager.currentGui = rhythymGui;
 
         /*enemy = new GameObject("euzebiusz wiercibok");
@@ -306,8 +310,21 @@ class ProceduralTest : Scene
         this.AddChild(enemy);*/
 
         this.AddChild(go);
-    
-    }
+
+
+        GameObject boss = new GameObject("boss");
+		boss.transform.position = new Vector3(512, 0, 50);
+        boss.albedo = new Color(1, 0.2f, 1);
+		boss.model = loadedModels["trent"];
+        boss.texture = loadedTextures["trent"];
+        boss.AddComponent(new SphereColliderComponent(8f));
+        this.AddChild(boss);
+
+
+		TPCamera.cameraComponent.SetMain();
+        EngineManager.InputManager.gMode = true;
+
+	}
 
     public override void Update()
     {
@@ -355,23 +372,26 @@ class ProceduralTest : Scene
 
         go.transform.position = pos;
         go.transform.scale = new Vector3(0.75f);
-        go.model = loadedModels["sphere"];
-        go.texture = loadedTextures["gabTex"];
+        
         go.AddComponent(new SphereColliderComponent(0.75f, false));
-        //go.AddComponent(new DebugMoveComponent());
-        //go.GetComponent<DebugMoveComponent>().move = false;
         go.AddComponent(new Follower(go, 2f));
-        var clip1 = new AnimationClip();
-        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0f, pos));
-        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(2f, pos));
-        // scale: pulse 1→2→1
-        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(0.75f)));
-        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(1f, new Vector3(1f)));
-        clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(2f, new Vector3(2f)));
+        GameObject visual = new GameObject("GebusVisual");
+		visual.model = loadedModels["sphere"];
+		visual.texture = loadedTextures["gabTex"];
+        go.AddChild(visual);
+
+		var clip1 = new AnimationClip();
+        clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0f, Vector3.Up*0));
+		//clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0.2f, Vector3.Up * 0));
+		clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0.4f, Vector3.Up*1));
+		clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0.8f, Vector3.Up * 0));
+		// scale: pulse 1→2→1
+		clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(1f)));
 
         var animator2 = new AnimatorComponent(clip1, loop: true);
 
-        go.AddComponent(animator2);
+		visual.AddComponent(animator2);
+        animator2.Play();
 
         return go;
     }
