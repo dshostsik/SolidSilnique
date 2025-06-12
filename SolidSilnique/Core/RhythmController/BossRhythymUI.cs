@@ -203,6 +203,7 @@ public class BossRhythymUI
                 }
                 visuals.setNoteInvisible(loadedNotes[i].Button, loadedNotes[i].Time);
                 loadedNotes.RemoveAt(i);
+
                 limit = loadedNotes.Count;
             }
 

@@ -158,7 +158,7 @@ namespace SolidSilnique
             // Set1440p(fullscreen: true);
             Window.AllowUserResizing = true;
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            _graphics.IsFullScreen = false;
+            _graphics.IsFullScreen = true;
             //Window.IsBorderless = true;
             // _graphics.HardwareModeSwitch = true;
             //_graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;

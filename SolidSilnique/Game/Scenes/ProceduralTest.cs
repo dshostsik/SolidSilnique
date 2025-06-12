@@ -55,7 +55,7 @@ class ProceduralTest : Scene
         //loadedModels.Add("drzewo/drzewo", Content.Load<Model>("drzewo/drzewo"));
         loadedModels.Add("trent", Content.Load<Model>("trent"));
 
-        loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
+        loadedTextures.Add("deimos", Content.Load<Texture2D>("Map1/layer1/diffuse"));
         //loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
         loadedTextures.Add("simpleGreen", Content.Load<Texture2D>("simpleGreen"));
         loadedTextures.Add("simpleBlack", Content.Load<Texture2D>("simpleBlack"));
