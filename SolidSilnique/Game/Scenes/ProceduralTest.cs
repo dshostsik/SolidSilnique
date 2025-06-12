@@ -293,7 +293,9 @@ class ProceduralTest : Scene
 				//prevGeb = gogus;
 			}
 
-		GameObject gigus = CreateGebus(new Vector3(180,15,700));
+		GameObject gigus = CreateGebus(new Vector3(165,15,600));
+
+
 		gigus.GetComponent<Follower>().Target = gab;
         gigus.albedo = Color.Red;
 		this.AddChild(gigus);
@@ -375,17 +377,19 @@ class ProceduralTest : Scene
         
         go.AddComponent(new SphereColliderComponent(0.75f, false));
         go.AddComponent(new Follower(go, 2f));
+
         GameObject visual = new GameObject("GebusVisual");
 		visual.model = loadedModels["sphere"];
 		visual.texture = loadedTextures["gabTex"];
+        visual.albedo = Color.Red;
         go.AddChild(visual);
 
 		var clip1 = new AnimationClip();
         clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0f, Vector3.Up*0));
-		//clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0.2f, Vector3.Up * 0));
+		
 		clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0.4f, Vector3.Up*1));
 		clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0.8f, Vector3.Up * 0));
-		// scale: pulse 1→2→1
+		
 		clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(1f)));
 
         var animator2 = new AnimatorComponent(clip1, loop: true);
