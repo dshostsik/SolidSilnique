@@ -32,6 +32,21 @@ public class BossRhythymUI
     SpriteBatch spriteBatch;
     private GUIRhythymController visuals;
     List<Texture2D> textures = new List<Texture2D>();
+    private Texture2D goodHitTexture;
+
+
+    private class Feedback
+    {
+        public Texture2D Texture;
+        public Vector2   Position;
+        public Color     Color;
+        public float     StartTime;
+        public float     Duration;
+    }
+    private readonly List<Feedback> _feedbacks = new();
+
+    private const float FeedbackDur = 0.5f;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public void Start(ContentManager content,SpriteBatch spriteBatch)
     {
@@ -45,8 +60,8 @@ public class BossRhythymUI
         textures.Add(content.Load<Texture2D>("Textures/BlueActive"));
         textures.Add(content.Load<Texture2D>("Textures/GreenActive"));
         textures.Add(content.Load<Texture2D>("Textures/RedActive"));
-        
-        
+        goodHitTexture = content.Load<Texture2D>("Visuals/Perfect");
+
         audio = new AtomicSoundTrack("master house",
             content, 0.1f);
         loadedNotes = NotesLoader.LoadNotesFromXml("Content/level.xml");
@@ -105,6 +120,22 @@ public class BossRhythymUI
             }
             
         }
+
+        for (int i = _feedbacks.Count - 1; i >= 0; i--)
+        {
+            var fb = _feedbacks[i];
+            if (songTime - fb.StartTime <= fb.Duration)
+            {
+                EngineManager.renderQueueUI.Enqueue(
+                    Tuple.Create(fb.Texture,
+                                 fb.Position,
+                                 fb.Color));
+            }
+            else
+            {
+                _feedbacks.RemoveAt(i);
+            }
+        }
         checkTooOldNotes();
         if (loadedNotes.Count == 0)
         {
@@ -157,8 +188,16 @@ public class BossRhythymUI
                 
                 
                 Console.WriteLine(loadedNotes[i].Button);
-                
-                
+
+                Vector2 hitPos = new Vector2(960, 100);
+                _feedbacks.Add(new Feedback
+                {
+                    Texture = goodHitTexture,
+                    Position = new Vector2(960, 100),  // tweak as desired
+                    Color = Color.White,
+                    StartTime = songTime,
+                    Duration = FeedbackDur
+                });
                 combo++;
                 if (health < 96)
                 {

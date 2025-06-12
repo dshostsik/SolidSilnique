@@ -305,8 +305,8 @@ namespace SolidSilnique
             {
                 _game = this
             };
-            Texture2D leaftex = Content.Load<Texture2D>("Textures/Dust");
-            _leafSystem.LoadContent(GraphicsDevice, Content, leaftex);
+            Texture2D dusttex = Content.Load<Texture2D>("Textures/Dust");
+            _leafSystem.LoadContent(GraphicsDevice, Content, dusttex);
 
             _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 4000f, gravity: new Vector3(0, -0.2f, 0))
             {    
