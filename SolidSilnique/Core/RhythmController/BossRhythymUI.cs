@@ -43,7 +43,9 @@ public class BossRhythymUI
     private readonly List<Feedback> _feedbacks = new();
 
     private const float FeedbackDur = 0.2f;
+    
 
+    public event EventHandler<NoteHitEventArgs> hit;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public void Start(ContentManager content,SpriteBatch spriteBatch)
     {
@@ -179,13 +181,14 @@ public class BossRhythymUI
             
             if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time-0.8) < 1.2f)
             {
+                hit?.Invoke(this,new NoteHitEventArgs(Math.Abs(pressTime-(float)loadedNotes[i].Time),a));
                 offsets.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time));
-                Console.WriteLine(songTime - loadedNotes[i].Time);
+                //Console.WriteLine(songTime - loadedNotes[i].Time);
                 accuracy.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
                 
                 
                 
-                Console.WriteLine(loadedNotes[i].Button);
+                //Console.WriteLine(loadedNotes[i].Button);
 
                 Vector2 hitPos = new Vector2(960, 100);
                 _feedbacks.Add(new Feedback
@@ -297,4 +300,19 @@ public class BossRhythymUI
         }
         return score;
     }
+    public class NoteHitEventArgs : EventArgs
+    {
+        
+        public float Accuracy { get; private set; }
+        public int NoteType { get; private set; }
+
+        public NoteHitEventArgs(float accuracy, int noteType)
+        {
+            Accuracy = accuracy;
+            NoteType = noteType;
+        }
+    }
+    
+    
+    
 }

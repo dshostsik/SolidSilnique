@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SolidSilnique.Core;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 using GUIRESOURCES;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core.Animation;
+using SolidSilnique.MonoAL;
 
 
 namespace SolidSilnique.GameContent;
@@ -26,6 +28,7 @@ class ProceduralTest : Scene
     public EnvironmentObject enviro = new EnvironmentObject();
     KeyboardState kState = new KeyboardState();
     private BossRhythymUI bossRhythym = new BossRhythymUI();
+    private AudioPlayer hitSounds;
     SpriteBatch spriteBatch = new SpriteBatch(EngineManager.graphics);
     public GUI rhythymGui;
 
@@ -121,6 +124,12 @@ class ProceduralTest : Scene
 
     public override void Setup()
     {
+	    string[] sounds = new string[4];
+	    sounds[0] = "Content/Sounds/drum-hitclap.wav";
+	    sounds[1] = "Content/Sounds/drum-hitfinish.wav";
+	    sounds[2] = "Content/Sounds/drum-hitnormal.wav";
+	    sounds[3] = "Content/Sounds/drum-hitnormalh.wav";
+	    hitSounds = new AudioPlayer(sounds, PositionalHelper.GetInstance(), 1f, 1f);
         environmentObject = new EnvironmentObject();
         environmentObject.Generate("Map1", content, 3, 60, 3, 8);
 
@@ -320,8 +329,8 @@ class ProceduralTest : Scene
 
 		TPCamera.cameraComponent.SetMain();
         EngineManager.InputManager.gMode = true;
-
-	}
+        bossRhythym.hit += powiedzDupa;
+    }
 
     public override void Update()
     {
@@ -406,5 +415,10 @@ class ProceduralTest : Scene
     {
         return false;// SquaredDistanceBetweenEnemyAndPlayer() < enemy.GetComponent<Follower>().SocialDistance *
             //enemy.GetComponent<Follower>().SocialDistance;
+    }
+
+    private void powiedzDupa(object sender,BossRhythymUI.NoteHitEventArgs args)
+    {	
+	    Console.WriteLine(args.NoteType);
     }
 }
