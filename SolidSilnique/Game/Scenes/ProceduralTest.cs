@@ -124,12 +124,14 @@ class ProceduralTest : Scene
 
     public override void Setup()
     {
+	    /*
 	    string[] sounds = new string[4];
 	    sounds[0] = "Content/Sounds/drum-hitclap.wav";
 	    sounds[1] = "Content/Sounds/drum-hitfinish.wav";
 	    sounds[2] = "Content/Sounds/drum-hitnormal.wav";
 	    sounds[3] = "Content/Sounds/drum-hitnormalh.wav";
 	    hitSounds = new AudioPlayer(sounds, PositionalHelper.GetInstance(), 1f, 1f);
+	    */
         environmentObject = new EnvironmentObject();
         environmentObject.Generate("Map1", content, 3, 60, 3, 8);
 
