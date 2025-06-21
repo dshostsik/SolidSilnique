@@ -14,6 +14,7 @@ public class HitNoteVisual
     public int noteButton;
     public bool noteVisible = false;
     Texture2D noteTexture;
+    private float lastTime;
     public HitNoteVisual(float noteTime, int noteButton,List<Texture2D> TextureNotes)
     {
         this.noteTime = noteTime;
@@ -53,7 +54,8 @@ public class HitNoteVisual
         {
             noteVisible = true;
         }
-        float gameTime = Time.deltaTime;
+        float gameTime = songTime - lastTime;
+        lastTime = songTime;
         if (noteVisible)
         {
             switch (noteButton)
@@ -76,7 +78,7 @@ public class HitNoteVisual
         }
         
 
-        if (noteTime < songTime -0.05f)
+        if (noteTime < songTime -0.1f)
         {
             noteVisible = false;
         }

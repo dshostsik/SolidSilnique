@@ -421,6 +421,6 @@ class ProceduralTest : Scene
 
     private void powiedzDupa(object sender,BossRhythymUI.NoteHitEventArgs args)
     {	
-	    Console.WriteLine(args.NoteType);
+	    //Console.WriteLine(args.NoteType);
     }
 }

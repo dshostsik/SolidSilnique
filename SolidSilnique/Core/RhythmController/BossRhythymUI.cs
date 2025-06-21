@@ -25,7 +25,7 @@ public class BossRhythymUI
     KeyboardState kState = new KeyboardState();
     private GamePadState gpState;
     ContentManager content;
-    AtomicSoundTrack audio;
+    NAudioPlayer audio;
     SpriteBatch spriteBatch;
     private GUIRhythymController visuals;
     List<Texture2D> textures = new List<Texture2D>();
@@ -61,9 +61,9 @@ public class BossRhythymUI
         textures.Add(content.Load<Texture2D>("Textures/RedActive"));
         goodHitTexture = content.Load<Texture2D>("Visuals/Perfect");
         badHitTexture = content.Load<Texture2D>("Visuals/X");
-
-        audio = new AtomicSoundTrack("master house",
-            content, 0.1f);
+        
+        audio = new NAudioPlayer();
+        audio.LoadAudio("Content/master house.mp3");
         loadedNotes = NotesLoader.LoadNotesFromXml("Content/level.xml");
         visuals = new GUIRhythymController(loadedNotes,content);
         songTime = 0f;
@@ -82,7 +82,7 @@ public class BossRhythymUI
             return;
         }
 
-        songTime += Time.deltaTime;
+        songTime = (float)audio.GetCurrentPosition().TotalSeconds;
         
         
         visuals.updateGUIRhythym(loadedNotes,buttonsPressed,songTime);
@@ -179,11 +179,11 @@ public class BossRhythymUI
         {
             
             
-            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time-0.8) < 1.2f)
+            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time-0.014) < 0.14f)
             {
                 hit?.Invoke(this,new NoteHitEventArgs(Math.Abs(pressTime-(float)loadedNotes[i].Time),a));
                 offsets.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time));
-                //Console.WriteLine(songTime - loadedNotes[i].Time);
+                Console.WriteLine(songTime - loadedNotes[i].Time);
                 accuracy.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
                 
                 
@@ -236,7 +236,7 @@ public class BossRhythymUI
                 loadedNotes.RemoveAt(i);
                 if (health >= 5)
                 {
-                    health -= 5;
+                    //health -= 5;
                 }
                 
             }
@@ -267,25 +267,28 @@ public class BossRhythymUI
         if (kState.IsKeyDown(Keys.J) || gpState.IsButtonDown(Buttons.X))
         {
             buttonsPressed[1] = 1;
-            accuracyPressed[1] = audio.songTime();
+            accuracyPressed[1] = songTime;
+            
+            
+            
         }  
              
               if  (kState.IsKeyDown(Keys.I) || gpState.IsButtonDown(Buttons.Y))
              { 
                         buttonsPressed[0] = 1         ;
-                accuracyPressed[0] = audio.songTime();
+                accuracyPressed[0] = songTime;
             }
             
             if (kState.IsKeyDown(Keys.K) || gpState.IsButtonDown(Buttons.A))
             {
-                buttonsPressed[2] = 1; 
-                accuracyPressed[2] = audio.songTime();
+                buttonsPressed[2] = 1;
+                accuracyPressed[2] = songTime;
             }
             
             if (kState.IsKeyDown(Keys.L) || gpState.IsButtonDown(Buttons.B))
             {
-                buttonsPressed[3] = 1; 
-                accuracyPressed[3] = audio.songTime();
+                buttonsPressed[3] = 1;
+                accuracyPressed[3] = songTime;
             }
             
         
