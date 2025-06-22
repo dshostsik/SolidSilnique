@@ -47,7 +47,7 @@ class ProceduralTest : Scene
     public override void LoadContent(ContentManager Content)
     {
         //loadedModels.Add("drzewo", Content.Load<Model>("drzewo2"));
-        //loadedModels.Add("deimos", Content.Load<Model>("deimos"));
+        loadedModels.Add("deimos", Content.Load<Model>("deimos"));
         //loadedModels.Add("plane", Content.Load<Model>("plane"));
         loadedModels.Add("cube", Content.Load<Model>("cube"));
         //loadedModels.Add("cone", Content.Load<Model>("cone"));
@@ -62,8 +62,8 @@ class ProceduralTest : Scene
         //loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
         loadedModels.Add("dodik", Content.Load<Model>("dodik"));
         
-        loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
-        loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
+        //loadedTextures.Add("deimos", Content.Load<Texture2D>("deimos_texture"));
+        //loadedTextures.Add("testTex", Content.Load<Texture2D>("testTex"));
         loadedTextures.Add("simpleGreen", Content.Load<Texture2D>("simpleGreen"));
         loadedTextures.Add("simpleBlack", Content.Load<Texture2D>("simpleBlack"));
         loadedTextures.Add("gabTex", Content.Load<Texture2D>("Textures/gab_tex"));
@@ -321,8 +321,7 @@ class ProceduralTest : Scene
         gigus.albedo = Color.Red;
 		this.AddChild(gigus);
 
-
-		rhythymGui = new GUI("Content/RhythymGui.xml", content);
+		
         GameObject ziutek = CreateMovableObject("ziutek", 200,  200);
         ziutek.GetComponent<SphereColliderComponent>().boundingSphere.Radius = 2.0f;
         //ziutek.GetComponent<Follower>().Target = gab;

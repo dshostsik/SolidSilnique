@@ -54,9 +54,6 @@
         <PackageReference Include="SimplexNoise" Version="2.0.0" />
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Content\Background\" />
-    </ItemGroup>
-    <ItemGroup>
       <Compile Remove="Core\RhythmController\RTControll.cs" />
     </ItemGroup>
     <ItemGroup>
