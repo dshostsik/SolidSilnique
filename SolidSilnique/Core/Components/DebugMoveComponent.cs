@@ -1,10 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SolidSilnique.Core.Components
 {
@@ -14,7 +9,7 @@ namespace SolidSilnique.Core.Components
         public bool move = true;
 
         private const float MoveSpeed = 10f;
-        private const float RotationSpeed = 30f;
+        private const float RotationSpeed = 60f;
         private const float GravitySpeed = 5f;
 
         private int left, right, forward, backward = 0;
@@ -31,7 +26,7 @@ namespace SolidSilnique.Core.Components
 
             
             float hor = right - left;
-            float vert = forward - backward;
+            float vert = backward - forward;
 
             var gp = GamePad.GetState(PlayerIndex.One);
             if (gp.IsConnected)

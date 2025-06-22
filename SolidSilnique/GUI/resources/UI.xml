@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Hud name="test">
-    <GuiElement positionX="50" positionY="-10" scale="1">
-        <Bar name="hpbar" orientation="vertical" inverse="false" width="50"/>
-    </GuiElement>
+	<GuiElement positionX="50" positionY="-10" scale="1">
+		<Bar name="HP_BAR" orientation="vertical" inverse="false" width="50"/>
+	</GuiElement>
+	<GuiElement positionX="50" positionY="-10" scale="1">
+		<Image name="HP_FRAME"/>
+	</GuiElement>
     <GuiElement positionX="0" positionY="200" scale="0">
         <Image name="D"/>
     </GuiElement>
@@ -10,7 +13,7 @@
         <Button name="button" width="10" height="5"/>
     </GuiElement>
     <GuiElement positionX="50" positionY="70" scale="0,5">
-        <TextInput name="pole" fontSize="15" fontStyle="Arial" placeholder="text"/>
+        <TextInput name="pole" fontSize="15" fontStyle="Arial" placeholder="TEST"/>
     </GuiElement>
 
 </Hud>

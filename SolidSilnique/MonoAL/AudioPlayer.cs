@@ -1,9 +1,8 @@
-﻿using System;
-
-namespace SolidSilnique.MonoAL;
-using System.IO;
+﻿using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
+
+namespace SolidSilnique.MonoAL;
 public class AudioPlayer
 {
     private SoundEffect[] SoundEffects;

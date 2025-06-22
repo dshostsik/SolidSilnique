@@ -1,17 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SolidSilnique.Core;
-using SolidSilnique.GameContent;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SolidSilnique.Core.Components;
 using GUIRESOURCES;
-using SolidSilnique.Core.Diagnostics;
-using System.Reflection;
 
 namespace SolidSilnique.Core
 {
@@ -20,13 +12,13 @@ namespace SolidSilnique.Core
         Low = 1024,
         Medium = 2048,
         High = 4096,
-        Ultra = 8192
+        Ultra = 8192*2
     }
 
     static class EngineManager
     {
         public static Scene scene = null;
-        
+
         public static Queue<GameObject> renderQueue = [];
 		public static Dictionary<GameObject, VertexBufferBindingGroup> InstancesQueue = []; //representative, InstanceBuffer
         public static Queue<Tuple<Texture2D,Vector2,Color>> renderQueueUI = [];
@@ -57,17 +49,24 @@ namespace SolidSilnique.Core
         private static RenderTarget2D _staticShadowMapRenderTarget;
         private static int _iterationsCounter = 0;
         private static Matrix lightViewProjection;
-        private static Matrix _lightProjection =  Matrix.CreateOrthographic(512 * 1.41f, 512*1.41f, -128f, 128);
+        private static Matrix _lightProjection =  Matrix.CreateOrthographic(768 * 1.41f, 768*1.41f, -512, 512);
 
+        private static RenderTarget2D _sceneRenderTarget;
+        private static RenderTarget2D tempRenderTarget;
+        public static SpriteBatch _postSpriteBatch;
+        public static Effect _postProcessEffect;
+
+        public static GraphicsDeviceManager GraphicsManager;
+        public static Skybox Skybox;
         public static Input InputManager;
         public static bool mouseFree = false;
 
-        private static SpriteBatch UiRenderer;
+        public static LeafParticle LeafSystem1;
+        public static LeafParticle LeafSystem2;
 
         public static void Start()
         {
             scene.Start();
-            UiRenderer = new SpriteBatch(graphics);
             GenerateInstanceData();
         }
 
@@ -96,8 +95,8 @@ namespace SolidSilnique.Core
 
         private static RenderTarget2D BakeStaticShadows(Shader shadowShader, LightsManagerComponent manager)
         {
-            
-            RenderTarget2D output = new RenderTarget2D(graphics, _testSettings,
+			//sh.SetUniform("useInstancingShadows", 0);
+			RenderTarget2D output = new RenderTarget2D(graphics, _testSettings,
                 _testSettings, false,
                 SurfaceFormat.Single, DepthFormat.Depth24);
             shadowsQueue = new Queue<GameObject>(renderQueue);
@@ -112,18 +111,26 @@ namespace SolidSilnique.Core
 
             shadowShader.SwapTechnique("ShadeTheSceneRightNow");
             shadowShader.SetUniform("LightViewProj", lightViewProjection);
-            //shader.SetUniform("Dimensions", new Vector2(output.Width, output.Height));
-            if(scene.environmentObject != null)
+			//shader.SetUniform("Dimensions", new Vector2(output.Width, output.Height));
+			graphics.RasterizerState = new RasterizerState
+			{
+				CullMode = CullMode.None,
+				DepthBias = (1 / _testSettings) * 1024 * 1e+17f,
+				SlopeScaleDepthBias = 4f
+			};
+
+			if (scene.environmentObject != null)
             {
-				graphics.RasterizerState = RasterizerState.CullCounterClockwise;
-	            //scene.environmentObject.DrawAllBuffersToShader(shadowShader);
+				//graphics.RasterizerState = RasterizerState.CullNone;
+	            scene.environmentObject.DrawAllBuffersToShader(shadowShader);
             }
 
             
 
 
-			graphics.RasterizerState = RasterizerState.CullCounterClockwise;
-            while (shadowsQueue.Count > 0)
+			
+
+			while (shadowsQueue.Count > 0)
             {
                 GameObject go = shadowsQueue.Dequeue();
                 if (go.model == null || !go.isStatic)
@@ -146,14 +153,15 @@ namespace SolidSilnique.Core
                     shadowMesh.Draw();
                 }
             }
-			
+
+			DrawInstanceData(shadowShader, "Shadows");
+
             
-            
-            // using (var stream = new FileStream("shadowMap.png", FileMode.Create))
-            // {
-            //     output.SaveAsPng(stream, output.Width, output.Height);
-            // }
-            graphics.RasterizerState = RasterizerState.CullCounterClockwise;
+			// using (var stream = new FileStream("shadowMap.png", FileMode.Create))
+			// {
+			//     output.SaveAsPng(stream, output.Width, output.Height);
+			// }
+			graphics.RasterizerState = RasterizerState.CullCounterClockwise;
             graphics.SetRenderTarget(null);
             //-------------------------------------
             
@@ -161,21 +169,62 @@ namespace SolidSilnique.Core
         }
         
         
-        public static void Draw( Shader shadowShader, Matrix view, Matrix projection, LightsManagerComponent manager)
+        public static void Draw( Shader shadowShader, Matrix view, Matrix projection, LightsManagerComponent manager,Shader PostProcessShader )
         {
+            if (_sceneRenderTarget == null)
+            {
+	            
+                _sceneRenderTarget = new RenderTarget2D(
+                    graphics,
+                    1920, 1080,
+                    false,
+                    SurfaceFormat.Color,
+                    DepthFormat.Depth24);
+                
+                tempRenderTarget = new RenderTarget2D(
+	                graphics,
+	                1920, 1080,
+	                false,
+	                SurfaceFormat.Color,
+	                DepthFormat.Depth24);
+            }
+            
+        
+            
+            graphics.SetRenderTarget(_sceneRenderTarget);
+            graphics.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Black, 1.0f, 0);
+
+            
+
+            if (Skybox != null)
+                    {
+               var skyView = view;
+                skyView.Translation = Vector3.Zero;
+                var prevDepth = graphics.DepthStencilState;
+                graphics.DepthStencilState = DepthStencilState.None;
+                graphics.RasterizerState = RasterizerState.CullNone;
+
+
+                Skybox.Draw(GraphicsManager, view);
+
+                graphics.DepthStencilState = prevDepth;
+            }
+            
+
+            
+
+            graphics.DepthStencilState = DepthStencilState.Default;
+            graphics.RasterizerState = RasterizerState.CullCounterClockwise;
             scene.Draw();
 
             if (_iterationsCounter < 1)
             {
                 _iterationsCounter++;
-				_staticShadowMapRenderTarget = BakeStaticShadows(shadowShader, manager);
-			}
-			
+                _staticShadowMapRenderTarget = BakeStaticShadows(shadowShader, manager);
+            }
 
-
-
-			shader.SetUniform("LightViewProj", lightViewProjection);
-			shader.SetTexture("shadowMap", _staticShadowMapRenderTarget);
+            shader.SetUniform("LightViewProj", lightViewProjection);
+            shader.SetTexture("shadowMap", _staticShadowMapRenderTarget);
             shader.SetUniform("shadowMapResolution", _testSettings);
             shader.Effect.CurrentTechnique = shader.Effect.Techniques["BasicColorDrawingWithLights"];
 			// Normal rendering 
@@ -183,82 +232,63 @@ namespace SolidSilnique.Core
             {
                 GameObject go = renderQueue.Dequeue();
 
-                //FRUSTUM CULLING
                 _frustum.Matrix = view * projection;
-
                 var position = go.transform.position;
-
-                // Determine distance from camera to object
                 var distance = Vector3.Distance(
                     EngineManager.scene.mainCamera.CameraPosition,
                     position);
 
-                // Select appropriate LOD model based on distance
-
                 if (go.LODModels != null && go.LODModels.Count > 0)
-                {
                     go.model = go.GetLODModel(distance);
-                }
-
 
                 if (go.model == null)
-                {
                     continue;
-                }
 
                 try
                 {
                     Matrix model = go.transform.getModelMatrix();
-
                     setMaterial(go);
 
-
-					shader.SetUniform("World", model);
-                    Matrix modelTransInv = Matrix.Transpose(Matrix.Invert(go.transform.getModelMatrix()));
+                    shader.SetUniform("World", model);
+                    Matrix modelTransInv = Matrix.Transpose(Matrix.Invert(model));
                     shader.SetUniform("WorldTransInv", modelTransInv);
                     
                     
                     for (int i = 0; i < go.model.Meshes.Count; i++)
                     {
-                        ModelMesh mesh = go.model.Meshes[i];
+                        var mesh = go.model.Meshes[i];
                         if (useCulling)
                         {
-                            var sphere = mesh.BoundingSphere.Transform(go.transform.getModelMatrix());
+                            var sphere = mesh.BoundingSphere.Transform(model);
                             bool visible = _frustum.Intersects(sphere);
 
                             if (useWireframe)
                             {
-                                var prevRasterizer = graphics.RasterizerState;
-
-
+                                var prevRaster = graphics.RasterizerState;
                                 wireframeEffect.View = view;
                                 wireframeEffect.Projection = projection;
                                 wireframeEffect.World = Matrix.Identity;
-                                // TODO: may be we can get rid of this somehow
                                 graphics.RasterizerState = new RasterizerState { FillMode = FillMode.WireFrame };
-
 
                                 var box = BoundingBox.CreateFromSphere(sphere);
                                 var corners = box.GetCorners();
-                                // TODO: and this
                                 var lines = new VertexPositionColor[24];
                                 Color wireColor = visible ? Color.Green : Color.Red;
+                                int[,] edges = {
+                            {0,1},{1,2},{2,3},{3,0},
+                            {4,5},{5,6},{6,7},{7,4},
+                            {0,4},{1,5},{2,6},{3,7}
+                        };
                                 int idx = 0;
-                                // TODO: and this
-                                int[,] edges =
-                                {
-                                    { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
-                                    { 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 4 },
-                                    { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 }
-                                };
                                 for (int e = 0; e < edges.GetLength(0); e++)
                                 {
-                                    var a = corners[edges[e, 0]];
-                                    var b = corners[edges[e, 1]];
-                                    lines[idx++] = new VertexPositionColor(a, wireColor);
-                                    lines[idx++] = new VertexPositionColor(b, wireColor);
+                                    lines[idx++] = new VertexPositionColor(
+                                        corners[edges[e, 0]],
+                                        wireColor);
+                                    lines[idx++] = new VertexPositionColor(
+                                        corners[edges[e, 1]],
+                                        wireColor);
                                 }
-
                                 foreach (var pass in wireframeEffect.CurrentTechnique.Passes)
                                 {
                                     pass.Apply();
@@ -268,17 +298,15 @@ namespace SolidSilnique.Core
                                         0,
                                         edges.GetLength(0));
                                 }
-
-                                graphics.RasterizerState = prevRasterizer;
+                                graphics.RasterizerState = prevRaster;
                             }
 
                             if (!visible)
                                 continue;
                         }
-                        
-                        for (int j = 0; j < mesh.MeshParts.Count; j++)
+
+                        foreach (var part in mesh.MeshParts)
                         {
-                            var part = mesh.MeshParts[j];
                             part.Effect = shader.Effect;
                             if (celShadingEnabled)
                             {
@@ -298,47 +326,91 @@ namespace SolidSilnique.Core
                         }
                     }
                 }
-
-
-                catch (NullReferenceException e)
+                catch (Exception e)
                 {
-                    Console.WriteLine(e.Message, e.Source, e.StackTrace);
+                    Console.WriteLine(e);
                     throw;
                 }
-                catch (UniformNotFoundException u)
-                {
-                    Console.WriteLine(u.Message);
-                    throw;
-                }
+            }
 
-                
-
-			}
-            if(scene.environmentObject != null)
-            {
+            if (scene.environmentObject != null)
                 scene.environmentObject.Draw(_frustum);
-            }
-			DrawInstanceData();
+            DrawInstanceData(shader);
+            graphics.DepthStencilState = DepthStencilState.DepthRead;
 
+            // Compute the current song/time or frame time; if you have a static Time.totalGameTime:
+            float t = Time.deltaTime;
+
+            // Draw each leaf system
+            LeafSystem1?.Draw(graphics, view, projection, t);
+            LeafSystem2?.Draw(graphics, view, projection, t);
+
+            var vp = graphics.Viewport;
             
+            
+            
+            _postProcessEffect.Parameters["PrevRenderedSampler+PrevRendered"].SetValue(_sceneRenderTarget);
+            
+            PostProcessShader.SwapTechnique("PostProcess");
+            graphics.SetRenderTarget(tempRenderTarget);
+			
+            _postSpriteBatch.Begin(
+	            SpriteSortMode.Immediate,
+	            BlendState.Opaque,
+	            SamplerState.LinearClamp,
+	            DepthStencilState.None,
+	            RasterizerState.CullNone,
+	            PostProcessShader.Effect
+            );
+            
+            
+
+            _postSpriteBatch.Draw(
+	            _sceneRenderTarget,
+	            new Rectangle(0, 0, vp.Width, vp.Height),
+	            Color.White
+            );
+			
+            _postSpriteBatch.End();
+            PostProcessShader.SwapTechnique("Bloom");
+            _postProcessEffect.Parameters["PrevRenderedSampler+PrevRendered"].SetValue(tempRenderTarget);
+            _postProcessEffect.Parameters["PrevRenderedSamplerColor+PrevRenderedColor"].SetValue(_sceneRenderTarget);
+            graphics.SetRenderTarget(null);
+            
+            _postSpriteBatch.Begin(
+	            SpriteSortMode.Immediate,
+	            BlendState.Opaque,
+	            SamplerState.LinearClamp,
+	            DepthStencilState.None,
+	            RasterizerState.CullNone,
+	            PostProcessShader.Effect
+            );
+            
+            
+
+            _postSpriteBatch.Draw(
+	            tempRenderTarget,
+	            new Rectangle(0, 0, vp.Width, vp.Height),
+	            Color.White
+            );
+			
+            _postSpriteBatch.End();
+            
+            var UiRenderer = new SpriteBatch(graphics);
             UiRenderer.Begin();
-            while(renderQueueUI.Count > 0)
+            while (renderQueueUI.Count > 0)
             {
-                Tuple<Texture2D,Vector2,Color> element = renderQueueUI.Dequeue();
-                
-                UiRenderer.Draw(element.Item1, element.Item2, element.Item3);
-                
+	            var element = renderQueueUI.Dequeue();
+	            UiRenderer.Draw(element.Item1, element.Item2, element.Item3);
             }
-            
-            
-            //Rednder Mateuszkowe GUI :) using the same SpriteBatch :) 
             if (currentGui != null)
             {
-                currentGui.Draw(UiRenderer);
+	            currentGui.Draw(UiRenderer);
             }
-
-            
             UiRenderer.End();
+            
+           
+            
         }
     
 		
@@ -389,6 +461,7 @@ namespace SolidSilnique.Core
 			shader.SetTexture("texture_normal1", go.normalMap ?? normalMap);
 			shader.SetTexture("texture_roughness1", go.roughnessMap ?? defaultRoughnessMap);
 			shader.SetTexture("texture_ao1", go.aoMap ?? defaultAOMap);
+			shader.SetUniform("albedo", go.albedo.ToVector4());
 
 			shader.SetUniform("useLayering", 0);
 			shader.SetUniform("useNormalMap", (go.normalMap != null) ? 1 : 0);
@@ -468,10 +541,10 @@ namespace SolidSilnique.Core
 
 		}
 
-			static void DrawInstanceData()
+			static void DrawInstanceData(Shader sh, string affix = "")
 		{
 
-            shader.SetUniform("useInstancing", 1);
+            sh.SetUniform("useInstancing"+affix, 1);
 
             foreach (GameObject representative in InstancesQueue.Keys) {
 
@@ -500,7 +573,7 @@ namespace SolidSilnique.Core
                 setMaterial(representative);
 
 
-				foreach (EffectPass pass in shader.Effect.CurrentTechnique.Passes)
+				foreach (EffectPass pass in sh.Effect.CurrentTechnique.Passes)
 				{
 					pass.Apply();
 
@@ -519,7 +592,7 @@ namespace SolidSilnique.Core
 
 			}
 
-			shader.SetUniform("useInstancing", 0);
+			sh.SetUniform("useInstancing"+ affix, 0);
 
 
 

@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using SolidSilnique.Core.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SolidSilnique.Core.Physics
 {

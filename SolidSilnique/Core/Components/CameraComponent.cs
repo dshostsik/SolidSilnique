@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-
-namespace SolidSilnique.Core.Components
+﻿namespace SolidSilnique.Core.Components
 {
 	public class CameraComponent : Component
 	{

@@ -2,7 +2,6 @@
 
 using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core.Components;
 using SolidSilnique.Core.Diagnostics;
 
@@ -20,11 +19,18 @@ namespace SolidSilnique.Core.ArtificialIntelligence
 
 
 
+
+
     /// <summary>
     /// Class that allows <see cref="GameObject"/> to follow a specified target.
     /// </summary>
     public class Follower : Component
     {
+
+        public static GameObject enemyToFight = null;
+
+
+
         /// <summary>
         /// Reference to a target <see cref="GameObject"/> that will be followed by Self
         /// </summary>
@@ -164,6 +170,11 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         public override void Update()
         {
             gameObject.transform.position += Vector3.Down * Time.deltaTime * 9.81f;
+
+            if (enemyToFight != null) {
+                return;
+            }
+
             switch (state)
             {
                 case AIState.HOSTILE_PATROL:
@@ -191,6 +202,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         public void PatrolUpdate()
         {
 
+            
 
             patrolTimeToChange += Time.deltaTime;
             if (patrolTimeToChange >= patrolTimer)
@@ -229,15 +241,16 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             {
                 state = AIState.HOSTILE_RETURN;
             }
-            KeyboardState kState = Keyboard.GetState();
-            if (kState.IsKeyDown(Keys.V))
+
+            if (Vector3.DistanceSquared(this.gameObject.transform.position, Target.transform.position) <= SocialDistance*SocialDistance)
             {
-                //State Transition
-                // -> Follow state - turn friendly
-                state = AIState.FRIENDLY_FOLLOW;
-				
-                //Tex change
-                gameObject.texture = EngineManager.scene.loadedTextures["simpleGreen"];
+                
+                if(enemyToFight == null)
+                {
+                    enemyToFight = gameObject;
+                }
+
+                
 
 			}
 
@@ -253,7 +266,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
                 // -> Chase state
                 state = AIState.HOSTILE_CHASE;
             }
-            else if (Vector3.DistanceSquared(spawnPoint, gameObject.transform.position) >= homeRange * homeRange * 0.2f * 0.2f)
+            else if (Vector3.DistanceSquared(spawnPoint, gameObject.transform.position) >= homeRange * homeRange * 0.3f * 0.3f)
             {
                 moveVec = -(gameObject.transform.position - (spawnPoint + patrolTargetOffset));
                 moveVec.Normalize();
@@ -289,5 +302,15 @@ namespace SolidSilnique.Core.ArtificialIntelligence
 			// -> Follow state
 			state = AIState.FRIENDLY_FOLLOW;
 		}
+
+        public void SetFriendly() {
+            //Tex change
+            //State Transition
+            // -> Follow state - turn friendly
+            state = AIState.FRIENDLY_FOLLOW;
+            gameObject.children[0].albedo = Color.White;
+
+
+        }
 	}
 }

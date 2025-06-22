@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net.NetworkInformation;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,10 +7,11 @@ using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core;
 using SolidSilnique.Core.RhythmController;
 using SolidSilnique.MonoAL;
-using static NotesLoader;
+
 public class BossRhythymUI
 {
     float offset = 0.32f;
+    public bool hasEnded = false;
     private Stack<int> buttons = new Stack<int>();
     private List<float> accuracy = new List<float>();
     private List<Note> loadedNotes = new List<Note>();
@@ -27,22 +25,45 @@ public class BossRhythymUI
     KeyboardState kState = new KeyboardState();
     private GamePadState gpState;
     ContentManager content;
-    AtomicSoundTrack audio;
+    NAudioPlayer audio;
     SpriteBatch spriteBatch;
     private GUIRhythymController visuals;
     List<Texture2D> textures = new List<Texture2D>();
+    private Texture2D goodHitTexture;
+    private Texture2D badHitTexture;
+
+    private class Feedback
+    {
+        public Texture2D Texture;
+        public Vector2   Position;
+        public Color     Color;
+        public float     StartTime;
+        public float     Duration;
+    }
+    private readonly List<Feedback> _feedbacks = new();
+
+    private const float FeedbackDur = 0.2f;
+    
+
+    public event EventHandler<NoteHitEventArgs> hit;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     public void Start(ContentManager content,SpriteBatch spriteBatch)
     {
         this.spriteBatch = spriteBatch;
         this.content = content;
-        textures.Add(content.Load<Texture2D>("Textures/redNote"));
-        textures.Add(content.Load<Texture2D>("Textures/blueNote"));
-        textures.Add(content.Load<Texture2D>("Textures/yellowNote"));
-        textures.Add(content.Load<Texture2D>("Textures/violetNote"));
+        textures.Add(content.Load<Texture2D>("Textures/YellowNotActive"));
+        textures.Add(content.Load<Texture2D>("Textures/BlueNotActive"));
+        textures.Add(content.Load<Texture2D>("Textures/GreenNotActive"));
+        textures.Add(content.Load<Texture2D>("Textures/RedNotActive"));
+        textures.Add(content.Load<Texture2D>("Textures/YellowActive"));
+        textures.Add(content.Load<Texture2D>("Textures/BlueActive"));
+        textures.Add(content.Load<Texture2D>("Textures/GreenActive"));
+        textures.Add(content.Load<Texture2D>("Textures/RedActive"));
+        goodHitTexture = content.Load<Texture2D>("Visuals/Perfect");
+        badHitTexture = content.Load<Texture2D>("Visuals/X");
         
-        audio = new AtomicSoundTrack("master house",
-            content, 0.1f);
+        audio = new NAudioPlayer();
+        audio.LoadAudio("Content/master house.mp3");
         loadedNotes = NotesLoader.LoadNotesFromXml("Content/level.xml");
         visuals = new GUIRhythymController(loadedNotes,content);
         songTime = 0f;
@@ -60,11 +81,9 @@ public class BossRhythymUI
         {
             return;
         }
-        songTime += Time.deltaTime;
-        if (audio.songTime() < 0)
-        {
-            Console.WriteLine("o kurwa");
-        }
+
+        songTime = (float)audio.GetCurrentPosition().TotalSeconds;
+        
         
         visuals.updateGUIRhythym(loadedNotes,buttonsPressed,songTime);
         visuals.drawNotes(spriteBatch);
@@ -74,12 +93,14 @@ public class BossRhythymUI
         Color[] colors = new Color[2];
         colors[0] = Color.Black;
         colors[1] = Color.White;
+        
+        
         //EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[0], new Vector2(896, 476), colors[buttonsPressed[0]])); // I
         
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[0], new Vector2(896, 476-80), colors[buttonsPressed[0]])); // I
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[1], new Vector2(896-80, 476), colors[buttonsPressed[1]])); // <
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[2], new Vector2(896, 476+80), colors[buttonsPressed[2]])); // K
-        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(896+80, 476), colors[buttonsPressed[3]])); // >
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[buttonsPressed[0] * 4+0], new Vector2(896, 476-80 + 32), Color.White)); // I
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[buttonsPressed[1] * 4+1], new Vector2(896-80 + 32, 476), Color.White)); // <
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[buttonsPressed[2] * 4+2], new Vector2(896, 476+80 - 32), Color.White)); // K
+        EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[buttonsPressed[3] * 4+3], new Vector2(896+80 - 32, 476), Color.White)); // >
         
         if (CheckNotZero(buttonsPressed) > 0)
         {
@@ -98,6 +119,22 @@ public class BossRhythymUI
                 
             }
             
+        }
+
+        for (int i = _feedbacks.Count - 1; i >= 0; i--)
+        {
+            var fb = _feedbacks[i];
+            if (songTime - fb.StartTime <= fb.Duration)
+            {
+                EngineManager.renderQueueUI.Enqueue(
+                    Tuple.Create(fb.Texture,
+                                 fb.Position,
+                                 fb.Color));
+            }
+            else
+            {
+                _feedbacks.RemoveAt(i);
+            }
         }
         checkTooOldNotes();
         if (loadedNotes.Count == 0)
@@ -135,24 +172,33 @@ public class BossRhythymUI
         int limit = 4;
         if (loadedNotes.Count < 4)
         {
-            Console.WriteLine(loadedNotes.Count);
+            
             limit = loadedNotes.Count;
         }
         for (int i = 0; i < limit; i++)
         {
             
             
-            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time -3.5) < 2f)
+            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time-0.014) < 0.14f)
             {
+                hit?.Invoke(this,new NoteHitEventArgs(Math.Abs(pressTime-(float)loadedNotes[i].Time),a));
                 offsets.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time));
-                
-                accuracy.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
-                EngineManager.renderQueueUI.Enqueue(new Tuple<Texture2D, Vector2, Color>(textures[3], new Vector2(1300, 720-64), Color.White));
-                
                 Console.WriteLine(songTime - loadedNotes[i].Time);
-                Console.WriteLine(loadedNotes[i].Button);
-                Console.WriteLine("przerwa");
+                accuracy.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
                 
+                
+                
+                //Console.WriteLine(loadedNotes[i].Button);
+
+                Vector2 hitPos = new Vector2(960, 100);
+                _feedbacks.Add(new Feedback
+                {
+                    Texture = goodHitTexture,
+                    Position = new Vector2(960, 100),
+                    Color = Color.White,
+                    StartTime = songTime,
+                    Duration = FeedbackDur
+                });
                 combo++;
                 if (health < 96)
                 {
@@ -160,6 +206,7 @@ public class BossRhythymUI
                 }
                 visuals.setNoteInvisible(loadedNotes[i].Button, loadedNotes[i].Time);
                 loadedNotes.RemoveAt(i);
+
                 limit = loadedNotes.Count;
             }
 
@@ -177,12 +224,19 @@ public class BossRhythymUI
         {
             if (loadedNotes[i].Time < songTime - 1.5f)
             {
-                
+                _feedbacks.Add(new Feedback
+                {
+                    Texture = badHitTexture,
+                    Position = new Vector2(960, 100),
+                    Color = Color.White,
+                    StartTime = songTime,
+                    Duration = FeedbackDur
+                });
                 combo = 0;
                 loadedNotes.RemoveAt(i);
                 if (health >= 5)
                 {
-                    health -= 5;
+                    //health -= 5;
                 }
                 
             }
@@ -204,6 +258,8 @@ public class BossRhythymUI
         {
             avgOffset += offsets[i];
         }
+
+        hasEnded = true;
     }
 
     void readInput()
@@ -211,25 +267,28 @@ public class BossRhythymUI
         if (kState.IsKeyDown(Keys.J) || gpState.IsButtonDown(Buttons.X))
         {
             buttonsPressed[1] = 1;
-            accuracyPressed[1] = audio.songTime();
+            accuracyPressed[1] = songTime;
+            
+            
+            
         }  
              
               if  (kState.IsKeyDown(Keys.I) || gpState.IsButtonDown(Buttons.Y))
              { 
                         buttonsPressed[0] = 1         ;
-                accuracyPressed[0] = audio.songTime();
+                accuracyPressed[0] = songTime;
             }
             
             if (kState.IsKeyDown(Keys.K) || gpState.IsButtonDown(Buttons.A))
             {
-                buttonsPressed[2] = 1; 
-                accuracyPressed[2] = audio.songTime();
+                buttonsPressed[2] = 1;
+                accuracyPressed[2] = songTime;
             }
             
             if (kState.IsKeyDown(Keys.L) || gpState.IsButtonDown(Buttons.B))
             {
-                buttonsPressed[3] = 1; 
-                accuracyPressed[3] = audio.songTime();
+                buttonsPressed[3] = 1;
+                accuracyPressed[3] = songTime;
             }
             
         
@@ -244,4 +303,19 @@ public class BossRhythymUI
         }
         return score;
     }
+    public class NoteHitEventArgs : EventArgs
+    {
+        
+        public float Accuracy { get; private set; }
+        public int NoteType { get; private set; }
+
+        public NoteHitEventArgs(float accuracy, int noteType)
+        {
+            Accuracy = accuracy;
+            NoteType = noteType;
+        }
+    }
+    
+    
+    
 }

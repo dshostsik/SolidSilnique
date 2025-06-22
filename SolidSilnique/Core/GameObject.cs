@@ -2,11 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net.Http.Json;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Xml;
 
 namespace SolidSilnique.Core
 {
@@ -41,7 +37,7 @@ namespace SolidSilnique.Core
         public Texture2D normalMap = null;
         public Texture2D roughnessMap = null;
         public Texture2D aoMap = null;
-
+        public Color albedo = Color.White;
 
         // Level of Detail (LOD)
         /// <summary>
@@ -57,6 +53,7 @@ namespace SolidSilnique.Core
 
         public bool useInstancing = false;
         public bool isStatic = false;
+
         
         //Components
         [JsonInclude]

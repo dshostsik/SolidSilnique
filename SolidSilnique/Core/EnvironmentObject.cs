@@ -3,10 +3,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using SolidSilnique.Core.Physics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SolidSilnique.Core
 {
@@ -203,6 +199,7 @@ namespace SolidSilnique.Core
 			shader.SetTexture("texture_normal1", layerMaterials[0].normal);
 			shader.SetTexture("texture_roughness1", layerMaterials[0].roughness);
 			shader.SetTexture("texture_ao1", layerMaterials[0].ao);
+			shader.SetUniform("albedo", Color.White.ToVector4());
 
 			shader.SetUniform("useNormalMap", 0);
 			shader.SetUniform("useRoughnessMap", 1);

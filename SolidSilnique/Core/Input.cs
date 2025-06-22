@@ -2,12 +2,6 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Graphics;
-using static System.Formats.Asn1.AsnWriter;
-using System.Net.NetworkInformation;
 
 namespace SolidSilnique.Core
 {
@@ -182,7 +176,7 @@ namespace SolidSilnique.Core
 
             // Up = Space or GamePad
             var up = new ActionBinding();
-            up.Keys.Add(Keys.Space);
+            //up.Keys.Add(Keys.Space);
             //up.Buttons.Add(Buttons.A);
             Add("Up", up);
 

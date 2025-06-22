@@ -160,7 +160,7 @@ public class ProceduralGrass
         {
             GameObject go = new GameObject("NotTree") { 
                 isStatic = true,
-                useInstancing = false
+                useInstancing = true
 
 			};
             float randX = i * 3, randZ = j * 3;
@@ -191,15 +191,10 @@ public class ProceduralGrass
             go.AddLOD(loadedModels[randomModel], 0f);
             go.AddLOD(loadedModels[randomModel], 100f);
             go.AddLOD(null, 200f);
-            if(randomModel == 2 || randomModel == 3 || randomModel == 4 || randomModel == 5)
-            {
-                go.texture = loadedTextures[0];
+            
+                go.texture = loadedTextures[randomModel];
                 
-            }
-            else
-            {
-                go.texture = loadedTextures[1];
-            }
+            
             
 
             createdObjects.Add(go);

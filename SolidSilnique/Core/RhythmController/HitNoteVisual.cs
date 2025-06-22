@@ -14,6 +14,7 @@ public class HitNoteVisual
     public int noteButton;
     public bool noteVisible = false;
     Texture2D noteTexture;
+    private float lastTime;
     public HitNoteVisual(float noteTime, int noteButton,List<Texture2D> TextureNotes)
     {
         this.noteTime = noteTime;
@@ -26,18 +27,18 @@ public class HitNoteVisual
         {
             case 0:
                 positionX = 896;
-                positionY =  -40;
+                positionY =  -40+32;
                 break;
             case 1:
-                positionX = 460-80;
+                positionX = 460-80+32;
                 positionY = 476;
                 break;
             case 2:
                 positionX = 896;
-                positionY = 912+80;
+                positionY = 912+80-32;
                 break;
             case 3:
-                positionX = 1332+80;
+                positionX = 1332+80-32;
                 positionY = 476;
                 break;
                 
@@ -49,34 +50,35 @@ public class HitNoteVisual
 
     public void updatePos(float songTime)
     {
-        if (songTime + 0.5f >= noteTime && !noteVisible)
+        if (songTime + 1f >= noteTime && !noteVisible)
         {
             noteVisible = true;
         }
-        float gameTime = Time.deltaTime;
+        float gameTime = songTime - lastTime;
+        lastTime = songTime;
         if (noteVisible)
         {
             switch (noteButton)
             {
                 
                 case 0:
-                    positionY +=  (int)(gameTime * 872);
+                    positionY +=  (int)(gameTime * 436);
                     break;
                 case 1:
-                    positionX +=  (int)(gameTime * 872);
+                    positionX +=  (int)(gameTime * 436);
                     break;
                 case 2:
-                    positionY -=  (int)(gameTime * 872);
+                    positionY -=  (int)(gameTime * 436);
                     break;
                 case 3:
-                    positionX -=  (int)(gameTime * 872);
+                    positionX -=  (int)(gameTime * 436);
                     break;
                 
             }  
         }
         
 
-        if (noteTime < songTime -0.05f)
+        if (noteTime < songTime -0.1f)
         {
             noteVisible = false;
         }

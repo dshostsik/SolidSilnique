@@ -10,7 +10,6 @@ using SolidSilnique.GameContent;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 // Use this to prevent conflicts with Microsoft.Xna.Framework.Graphics.DirectionalLight
 using DirectionalLight = SolidSilnique.Core.DirectionalLight;
-using System.Reflection.Metadata;
 
 namespace SolidSilnique
 {
@@ -82,6 +81,7 @@ namespace SolidSilnique
 
         private Shader shader;
         private Shader shadowShader;
+        private Shader postShader;
 
         public bool useCulling = false;
 
@@ -112,9 +112,9 @@ namespace SolidSilnique
             _graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
             IsFixedTimeStep = false;
-            Mouse.SetCursor(MouseCursor.Crosshair);
+            //Mouse.SetCursor(MouseCursor.Crosshair);
             counter = new FrameCounter();
             scrollWheelValue = 0;
         }
@@ -158,12 +158,12 @@ namespace SolidSilnique
             // Set1440p(fullscreen: true);
             Window.AllowUserResizing = true;
             _graphics.GraphicsProfile = GraphicsProfile.HiDef;
-            _graphics.IsFullScreen = false;
+            _graphics.IsFullScreen = true;
             //Window.IsBorderless = true;
             // _graphics.HardwareModeSwitch = true;
             //_graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             //_graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
-            _graphics.SynchronizeWithVerticalRetrace = false; //VSync
+            _graphics.SynchronizeWithVerticalRetrace = true; //VSync
             //_graphics.SynchronizeWithVerticalRetrace = false; // disabled VSync for uncapped FPS
             _graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             _graphics.ApplyChanges();
@@ -194,6 +194,11 @@ namespace SolidSilnique
                 GraphicsDevice,
                 this,
                 "ShadeTheSceneRightNow");
+            
+            postShader = new Shader("Shaders/postProcessShader",
+                GraphicsDevice,
+                this,
+                "PostProcess");
 
 
             manager = new LightsManagerComponent(shader);
@@ -259,6 +264,8 @@ namespace SolidSilnique
             _skybox = new Skybox();
             _skybox.Setup(Content, _graphics, GraphicsDevice, _projection);
 
+            EngineManager.GraphicsManager = _graphics;
+            EngineManager.Skybox = _skybox;
             
 
             base.Initialize();
@@ -293,20 +300,25 @@ namespace SolidSilnique
             EngineManager.Start();
 
             // Initialize GPU leaf particles
-            _leafSystem = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 40f,gravity: new Vector3(0, 0, 0))
+            _leafSystem = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 1e6f, gravity: new Vector3(0, 0, 0))
             {
                 _game = this
             };
-            Texture2D leaftex = Content.Load<Texture2D>("Textures/Dust");
-            _leafSystem.LoadContent(GraphicsDevice, Content, leaftex);
+            Texture2D dusttex = Content.Load<Texture2D>("Textures/Dust");
+            _leafSystem.LoadContent(GraphicsDevice, Content, dusttex);
 
-            _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 20f, gravity: new Vector3(0, -0.2f, 0))
+            _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 4000f, gravity: new Vector3(0, -0.2f, 0))
             {    
                 _game = this
             };
             Texture2D leaftex2 = Content.Load<Texture2D>("Textures/leaf_diffuse");
             _leafSystem2.LoadContent(GraphicsDevice, Content, leaftex2);
 
+            EngineManager._postSpriteBatch = new SpriteBatch(EngineManager.graphics);
+            EngineManager._postProcessEffect = Content.Load<Effect>("Shaders/postProcessShader");
+
+            EngineManager.LeafSystem1 = _leafSystem;
+            EngineManager.LeafSystem2 = _leafSystem2;
         }
 
 
@@ -376,13 +388,13 @@ namespace SolidSilnique
             // TODO: Add your drawing code here
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.CornflowerBlue, 1.0f, 0);
 
-            GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
-            GraphicsDevice.RasterizerState = RasterizerState.CullNone;
+            //GraphicsDevice.DepthStencilState = DepthStencilState.DepthRead;
+            //GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
-            _skybox.Draw(_graphics, _view);
+            //_skybox.Draw(_graphics, _view);
 
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
+            //GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+            //GraphicsDevice.RasterizerState = RasterizerState.CullCounterClockwise;
 
 
             shader.SetUniform("View", _view);
@@ -393,11 +405,12 @@ namespace SolidSilnique
             //if (useCulling)
             //PerformCulledDraw();
             //else
-            EngineManager.Draw(shadowShader, _view, _projection, manager);
 
-            float t = (float)gameTime.TotalGameTime.TotalSeconds;
-            _leafSystem.Draw(GraphicsDevice, _view, _projection, t);
-            _leafSystem2.Draw(GraphicsDevice, _view, _projection, t);
+            EngineManager.Draw(shadowShader, _view, _projection, manager,postShader);
+
+            
+            //float t = (float)gameTime.TotalGameTime.TotalSeconds;
+
 
 
 

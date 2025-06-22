@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SolidSilnique.Core.Diagnostics;
