@@ -64,9 +64,19 @@ namespace SolidSilnique.Core
         public static LeafParticle LeafSystem1;
         public static LeafParticle LeafSystem2;
 
+        public static SpriteBatch UiRenderer;
+
+        // Used for darkening the scene
+        public static int darkenTheScene;
+        
+        // Initialize exit from a game
+        public static bool CloseGame = false;
+        public static bool mouseVisible = false;
+        
         public static void Start()
         {
             scene.Start();
+            UiRenderer = new SpriteBatch(graphics);
             GenerateInstanceData();
         }
 
@@ -74,8 +84,15 @@ namespace SolidSilnique.Core
         {
             Time.deltaTimeMs = gameTime.ElapsedGameTime.Milliseconds;
             Time.deltaTime = Time.deltaTimeMs / 1000.0f;
+            shader.SetUniform("darken", darkenTheScene);
+            Skybox.skyboxEffect.Parameters["darken"].SetValue(darkenTheScene);
+            Game1.CloseGame = CloseGame;
+            Game1.MouseVisible = mouseVisible;
             scene.Update();
-			EngineManager.scene.mainCamera.UpdateCameraVectors();
+            if (null != EngineManager.scene.mainCamera)
+            {
+	            EngineManager.scene.mainCamera.UpdateCameraVectors();
+            }
 		}
 
         public static void InitializeInput(Game1 game)
@@ -396,7 +413,7 @@ namespace SolidSilnique.Core
 			
             _postSpriteBatch.End();
             
-            var UiRenderer = new SpriteBatch(graphics);
+            //var UiRenderer = new SpriteBatch(graphics);
             UiRenderer.Begin();
             while (renderQueueUI.Count > 0)
             {

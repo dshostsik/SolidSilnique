@@ -13,6 +13,8 @@ SamplerState CubeSampler : register(s1); // The sampler bound to sampler registe
 matrix View;
 matrix Projection;
 
+int darken;
+
 struct VertexShaderInput
 {
     float4 Position : POSITION0; // Vertex position
@@ -40,7 +42,12 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
 
 float4 MainPS(VertexShaderOutput input) : SV_TARGET
 {
-    return CubeTexture.Sample(CubeSampler, normalize(float3(input.TexCord.x,input.TexCord.y*-1,input.TexCord.z)));
+    if (darken != 1) {
+        return CubeTexture.Sample(CubeSampler, normalize(float3(input.TexCord.x,input.TexCord.y*-1,input.TexCord.z)));
+    }
+    else {
+        return CubeTexture.Sample(CubeSampler, normalize(float3(input.TexCord.x,input.TexCord.y*-1,input.TexCord.z))) * float4(0.05f, 0.05f, 0.05f, 1.0f);
+    }
 }
 
 technique BasicColorDrawing

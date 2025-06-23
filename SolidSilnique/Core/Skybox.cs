@@ -9,7 +9,7 @@ namespace SolidSilnique.Core
 	{
 
 		TextureCube textureCube;
-		Effect skyboxEffect;
+		public Effect skyboxEffect;
 		VertexBuffer vertexBuffer;
 		private SamplerState samplerState;
 

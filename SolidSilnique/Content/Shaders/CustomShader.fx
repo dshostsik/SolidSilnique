@@ -209,6 +209,9 @@ sampler2D layer_roughness_2;
 sampler2D layer_ao_2;
 sampler2D layer_mask_2;
 
+// We'll use it for darkening the entire scene if main menu option is visible
+int darken;
+
 //-------------------------------------
 //           PIXEL SHADER            
 //-------------------------------------
@@ -371,8 +374,11 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
     }    
     
     
-    
-	return float4((directionalLight + totalPointLight + totalSpotlight), 1.0)  * textureVector * albedo;
+    if (darken != 1) {
+	    return float4((directionalLight + totalPointLight + totalSpotlight), 1.0)  * textureVector * albedo;
+    } else {
+        return float4((directionalLight + totalPointLight + totalSpotlight), 1.0)  * textureVector * albedo * float4(0.05f, 0.05f, 0.05f, 1.0f);
+    }
 }
 
 

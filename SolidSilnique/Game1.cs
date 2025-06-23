@@ -101,8 +101,9 @@ namespace SolidSilnique
         GameTime gameTime;
         private LeafParticle _leafSystem;
         private LeafParticle _leafSystem2;
-
-
+        
+        public static bool CloseGame = false;
+        public static bool MouseVisible = false;
 
         /// <summary>
         /// Constructor
@@ -114,10 +115,11 @@ namespace SolidSilnique
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
             IsFixedTimeStep = false;
-            //Mouse.SetCursor(MouseCursor.Crosshair);
+            Mouse.SetCursor(MouseCursor.Arrow);
             counter = new FrameCounter();
             scrollWheelValue = 0;
         }
+
         public void Set1080p(bool fullscreen = false)
         {
             // 1920×1080 is 1080p
@@ -169,8 +171,6 @@ namespace SolidSilnique
             _graphics.ApplyChanges();
 
 
-           
-
             // Create camera
             //TODO delete
             //TODO delete
@@ -194,7 +194,7 @@ namespace SolidSilnique
                 GraphicsDevice,
                 this,
                 "ShadeTheSceneRightNow");
-            
+
             postShader = new Shader("Shaders/postProcessShader",
                 GraphicsDevice,
                 this,
@@ -266,7 +266,7 @@ namespace SolidSilnique
 
             EngineManager.GraphicsManager = _graphics;
             EngineManager.Skybox = _skybox;
-            
+
 
             base.Initialize();
         }
@@ -294,21 +294,24 @@ namespace SolidSilnique
             EngineManager.scene.LoadContent(Content);
             EngineManager.scene.Setup();
 
-            EngineManager.scene.mainCamera.UpdateCameraVectors();
-            
+            if (null != EngineManager.scene.mainCamera)
+            {
+                EngineManager.scene.mainCamera.UpdateCameraVectors();
+            }
+
 
             EngineManager.Start();
 
             // Initialize GPU leaf particles
-            _leafSystem = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 1e6f, gravity: new Vector3(0, 0, 0))
+            _leafSystem = new LeafParticle(maxParticles: (int)2e+3, lifeTime: 1e6f, gravity: new Vector3(0, 0, 0))
             {
                 _game = this
             };
             Texture2D dusttex = Content.Load<Texture2D>("Textures/Dust");
             _leafSystem.LoadContent(GraphicsDevice, Content, dusttex);
 
-            _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 4000f, gravity: new Vector3(0, -0.2f, 0))
-            {    
+            _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3, lifeTime: 4000f, gravity: new Vector3(0, -0.2f, 0))
+            {
                 _game = this
             };
             Texture2D leaftex2 = Content.Load<Texture2D>("Textures/leaf_diffuse");
@@ -332,24 +335,29 @@ namespace SolidSilnique
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-                Keyboard.GetState().IsKeyDown(Keys.Escape))
+                CloseGame
+                //Keyboard.GetState().IsKeyDown(Keys.Escape)
+                )
                 Exit();
 
-            // Get current camera view
-            if (EngineManager.scene.mainCamera == EngineManager.scene.TPCamera)
+            if (EngineManager.scene.mainCamera != null)
             {
-                // Monster’s world position
-                Vector3 monsterPos = EngineManager.scene.TPCamera.CameraPosition;
-                // Place camera behind & above
-                Vector3 camPos = monsterPos + _tpcOffset;
-                // Aim slightly down at the monster
-                Vector3 lookAt = monsterPos + _tpcLookOffset;
-                _view = Matrix.CreateLookAt(camPos, lookAt, Vector3.Up);
-            }
-            else
-            {
-                // Free-cam’s usual view
-                _view = EngineManager.scene.mainCamera.getViewMatrix();
+                // Get current camera view
+                if (EngineManager.scene.mainCamera == EngineManager.scene.TPCamera)
+                {
+                    // Monster’s world position
+                    Vector3 monsterPos = EngineManager.scene.TPCamera.CameraPosition;
+                    // Place camera behind & above
+                    Vector3 camPos = monsterPos + _tpcOffset;
+                    // Aim slightly down at the monster
+                    Vector3 lookAt = monsterPos + _tpcLookOffset;
+                    _view = Matrix.CreateLookAt(camPos, lookAt, Vector3.Up);
+                }
+                else
+                {
+                    // Free-cam’s usual view
+                    _view = EngineManager.scene.mainCamera.getViewMatrix();
+                }
             }
 
             _lightView = Matrix.CreateLookAt(sunPosition, sunPosition + testDirectionalLight.Direction, Vector3.Up);
@@ -375,6 +383,7 @@ namespace SolidSilnique
             //Matrix rotation = Matrix.CreateFromAxisAngle(axis, angleRadians);
             //testDirectionalLight.Direction = Vector3.Transform(originalVector, rotation);
 
+            IsMouseVisible = MouseVisible;
 
             counter.Update(gameTime);
             EngineManager.ProcessInput(gameTime);
@@ -399,19 +408,20 @@ namespace SolidSilnique
 
             shader.SetUniform("View", _view);
             shader.SetUniform("Projection", _projection);
-            shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
+            if (null != EngineManager.scene.mainCamera)
+            {
+                shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
+            }
 
 
             //if (useCulling)
             //PerformCulledDraw();
             //else
 
-            EngineManager.Draw(shadowShader, _view, _projection, manager,postShader);
+            EngineManager.Draw(shadowShader, _view, _projection, manager, postShader);
 
-            
+
             //float t = (float)gameTime.TotalGameTime.TotalSeconds;
-
-
 
 
             _text.Begin();
@@ -421,8 +431,5 @@ namespace SolidSilnique
 
             base.Draw(gameTime);
         }
-
-        
-
-	}
+    }
 }

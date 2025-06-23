@@ -150,7 +150,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
 
             Vector3 direction = _target.transform.position - this.gameObject.transform.position;
             direction.Y = 0.0f;
-            if (direction.LengthSquared() <= (_socialDistance * _socialDistance)) return Vector3.Zero;
+            if (direction.LengthSquared() < (_socialDistance * _socialDistance)) return Vector3.Zero;
 
             direction.Normalize();
 
