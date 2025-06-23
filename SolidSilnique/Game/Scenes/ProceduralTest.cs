@@ -402,14 +402,34 @@ class ProceduralTest : Scene
 
     GameObject CreateGebus(Vector3 pos)
     {
-        GameObject go = new GameObject("Gebus");
+	    GameObject go = new GameObject("Gebus");
 
-        go.transform.position = pos;
-        go.transform.scale = new Vector3(0.75f);
+	    go.transform.position = pos;
+	    go.transform.scale = new Vector3(0.75f);
         
-        go.AddComponent(new SphereColliderComponent(0.75f, false));
-        go.AddComponent(new Follower(go, 2f));
-        return go;
+	    go.AddComponent(new SphereColliderComponent(0.75f, false));
+	    go.AddComponent(new Follower(go, 2f));
+
+	    GameObject visual = new GameObject("GebusVisual");
+	    visual.model = loadedModels["sphere"];
+	    visual.texture = loadedTextures["gabTex"];
+	    visual.albedo = Color.Red;
+	    go.AddChild(visual);
+
+	    var clip1 = new AnimationClip();
+	    clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0f, Vector3.Up*0));
+		
+	    clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0.4f, Vector3.Up*1));
+	    clip1.PositionCurve.AddKey(new Keyframe<Vector3>(0.8f, Vector3.Up * 0));
+		
+	    clip1.ScaleCurve.AddKey(new Keyframe<Vector3>(0f, new Vector3(1f)));
+
+	    var animator2 = new AnimatorComponent(clip1, loop: true);
+
+	    visual.AddComponent(animator2);
+	    animator2.Play();
+
+	    return go;
     }
 
     /// <summary>
