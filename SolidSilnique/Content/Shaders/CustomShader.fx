@@ -170,9 +170,10 @@ float ComputeShadows(float3 fragPos, float3 normal) {
     shadow = 0; //currentDepth - 0.00001f < (shadowMapDepth) ? 0.5f : 1.0f;
     
     float2 texelSize = 1.0 / shadowMapResolution;
-    for (int x = -3; x <= 3; ++x)
+    float stepek = 0.8f;
+    for (float x = -3*stepek; x <= 3*stepek; x+=stepek)
     {
-        for (int y = -3; y <= 3; ++y)
+        for (float y = -3 * stepek; y <= 3 * stepek; y += stepek)
         {
             float pcfDepth = tex2D(shadowMap, (shadowCoord.xy + float2(x, y) * texelSize) * float2(1, -1)).r;
             shadow += currentDepth - 1e-5f < pcfDepth ? 0.2f : 0.9f;
