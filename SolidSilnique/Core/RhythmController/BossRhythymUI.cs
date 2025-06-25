@@ -61,7 +61,8 @@ public class BossRhythymUI
         textures.Add(content.Load<Texture2D>("Textures/RedActive"));
         goodHitTexture = content.Load<Texture2D>("Visuals/Perfect");
         badHitTexture = content.Load<Texture2D>("Visuals/X");
-        
+        EngineManager.InputManager.ActionPressed += OnActionPressed;
+
         audio = new NAudioPlayer();
         audio.LoadAudio("Content/master house.mp3");
         loadedNotes = NotesLoader.LoadNotesFromXml("Content/level.xml");
@@ -75,8 +76,6 @@ public class BossRhythymUI
     public void Update()
     {
         
-        kState = Keyboard.GetState();
-        gpState = GamePad.GetState(PlayerIndex.One);
         if (turnedOff)
         {
             return;
@@ -87,7 +86,7 @@ public class BossRhythymUI
         
         visuals.updateGUIRhythym(loadedNotes,buttonsPressed,songTime);
         visuals.drawNotes(spriteBatch);
-        readInput();
+        
         
         
         Color[] colors = new Color[2];
@@ -150,8 +149,8 @@ public class BossRhythymUI
             audio.Stop();
             turnedOff = true;
         }
-        buttonsPressed = new int[4];
-        accuracyPressed = new float[4];
+        Array.Clear(buttonsPressed, 0, 4);
+        Array.Clear(accuracyPressed, 0, 4); ;
     }
 
     int CheckNotZero(int[] buttons)
@@ -292,6 +291,23 @@ public class BossRhythymUI
             }
             
         
+    }
+
+    private void OnActionPressed(string action)
+    {
+        int slot = action switch
+        {
+            "NoteI" => 0,
+            "NoteJ" => 1,
+            "NoteK" => 2,
+            "NoteL" => 3,
+            _ => -1
+        };
+        if (slot < 0) return;
+        buttonsPressed[slot] = 1;
+        accuracyPressed[slot] = songTime;
+
+        CheckCorespondingNote(slot, accuracyPressed[slot]);
     }
 
     public float ReturnScoresAndAccuracy()

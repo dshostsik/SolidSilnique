@@ -602,7 +602,7 @@ namespace SolidSilnique.Core
 
 
 		}
-        private static void OnActionPressed(string action)
+        public static void OnActionPressed(string action)
         {
             var cam = scene.mainCamera;
             switch (action)
