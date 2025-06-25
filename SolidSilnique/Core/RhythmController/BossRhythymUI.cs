@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core;
+using SolidSilnique.Core.Components;
 using SolidSilnique.Core.RhythmController;
 using SolidSilnique.MonoAL;
 
@@ -40,6 +41,7 @@ public class BossRhythymUI
         public float     StartTime;
         public float     Duration;
     }
+
     private readonly List<Feedback> _feedbacks = new();
 
     private const float FeedbackDur = 0.2f;
@@ -181,6 +183,11 @@ public class BossRhythymUI
             if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time-0.014) < 0.14f)
             {
                 hit?.Invoke(this,new NoteHitEventArgs(Math.Abs(pressTime-(float)loadedNotes[i].Time - 0.014f),a,combo+1));
+                NoteHit?.Invoke(this, new NoteEventArgs
+                {
+                    ButtonIndex = a,
+                    Accuracy = Math.Abs(pressTime - (float)loadedNotes[i].Time - 0.014f)
+                });
                 offsets.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time));
                 Console.WriteLine(songTime - loadedNotes[i].Time);
                 accuracy.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
@@ -261,38 +268,7 @@ public class BossRhythymUI
         hasEnded = true;
     }
 
-    void readInput()
-    {
-        if (kState.IsKeyDown(Keys.J) || gpState.IsButtonDown(Buttons.X))
-        {
-            buttonsPressed[1] = 1;
-            accuracyPressed[1] = songTime;
-            
-            
-            
-        }  
-             
-              if  (kState.IsKeyDown(Keys.I) || gpState.IsButtonDown(Buttons.Y))
-             { 
-                        buttonsPressed[0] = 1         ;
-                accuracyPressed[0] = songTime;
-            }
-            
-            if (kState.IsKeyDown(Keys.K) || gpState.IsButtonDown(Buttons.A))
-            {
-                buttonsPressed[2] = 1;
-                accuracyPressed[2] = songTime;
-            }
-            
-            if (kState.IsKeyDown(Keys.L) || gpState.IsButtonDown(Buttons.B))
-            {
-                buttonsPressed[3] = 1;
-                accuracyPressed[3] = songTime;
-            }
-            
-        
-    }
-
+    
     private void OnActionPressed(string action)
     {
         int slot = action switch
@@ -333,7 +309,15 @@ public class BossRhythymUI
             Combo = combo;
         }
     }
-    
-    
-    
+    public class NoteEventArgs : EventArgs
+    {
+
+        public int ButtonIndex;
+        public float Accuracy;
+    }
+
+    public event EventHandler<NoteEventArgs> NoteHit;
+
+
+
 }

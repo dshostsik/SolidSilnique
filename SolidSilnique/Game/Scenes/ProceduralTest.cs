@@ -12,6 +12,7 @@ using GUIRESOURCES;
 using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core.Animation;
 using SolidSilnique.MonoAL;
+using static BossRhythymUI;
 
 
 namespace SolidSilnique.GameContent;
@@ -27,7 +28,9 @@ class ProceduralTest : Scene
 
     public EnvironmentObject enviro = new EnvironmentObject();
     KeyboardState kState = new KeyboardState();
-    private BossRhythymUI bossRhythym = new BossRhythymUI();
+    BossRhythymUI bossRhythym = new BossRhythymUI();
+
+
     private AudioPlayer hitSounds;
     SpriteBatch spriteBatch = new SpriteBatch(EngineManager.graphics);
     public GUI rhythymGui;
@@ -188,9 +191,10 @@ class ProceduralTest : Scene
         //gab.aoMap = loadedTextures["gabAo"];
         gab.AddComponent(new DebugMoveComponent());
         gab.AddComponent(new SphereColliderComponent(1));
-
-
+        gab.AddComponent(new NoteResponseComponent());
         this.AddChild(gab);
+
+
         GameObject TPcam = new GameObject("cam");
         TPcam.AddComponent(new TPPCameraComponent());
         TPcam.transform.position = new Vector3(0, 1.5f, 0);
@@ -366,6 +370,7 @@ class ProceduralTest : Scene
         TPCamera.cameraComponent.SetMain();
         EngineManager.InputManager.gMode = true;
         bossRhythym.hit += powiedzDupa;
+        bossRhythym.hit += OnBossNoteHit;
 
         GameObject visual = new GameObject("GebusVisual");
         visual.model = loadedModels["sphere"];
@@ -610,5 +615,24 @@ class ProceduralTest : Scene
     private void powiedzDupa(object sender, BossRhythymUI.NoteHitEventArgs args)
     {
         //Console.WriteLine(args.NoteType);
+    }
+    private void OnBossNoteHit(object sender, NoteHitEventArgs e)
+    {
+        // ensure gab has the component
+        var responder = gab.GetComponent<NoteResponseComponent>();
+        if (responder == null) return;
+
+        // map button index → nod direction
+        NodDirection dir = e.NoteType switch
+        {
+            0 => NodDirection.Forward,   // I
+            2 => NodDirection.Backward,  // K
+            1 => NodDirection.Left,      // J
+            3 => NodDirection.Right,     // L
+            _ => NodDirection.Forward
+        };
+
+        // trigger the quick nod
+        responder.Trigger(dir);
     }
 }
