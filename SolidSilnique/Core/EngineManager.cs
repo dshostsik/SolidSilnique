@@ -44,9 +44,11 @@ namespace SolidSilnique.Core
         public static BasicEffect wireframeEffect;
         public static GraphicsDevice graphics;
         public static Shader shader;
+        public static LightsManagerComponent lightsManager;
 
 
-        private static RenderTarget2D _staticShadowMapRenderTarget;
+
+		private static RenderTarget2D _staticShadowMapRenderTarget;
         private static int _iterationsCounter = 0;
         private static Matrix lightViewProjection;
         private static Matrix _lightProjection =  Matrix.CreateOrthographic(768 * 1.41f, 768*1.41f, -512, 512);
@@ -169,7 +171,7 @@ namespace SolidSilnique.Core
         }
         
         
-        public static void Draw( Shader shadowShader, Matrix view, Matrix projection, LightsManagerComponent manager,Shader PostProcessShader )
+        public static void Draw( Shader shadowShader, Matrix view, Matrix projection, Shader PostProcessShader )
         {
             if (_sceneRenderTarget == null)
             {
@@ -220,7 +222,7 @@ namespace SolidSilnique.Core
             if (_iterationsCounter < 1)
             {
                 _iterationsCounter++;
-                _staticShadowMapRenderTarget = BakeStaticShadows(shadowShader, manager);
+                _staticShadowMapRenderTarget = BakeStaticShadows(shadowShader, lightsManager);
             }
 
             shader.SetUniform("LightViewProj", lightViewProjection);

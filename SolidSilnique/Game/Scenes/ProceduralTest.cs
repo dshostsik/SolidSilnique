@@ -328,6 +328,12 @@ class ProceduralTest : Scene
         boss.AddComponent(new SphereColliderComponent(8f));
         this.AddChild(boss);
 
+        //Overlord :)
+        GameObject overlord = new GameObject("Overlord");
+        overlord.AddComponent(new OverlordComponent());
+        this.AddChild(overlord);
+
+
 
 		TPCamera.cameraComponent.SetMain();
         EngineManager.InputManager.gMode = true;
@@ -350,6 +356,7 @@ class ProceduralTest : Scene
             bossRhythym.hasEnded = false;
             bossRhythym.Start(content, spriteBatch);
             turnedOn = true;
+            OverlordComponent.instance.SetFight(100, gab, Follower.enemyToFight);
         }
 
         if (turnedOn)
@@ -408,16 +415,6 @@ class ProceduralTest : Scene
 
     private bool turnedOn = false;
 
-    private float SquaredDistanceBetweenEnemyAndPlayer()
-    {
-        return 0;// Vector3.DistanceSquared(enemy.transform.position, gab.transform.position);
-    }
-
-    private bool EnemyReachedPlayer()
-    {
-        return false;// SquaredDistanceBetweenEnemyAndPlayer() < enemy.GetComponent<Follower>().SocialDistance *
-            //enemy.GetComponent<Follower>().SocialDistance;
-    }
 
     private void powiedzDupa(object sender,BossRhythymUI.NoteHitEventArgs args)
     {	

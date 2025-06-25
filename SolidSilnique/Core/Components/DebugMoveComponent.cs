@@ -23,7 +23,7 @@ namespace SolidSilnique.Core.Components
 
         public override void Update()
         {
-
+            OverlordStates olState = OverlordComponent.instance.state;
             
             float hor = right - left;
             float vert = backward - forward;
@@ -35,7 +35,7 @@ namespace SolidSilnique.Core.Components
                 //vert += gp.ThumbSticks.Left.Y;
             }
 
-            if (!move || !EngineManager.InputManager.gMode)
+            if (!move || !EngineManager.InputManager.gMode || olState != OverlordStates.EXPLORE)
             {
                 hor = 0f;
                 vert = 0f;

@@ -160,7 +160,7 @@ namespace SolidSilnique.Core.Components
                         spotlightAmbientColor[i] = _spotlights[i].AmbientColor;
                         spotlightDiffuseColor[i] = _spotlights[i].DiffuseColor;
                         spotlightSpecularColor[i] = _spotlights[i].SpecularColor;
-                        spotlightPosition[i] = _spotlights[i].gameObject.transform.position;
+                        spotlightPosition[i] = _spotlights[i].gameObject.transform.globalPosition;
                         spotlightLinearAttenuation[i] = _spotlights[i].Linear;
                         spotlightQuadraticAttenuation[i] = _spotlights[i].Quadratic;
                         spotlightConstant[i] = _spotlights[i].Constant;
@@ -179,6 +179,7 @@ namespace SolidSilnique.Core.Components
                 _shader.SetUniform("spotlight_constant", spotlightConstant);
                 _shader.SetUniform("spotlight_innerCut", spotlightInnerCut);
                 _shader.SetUniform("spotlight_outerCut", spotlightOuterCut);
+                _shader.SetUniform("realSpotlightArrayLength", Spotlight.SpotlightInstances);
             }
             catch (UniformNotFoundException e)
             {
