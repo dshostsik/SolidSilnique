@@ -14,7 +14,7 @@ public class BossRhythymUI
     public bool hasEnded = false;
     private Stack<int> buttons = new Stack<int>();
     private List<float> accuracy = new List<float>();
-    private List<Note> loadedNotes = new List<Note>();
+    public List<Note> loadedNotes = new List<Note>();
     private List<float> offsets = new List<float>();
     int[] buttonsPressed = new int[4];
     float[] accuracyPressed = new float[4];
@@ -181,7 +181,7 @@ public class BossRhythymUI
             
             if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time-0.014) < 0.14f)
             {
-                hit?.Invoke(this,new NoteHitEventArgs(Math.Abs(pressTime-(float)loadedNotes[i].Time),a));
+                hit?.Invoke(this,new NoteHitEventArgs(Math.Abs(pressTime-(float)loadedNotes[i].Time - 0.014f),a,combo+1));
                 offsets.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time));
                 Console.WriteLine(songTime - loadedNotes[i].Time);
                 accuracy.Add(Math.Abs(pressTime-(float)loadedNotes[i].Time)/50f);
@@ -308,11 +308,13 @@ public class BossRhythymUI
         
         public float Accuracy { get; private set; }
         public int NoteType { get; private set; }
+        public int Combo { get; private set; }
 
-        public NoteHitEventArgs(float accuracy, int noteType)
+        public NoteHitEventArgs(float accuracy, int noteType, int combo)
         {
             Accuracy = accuracy;
             NoteType = noteType;
+            Combo = combo;
         }
     }
     

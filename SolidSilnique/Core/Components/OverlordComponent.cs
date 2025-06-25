@@ -44,6 +44,7 @@ namespace SolidSilnique.Core.Components
 
 		//FIGHT VARIABLES
 		Follower enemy;
+		BossRhythymUI rhythymUI;
 		float enemyProgress;
 		float enemyProgressTarget;
 		Vector3 arenaPos;
@@ -92,6 +93,7 @@ namespace SolidSilnique.Core.Components
 				cShake = Vector3.Lerp(cShake, Vector3.Zero, Time.deltaTime * 10);
 				gameObject.children[1].transform.position = cPos;
 				gameObject.children[1].transform.LookAt(arenaPos);
+				EngineManager.currentGui.texts[3].text = enemyProgress.ToString() +" / "+ enemyProgressTarget.ToString() ;
 			}
 		}
 
@@ -99,6 +101,9 @@ namespace SolidSilnique.Core.Components
 		{
 			state = OverlordStates.FIGHT;
 			rhythmUi.hit += Hit;
+			rhythymUI = rhythmUi;
+			enemyProgressTarget = (rhythmUi.loadedNotes.Count()/2) * 30;
+
 
 			arenaPos = (player.transform.position + enemy.transform.position)/2.0f;
 			Vector3 displacementVector = (player.transform.position - arenaPos);
@@ -134,10 +139,19 @@ namespace SolidSilnique.Core.Components
 
 		private void Hit(object sender, BossRhythymUI.NoteHitEventArgs e)
 		{
+			float comboMod = 1+MathF.Min(2,MathF.Max(e.Combo - 1, 0) * 0.1f);
+			if (e.Accuracy <= 0.14f && e.Accuracy > 0.8f)
+			{
+				enemyProgress += 10 * comboMod; //Great
+			}
+			else if (e.Accuracy <= 0.8f) {
+				enemyProgress += 30 * comboMod; //Perfect
+			}
 
-			switch (e.NoteType) {
+			cShake += -Vector3.Forward * comboMod;
+			/*switch (e.NoteType) {
 				case 0: //UP
-					cShake = Vector3.Up;
+					
 					break;
 				case 1: //LEFT
 					cShake = Vector3.Forward;
@@ -151,7 +165,7 @@ namespace SolidSilnique.Core.Components
 					break;
 				
 
-			}
+			}*/
 			
 		}
 
