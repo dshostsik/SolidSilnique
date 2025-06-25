@@ -346,13 +346,24 @@ class ProceduralTest : Scene
 		gigus.GetComponent<Follower>().Target = gab;
 		this.AddChild(gigus);
 
+		gigus = CreateGebus(new Vector3(250, 15, 650), 1, "Hard", "wav");
+		gigus.GetComponent<Follower>().Target = gab;
+		this.AddChild(gigus);
 
-		
+		gigus = CreateGebus(new Vector3(300, 15, 650), 2, "Hard", "wav");
+		gigus.GetComponent<Follower>().Target = gab;
+		this.AddChild(gigus);
+
+		gigus = CreateGebus(new Vector3(400, 15, 650), 3, "Hard", "mp3");
+		gigus.GetComponent<Follower>().Target = gab;
+		this.AddChild(gigus);
+
+
 		//gigus.albedo = Color.Red;
-		
 
 
-        GameObject ziutek = CreateMovableObject("ziutek", 200, 200);
+
+		GameObject ziutek = CreateMovableObject("ziutek", 200, 200);
         ziutek.GetComponent<SphereColliderComponent>().boundingSphere.Radius = 2.0f;
         //ziutek.GetComponent<Follower>().Target = gab;
         this.AddChild(ziutek);
