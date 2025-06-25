@@ -162,10 +162,10 @@ namespace SolidSilnique.Core.Components
 			float comboMod = 1+MathF.Min(2,MathF.Max(e.Combo - 1, 0) * 0.05f);
 			if (e.Accuracy <= 0.14f && e.Accuracy > 0.8f)
 			{
-				enemyProgress += 10 * comboMod; //Great
+				enemyProgress += 10;// * comboMod; //Great
 			}
 			else if (e.Accuracy <= 0.8f) {
-				enemyProgress += 30 * comboMod; //Perfect
+				enemyProgress += 30;// * comboMod; //Perfect
 			}
 			currentGui.progressBars[1].progress = MathF.Min(100,(enemyProgress/enemyProgressTarget) * 100);
 
