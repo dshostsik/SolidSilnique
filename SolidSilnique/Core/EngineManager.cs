@@ -66,9 +66,12 @@ namespace SolidSilnique.Core
         public static LeafParticle LeafSystem1;
         public static LeafParticle LeafSystem2;
 
-        public static void Start()
+        public static SpriteBatch UiRenderer;
+		public static void Start()
         {
-            scene.Start();
+			UiRenderer = new SpriteBatch(graphics);
+
+			scene.Start();
             GenerateInstanceData();
         }
 
@@ -398,7 +401,7 @@ namespace SolidSilnique.Core
 			
             _postSpriteBatch.End();
             
-            var UiRenderer = new SpriteBatch(graphics);
+            
             UiRenderer.Begin();
             while (renderQueueUI.Count > 0)
             {
