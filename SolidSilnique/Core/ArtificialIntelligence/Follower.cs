@@ -59,7 +59,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         //Lost State
         public float teleportRange = 30f;
 
-
+        private float tolerance = 0.01f;
 
         /// <summary>
         /// The distance between Self and <see cref="Target"/> . The default value is calculated based on <see cref="_socialDistanceMultiplier"/>
@@ -150,7 +150,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
 
             Vector3 direction = _target.transform.position - this.gameObject.transform.position;
             direction.Y = 0.0f;
-            if (direction.LengthSquared() < (_socialDistance * _socialDistance)) return Vector3.Zero;
+            if ((direction.LengthSquared() - (_socialDistance * _socialDistance)) < tolerance) return Vector3.Zero;
 
             direction.Normalize();
 
@@ -245,7 +245,7 @@ namespace SolidSilnique.Core.ArtificialIntelligence
             if (Vector3.DistanceSquared(this.gameObject.transform.position, Target.transform.position) <= SocialDistance*SocialDistance)
             {
                 
-                if(enemyToFight == null)
+                if (enemyToFight == null)
                 {
                     enemyToFight = gameObject;
                 }
