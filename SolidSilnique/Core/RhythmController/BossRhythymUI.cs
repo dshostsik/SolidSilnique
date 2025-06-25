@@ -222,7 +222,7 @@ public class BossRhythymUI
     {
         for (int i = 0; i < loadedNotes.Count; i++)
         {
-            if (loadedNotes[i].Time < songTime - 1.5f)
+            if (loadedNotes[i].Time < songTime - 0.14f)
             {
                 _feedbacks.Add(new Feedback
                 {
