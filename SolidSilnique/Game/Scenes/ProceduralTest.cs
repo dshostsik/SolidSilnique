@@ -45,6 +45,8 @@ class ProceduralTest : Scene
     private GameObject enemy;
     private int _enemyHP = 100;
     private bool _playerInsideEnemyFOV = false;
+    private bool _songWasPlaying = false;
+    private double _lastAudioStopTime;
 
     public ProceduralTest()
     {
@@ -147,6 +149,8 @@ class ProceduralTest : Scene
         environmentObject = new EnvironmentObject();
         environmentObject.Generate("Map1", content, 3, 60, 3, 8);
 
+        _lastAudioStopTime = 0f;
+        
         ProceduralGrass newProc =
             new ProceduralGrass(models, textures, treeModels, treeTextures, content, environmentObject);
         Task task1 = Task.Run(() => newProc.precomputeNoise());
@@ -224,14 +228,14 @@ class ProceduralTest : Scene
         gab.AddChild(eye1);
 
 			GameObject pupil1 = new GameObject("pupil1");
-				pupil1.transform.position = new Vector3(0, 0, -0.427f * 2);
+				pupil1.transform.position = new Vector3(0, 0, -0.495f * 2);
 				pupil1.transform.scale = new Vector3(0.4f,0.4f,0.2f);
 				pupil1.model = loadedModels["sphere"];
 				pupil1.texture = loadedTextures["simpleBlack"];
 				eye1.AddChild(pupil1);
 
 		GameObject brow1 = new GameObject("brow1");
-		brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, -0.427f * 2);
+		brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, -0.495f * 2);
 		brow1.transform.scale = new Vector3(0.45f, 0.2f,0.4f);
 		brow1.transform.rotation = new Vector3(0f,0,-20f);
 		brow1.model = loadedModels["cube"];
@@ -239,21 +243,21 @@ class ProceduralTest : Scene
 		gab.AddChild(brow1);
 
 		GameObject eye2 = new GameObject("eye2");
-			eye2.transform.position = new Vector3(0.25f*2, 0.209f, -0.427f*2);
+			eye2.transform.position = new Vector3(0.25f*2, 0.209f, -0.495f * 2);
 			eye2.transform.scale = new Vector3(0.4f);
 			eye2.model = loadedModels["sphere"];
 			eye2.texture = loadedTextures["eye"];
 			gab.AddChild(eye2);
 
 		GameObject pupil2 = new GameObject("pupil1");
-		pupil2.transform.position = new Vector3(0, 0, -0.427f * 2);
+		pupil2.transform.position = new Vector3(0, 0, -0.495f * 2);
 		pupil2.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
 		pupil2.model = loadedModels["sphere"];
 		pupil2.texture = loadedTextures["simpleBlack"];
 		eye2.AddChild(pupil2);
 
 		GameObject brow2 = new GameObject("brow1");
-		brow2.transform.position = new Vector3(0.25f * 2, 0.5f, -0.427f * 2);
+		brow2.transform.position = new Vector3(0.25f * 2, 0.5f, -0.495f * 2);
 		brow2.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
 		brow2.transform.rotation = new Vector3(0f, 0, 20f);
 		brow2.model = loadedModels["cube"];
@@ -399,6 +403,11 @@ class ProceduralTest : Scene
             EngineManager.currentGui = mainMenuGui;
             // Unlock the mouse
             EngineManager.mouseFree = inMainMenu;
+            if (turnedOn && !_songWasPlaying)
+            {
+	            bossRhythym.audio.Pause();
+	            _songWasPlaying = true;
+            }
         }
 
         // Process only menu if inMainMenu is true. All updates will be suspended. Otherwise, update all entities
@@ -436,7 +445,6 @@ class ProceduralTest : Scene
             rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
             rhythymGui.texts[1].text = bossRhythym.combo.ToString();
 
-
             base.Update();
         }
     }
@@ -457,7 +465,7 @@ class ProceduralTest : Scene
                 Button button = mainMenuGui.buttons[i];
 
                 int x = (int)Math.Clamp(mouseX, button.positionX, button.positionX + button.width);
-                int y = (int)Math.Clamp(mouseY, button.positionY, button.positionY + button.width);
+                int y = (int)Math.Clamp(mouseY, button.positionY, button.positionY + button.height);
                 
                 // if mouse actually intercepts any button, then check it's number. predefined in Content/MainMenuGUI/menu.xml
                 if (mouseX == x && mouseY == y)
@@ -471,12 +479,17 @@ class ProceduralTest : Scene
                             EngineManager.currentGui = rhythymGui;
                             EngineManager.mouseFree = inMainMenu;
                             EngineManager.mouseVisible = false;
+                            if (_songWasPlaying && turnedOn)
+                            {
+	                            bossRhythym.audio.Play();
+	                            _songWasPlaying = false;
+                            }
                             break;
                         // Escape button
-                        case 2:
+                        case 1:
                             EngineManager.CloseGame = true;
                             break;
-                        // The Settings button is not implemented yet. idk if we really need it
+                        // The Settings button is not implemented. idk if we really need it
                     }
                 }
             }

@@ -25,7 +25,7 @@ public class BossRhythymUI
     KeyboardState kState = new KeyboardState();
     private GamePadState gpState;
     ContentManager content;
-    NAudioPlayer audio;
+    public NAudioPlayer audio;
     SpriteBatch spriteBatch;
     private GUIRhythymController visuals;
     List<Texture2D> textures = new List<Texture2D>();
