@@ -356,7 +356,7 @@ class ProceduralTest : Scene
             bossRhythym.hasEnded = false;
             bossRhythym.Start(content, spriteBatch);
             turnedOn = true;
-            OverlordComponent.instance.SetFight(100, gab, Follower.enemyToFight);
+            OverlordComponent.instance.SetFight(bossRhythym, 100, gab, Follower.enemyToFight);
         }
 
         if (turnedOn)

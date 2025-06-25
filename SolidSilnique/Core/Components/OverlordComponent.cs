@@ -75,20 +75,31 @@ namespace SolidSilnique.Core.Components
 		}
 
 		float rotate = 0;
+		Vector3 cShake = Vector3.Zero;
+		Vector3 cShakeActual = Vector3.Zero;
 
 		public override void Update()
 		{
 			if (state == OverlordStates.FIGHT) {
 				rotate += Time.deltaTime/3f;
-				Vector3 cPos = arenaPos + Vector3.Up * 6 + Vector3.Right * MathF.Sin(rotate) * 12 + Vector3.Forward * MathF.Cos(rotate) * 12;
+
+				cShakeActual = Vector3.Lerp(cShakeActual, cShake, Time.deltaTime * 10);
+				Vector3 cPos = arenaPos
+					+ Vector3.Up * (6f + cShakeActual.Y)
+					+ Vector3.Right * (MathF.Sin(rotate) * (12f + cShakeActual.Z))
+					+ Vector3.Forward * (MathF.Cos(rotate) * (12f + cShakeActual.Z));
+
+				cShake = Vector3.Lerp(cShake, Vector3.Zero, Time.deltaTime * 10);
 				gameObject.children[1].transform.position = cPos;
 				gameObject.children[1].transform.LookAt(arenaPos);
 			}
 		}
 
-		public void SetFight(float targetPoints, GameObject player, GameObject enemy)
+		public void SetFight(BossRhythymUI rhythmUi, float targetPoints, GameObject player, GameObject enemy)
 		{
 			state = OverlordStates.FIGHT;
+			rhythmUi.hit += Hit;
+
 			arenaPos = (player.transform.position + enemy.transform.position)/2.0f;
 			Vector3 displacementVector = (player.transform.position - arenaPos);
 			displacementVector.Normalize();
@@ -119,6 +130,29 @@ namespace SolidSilnique.Core.Components
 			//Start Rhythm UI
 
 
+		}
+
+		private void Hit(object sender, BossRhythymUI.NoteHitEventArgs e)
+		{
+
+			switch (e.NoteType) {
+				case 0: //UP
+					cShake = Vector3.Up;
+					break;
+				case 1: //LEFT
+					cShake = Vector3.Forward;
+					break;
+
+				case 2: //DOWN
+					cShake = -Vector3.Up;
+					break;
+				case 3: //RIGHT
+					cShake = -Vector3.Forward;
+					break;
+				
+
+			}
+			
 		}
 
 		public void Hit()
