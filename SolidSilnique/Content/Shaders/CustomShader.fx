@@ -379,7 +379,7 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
     if (darken != 1) {
 	    return float4((directionalLight + totalPointLight + totalSpotlight), 1.0) * textureVector * albedo + emissive;
     } else {
-        return float4((directionalLight + totalPointLight + totalSpotlight), 1.0) * textureVector * albedo * float4(0.05f, 0.05f, 0.05f, 1.0f) + emissive;
+        return float4(((directionalLight + totalPointLight + totalSpotlight), 1.0) * textureVector * albedo + emissive) * float4(0.05f, 0.05f, 0.05f, 1.0f);
     }
 }
 

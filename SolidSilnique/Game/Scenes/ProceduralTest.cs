@@ -48,6 +48,8 @@ class ProceduralTest : Scene
     private bool _songWasPlaying = false;
     private double _lastAudioStopTime;
 
+    private bool firstFrame = true;
+
     public ProceduralTest()
     {
     }
@@ -336,11 +338,11 @@ class ProceduralTest : Scene
 
         mainMenuGui = new GUI("Content/MainMenuUI/menu.xml", content);
         rhythymGui = new GUI("Content/RhythymGui.xml", content);
-        EngineManager.currentGui = rhythymGui;
+        //EngineManager.currentGui = rhythymGui;
 
         // Check if we're playing or nah
         EngineManager.darkenTheScene = inMainMenu ? 1 : 0;
-        //EngineManager.currentGui = inMainMenu ? mainMenuGui : rhythymGui;
+        EngineManager.currentGui = inMainMenu ? mainMenuGui : rhythymGui;
         EngineManager.mouseFree = inMainMenu;
         EngineManager.mouseVisible = inMainMenu;
 
@@ -365,6 +367,7 @@ class ProceduralTest : Scene
         //Overlord :)
         GameObject overlord = new GameObject("Overlord");
         overlord.AddComponent(new OverlordComponent());
+        overlord.GetComponent<OverlordComponent>().currentGui = rhythymGui;
         this.AddChild(overlord);
 
 
@@ -449,8 +452,8 @@ class ProceduralTest : Scene
 	        rhythymGui.texts[1].text = bossRhythym.combo.ToString();
 
 
-	        base.Update();
         }
+	    base.Update();
     }
 
     /// <summary>

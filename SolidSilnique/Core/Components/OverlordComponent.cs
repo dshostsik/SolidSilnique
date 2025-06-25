@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using SolidSilnique.Core.ArtificialIntelligence;
 using System;
 using System.Linq;
+using GUIRESOURCES;
 
 namespace SolidSilnique.Core.Components
 {
@@ -41,7 +42,8 @@ namespace SolidSilnique.Core.Components
 		//FIGHT VARIABLES
 		GameObject enemy;
 		GameObject player;
-		BossRhythymUI rhythymUI;
+		public BossRhythymUI rhythymUI;
+		public GUI currentGui;
 		float enemyProgress;
 		float enemyProgressTarget;
 		Vector3 arenaPos;
@@ -85,7 +87,7 @@ namespace SolidSilnique.Core.Components
 			state = OverlordStates.EXPLORE;
 			//EngineManager.lightsManager.DirectionalLight.Enabled = 0;
 			EngineManager.lightsManager.Start();
-			EngineManager.currentGui.progressBars[1].visible = false;
+			currentGui.progressBars[1].visible = false;
 
 		}
 
@@ -107,7 +109,7 @@ namespace SolidSilnique.Core.Components
 				cShake = Vector3.Lerp(cShake, Vector3.Zero, Time.deltaTime * 10);
 				gameObject.children[1].transform.position = cPos;
 				gameObject.children[1].transform.LookAt(arenaPos);
-				EngineManager.currentGui.texts[3].text = enemyProgress.ToString() +" / "+ enemyProgressTarget.ToString() ;
+				currentGui.texts[3].text = enemyProgress.ToString() +" / "+ enemyProgressTarget.ToString() ;
 			}
 		}
 
@@ -119,8 +121,8 @@ namespace SolidSilnique.Core.Components
 			enemyProgressTarget = (rhythmUi.loadedNotes.Count()) * 30;
 			this.enemy = enemy;
 			this.player = player;
-			EngineManager.currentGui.progressBars[1].visible = true;
-			EngineManager.currentGui.progressBars[1].progress = (enemyProgress / enemyProgressTarget) * 100;
+			currentGui.progressBars[1].visible = true;
+			currentGui.progressBars[1].progress = (enemyProgress / enemyProgressTarget) * 100;
 
 			arenaPos = (player.transform.position + enemy.transform.position)/2.0f;
 			Vector3 displacementVector = (player.transform.position - arenaPos);
@@ -164,7 +166,7 @@ namespace SolidSilnique.Core.Components
 			else if (e.Accuracy <= 0.8f) {
 				enemyProgress += 30 * comboMod; //Perfect
 			}
-			EngineManager.currentGui.progressBars[1].progress = MathF.Min(100,(enemyProgress/enemyProgressTarget) * 100);
+			currentGui.progressBars[1].progress = MathF.Min(100,(enemyProgress/enemyProgressTarget) * 100);
 
 			cShake += -Vector3.Forward * comboMod;
 			GameObject usedBall = this.gameObject.children[2].children[ballPoolIndex++];
@@ -203,7 +205,7 @@ namespace SolidSilnique.Core.Components
 		public void FinishFight(CameraComponent camToSet)
 		{
 			state = OverlordStates.EXPLORE;
-			EngineManager.currentGui.progressBars[1].visible = false;
+			currentGui.progressBars[1].visible = false;
 
 
 
