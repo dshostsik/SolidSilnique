@@ -221,12 +221,12 @@ namespace SolidSilnique
             testDirectionalLight.DiffuseColor = dirlight_diffuse;
             testDirectionalLight.SpecularColor = dirlight_specular;
 
-            testPointLight = new PointLight(0.022f, 0.0019f, 1);
+            /*testPointLight = new PointLight(0.022f, 0.0019f, 1);
             testPointLight.AmbientColor = dirlight_ambient;
             testPointLight.DiffuseColor = dirlight_diffuse;
-            testPointLight.SpecularColor = dirlight_specular;
+            testPointLight.SpecularColor = dirlight_specular;*/
 
-            testPointLightGameObject = new GameObject("Pointlight0");
+            /*testPointLightGameObject = new GameObject("Pointlight0");
             testPointLight.gameObject = testPointLightGameObject;
             testPointLightGameObject.AddComponent(testPointLight);
 
@@ -234,29 +234,31 @@ namespace SolidSilnique
             testSpotlight = new Spotlight(0.007f, 0.0002f, 1, new Vector3(-10, 0, 0), 5.5f, 7.5f);
             testSpotlightGameObject = new GameObject("Spotlight0");
             testSpotlight.gameObject = testSpotlightGameObject;
-            testSpotlightGameObject.AddComponent(testSpotlight);
+            testSpotlightGameObject.AddComponent(testSpotlight);*/
 
 
             testDirectionalLight.Enabled = 1;
-            testPointLight.Enabled = 1;
-            testSpotlight.Enabled = 1;
+            //testPointLight.Enabled = 1;
+            //testSpotlight.Enabled = 1;
 
             sunPosition = new Vector3(256f, 0f, 256f);
             //testSpotlight.Enabled = false;
 
-            manager.AddPointLight(testPointLight);
-            manager.AddSpotLight(testSpotlight);
+            //manager.AddPointLight(testPointLight);
+           // manager.AddSpotLight(testSpotlight);
             manager.DirectionalLight = testDirectionalLight;
             manager.DirectionalLightPosition = sunPosition;
-            manager.CreateNewPointLight();
-            testPointLightGameObject.transform.position = pointlight_position;
-            testSpotlightGameObject.transform.position = spotlight_position;
+            //manager.CreateNewPointLight();
+            //testPointLightGameObject.transform.position = pointlight_position;
+            //testSpotlightGameObject.transform.position = spotlight_position;
+
 
             manager.Start();
 
             //EngineManager.scene = new TestScene();
             EngineManager.graphics = GraphicsDevice;
             EngineManager.shader = shader;
+            EngineManager.lightsManager = manager;
             EngineManager.scene = new ProceduralTest();
 
             EngineManager.InitializeInput(this);
@@ -294,24 +296,21 @@ namespace SolidSilnique
             EngineManager.scene.LoadContent(Content);
             EngineManager.scene.Setup();
 
-            if (null != EngineManager.scene.mainCamera)
-            {
-                EngineManager.scene.mainCamera.UpdateCameraVectors();
-            }
-
+            EngineManager.scene.mainCamera.UpdateCameraVectors();
+            
 
             EngineManager.Start();
 
             // Initialize GPU leaf particles
-            _leafSystem = new LeafParticle(maxParticles: (int)2e+3, lifeTime: 1e6f, gravity: new Vector3(0, 0, 0))
+            _leafSystem = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 1e6f, gravity: new Vector3(0, 0, 0))
             {
                 _game = this
             };
             Texture2D dusttex = Content.Load<Texture2D>("Textures/Dust");
             _leafSystem.LoadContent(GraphicsDevice, Content, dusttex);
 
-            _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3, lifeTime: 4000f, gravity: new Vector3(0, -0.2f, 0))
-            {
+            _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 4000f, gravity: new Vector3(0, -0.2f, 0))
+            {    
                 _game = this
             };
             Texture2D leaftex2 = Content.Load<Texture2D>("Textures/leaf_diffuse");
@@ -340,24 +339,21 @@ namespace SolidSilnique
                 )
                 Exit();
 
-            if (EngineManager.scene.mainCamera != null)
+            // Get current camera view
+            if (EngineManager.scene.mainCamera == EngineManager.scene.TPCamera)
             {
-                // Get current camera view
-                if (EngineManager.scene.mainCamera == EngineManager.scene.TPCamera)
-                {
-                    // Monster’s world position
-                    Vector3 monsterPos = EngineManager.scene.TPCamera.CameraPosition;
-                    // Place camera behind & above
-                    Vector3 camPos = monsterPos + _tpcOffset;
-                    // Aim slightly down at the monster
-                    Vector3 lookAt = monsterPos + _tpcLookOffset;
-                    _view = Matrix.CreateLookAt(camPos, lookAt, Vector3.Up);
-                }
-                else
-                {
-                    // Free-cam’s usual view
-                    _view = EngineManager.scene.mainCamera.getViewMatrix();
-                }
+                // Monster’s world position
+                Vector3 monsterPos = EngineManager.scene.TPCamera.CameraPosition;
+                // Place camera behind & above
+                Vector3 camPos = monsterPos + _tpcOffset;
+                // Aim slightly down at the monster
+                Vector3 lookAt = monsterPos + _tpcLookOffset;
+                _view = Matrix.CreateLookAt(camPos, lookAt, Vector3.Up);
+            }
+            else
+            {
+                // Free-cam’s usual view
+                _view = EngineManager.scene.mainCamera.getViewMatrix();
             }
 
             _lightView = Matrix.CreateLookAt(sunPosition, sunPosition + testDirectionalLight.Direction, Vector3.Up);
@@ -408,19 +404,16 @@ namespace SolidSilnique
 
             shader.SetUniform("View", _view);
             shader.SetUniform("Projection", _projection);
-            if (null != EngineManager.scene.mainCamera)
-            {
-                shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
-            }
+            shader.SetUniform("viewPos", EngineManager.scene.mainCamera.CameraPosition);
 
 
             //if (useCulling)
             //PerformCulledDraw();
             //else
 
-            EngineManager.Draw(shadowShader, _view, _projection, manager, postShader);
+            EngineManager.Draw(shadowShader, _view, _projection,postShader);
 
-
+            
             //float t = (float)gameTime.TotalGameTime.TotalSeconds;
 
 

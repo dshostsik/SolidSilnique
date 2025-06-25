@@ -90,13 +90,19 @@ namespace SolidSilnique.Core
 
 		}
 
-		//EDIT METHODS
+		public void LookAt(Vector3 target) {
 
-		//public void Translate() { }
-		//public void RotateX();
-		//public void RotateY();
-		//public void RotateZ();
-		//public void Rotate();
+			Vector3 direction = position - target;
+
+			direction.Normalize();
+			float pitch = MathF.Asin(-direction.Y); // rotation around X-axis
+			float yaw = MathF.Atan2(direction.X, direction.Z); // rotation around Y-axis
+			pitch = MathHelper.ToDegrees(pitch);
+			yaw = MathHelper.ToDegrees(yaw);
+			rotation = new Vector3(pitch, yaw, 0f); // Roll is usually 0
+
+
+		}
 
 	}
 

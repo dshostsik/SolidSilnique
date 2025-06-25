@@ -71,12 +71,12 @@ namespace SolidSilnique.Core
         
         public override void Update()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
         
         public override void Start()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }

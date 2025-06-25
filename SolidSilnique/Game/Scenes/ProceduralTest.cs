@@ -103,34 +103,21 @@ class ProceduralTest : Scene
         //loadedTextures.Add("trent/ao", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Mixed_AO"));
         //loadedTextures.Add("trent/roughness", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Coat_roughness"));
 
-        models.Add(Content.Load<Model>("pModels/Rock1"));
-        textures.Add(loadedTextures["deimos"]);
-        //models.Add(Content.Load<Model>("pModels/Branch")); textures.Add(loadedTextures["deimos"]);
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        textures.Add(loadedTextures["leafTex"]);
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        textures.Add(loadedTextures["leafTex"]);
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        textures.Add(loadedTextures["leafTex"]);
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        textures.Add(loadedTextures["leafTex"]);
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        textures.Add(loadedTextures["leafTex"]);
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        textures.Add(loadedTextures["leafTex"]);
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        textures.Add(loadedTextures["leafTex"]);
-        models.Add(Content.Load<Model>("pModels/BushBig"));
-        textures.Add(loadedTextures["leafTex"]);
-        models.Add(Content.Load<Model>("pModels/BushSmall"));
-        textures.Add(loadedTextures["deimos"]);
-        models.Add(Content.Load<Model>("pModels/BushSmall"));
-        textures.Add(loadedTextures["deimos"]);
-        models.Add(Content.Load<Model>("pModels/BushSmall"));
-        textures.Add(loadedTextures["deimos"]);
-        //models.Add(Content.Load<Model>("pModels/Log")); textures.Add(loadedTextures["deimos"]);
-        models.Add(Content.Load<Model>("pModels/Stump"));
-        textures.Add(loadedTextures["deimos"]);
+        models.Add(Content.Load<Model>("pModels/Rock1")); textures.Add(loadedTextures["deimos"]);
+		//models.Add(Content.Load<Model>("pModels/Branch")); textures.Add(loadedTextures["deimos"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+		models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
+		models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
+		models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
+		//models.Add(Content.Load<Model>("pModels/Log")); textures.Add(loadedTextures["deimos"]);
+		models.Add(Content.Load<Model>("pModels/Stump")); textures.Add(loadedTextures["deimos"]);
 
         //models.Add(Content.Load<Model>("brzewno1/brzewno"));
         //models.Add(Content.Load<Model>("brzewno3/brzewno3"));
@@ -236,42 +223,42 @@ class ProceduralTest : Scene
         eye1.texture = loadedTextures["eye"];
         gab.AddChild(eye1);
 
-        GameObject pupil1 = new GameObject("pupil1");
-        pupil1.transform.position = new Vector3(0, 0, -0.495f * 2);
-        pupil1.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
-        pupil1.model = loadedModels["sphere"];
-        pupil1.texture = loadedTextures["simpleBlack"];
-        eye1.AddChild(pupil1);
+			GameObject pupil1 = new GameObject("pupil1");
+				pupil1.transform.position = new Vector3(0, 0, -0.427f * 2);
+				pupil1.transform.scale = new Vector3(0.4f,0.4f,0.2f);
+				pupil1.model = loadedModels["sphere"];
+				pupil1.texture = loadedTextures["simpleBlack"];
+				eye1.AddChild(pupil1);
 
-        GameObject brow1 = new GameObject("brow1");
-        brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, -0.495f * 2);
-        brow1.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
-        brow1.transform.rotation = new Vector3(0f, 0, -20f);
-        brow1.model = loadedModels["cube"];
-        brow1.texture = loadedTextures["simpleBlack"];
-        gab.AddChild(brow1);
+		GameObject brow1 = new GameObject("brow1");
+		brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, -0.427f * 2);
+		brow1.transform.scale = new Vector3(0.45f, 0.2f,0.4f);
+		brow1.transform.rotation = new Vector3(0f,0,-20f);
+		brow1.model = loadedModels["cube"];
+		brow1.texture = loadedTextures["simpleBlack"];
+		gab.AddChild(brow1);
 
-        GameObject eye2 = new GameObject("eye2");
-        eye2.transform.position = new Vector3(0.25f * 2, 0.209f, -0.495f * 2);
-        eye2.transform.scale = new Vector3(0.4f);
-        eye2.model = loadedModels["sphere"];
-        eye2.texture = loadedTextures["eye"];
-        gab.AddChild(eye2);
+		GameObject eye2 = new GameObject("eye2");
+			eye2.transform.position = new Vector3(0.25f*2, 0.209f, -0.427f*2);
+			eye2.transform.scale = new Vector3(0.4f);
+			eye2.model = loadedModels["sphere"];
+			eye2.texture = loadedTextures["eye"];
+			gab.AddChild(eye2);
 
-        GameObject pupil2 = new GameObject("pupil1");
-        pupil2.transform.position = new Vector3(0, 0, -0.495f * 2);
-        pupil2.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
-        pupil2.model = loadedModels["sphere"];
-        pupil2.texture = loadedTextures["simpleBlack"];
-        eye2.AddChild(pupil2);
+		GameObject pupil2 = new GameObject("pupil1");
+		pupil2.transform.position = new Vector3(0, 0, -0.427f * 2);
+		pupil2.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
+		pupil2.model = loadedModels["sphere"];
+		pupil2.texture = loadedTextures["simpleBlack"];
+		eye2.AddChild(pupil2);
 
-        GameObject brow2 = new GameObject("brow1");
-        brow2.transform.position = new Vector3(0.25f * 2, 0.5f, -0.495f * 2);
-        brow2.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
-        brow2.transform.rotation = new Vector3(0f, 0, 20f);
-        brow2.model = loadedModels["cube"];
-        brow2.texture = loadedTextures["simpleBlack"];
-        gab.AddChild(brow2);
+		GameObject brow2 = new GameObject("brow1");
+		brow2.transform.position = new Vector3(0.25f * 2, 0.5f, -0.427f * 2);
+		brow2.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
+		brow2.transform.rotation = new Vector3(0f, 0, 20f);
+		brow2.model = loadedModels["cube"];
+		brow2.texture = loadedTextures["simpleBlack"];
+		gab.AddChild(brow2);
 
 
         GameObject Tower = new GameObject("tower");
@@ -321,21 +308,21 @@ class ProceduralTest : Scene
 
 
         GameObject prevGeb = gab;
-        for (int i = 0; i < 3; i++)
-        {
-            GameObject gogus = CreateGebus(new Vector3(250 + i * 20, 80, 250 + i * 20));
-            gogus.GetComponent<Follower>().Target = gab;
-            if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
-            this.AddChild(gogus);
-            //prevGeb = gogus;
-        }
+			for (int i = 0; i < 3; i++)
+			{
+				GameObject gogus = CreateGebus(new Vector3(250 + i*20, 80, 250 + i*20));
+				gogus.GetComponent<Follower>().Target = gab;
+				if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
+				this.AddChild(gogus);
+				//prevGeb = gogus;
+			}
 
         GameObject gigus = CreateGebus(new Vector3(165, 15, 600));
 
 
-        gigus.GetComponent<Follower>().Target = gab;
+		gigus.GetComponent<Follower>().Target = gab;
         gigus.albedo = Color.Red;
-        this.AddChild(gigus);
+		this.AddChild(gigus);
 
 
         GameObject ziutek = CreateMovableObject("ziutek", 200, 200);
@@ -363,12 +350,18 @@ class ProceduralTest : Scene
 
 
         GameObject boss = new GameObject("boss");
-        boss.transform.position = new Vector3(512, 0, 50);
+		boss.transform.position = new Vector3(512, 0, 50);
         boss.albedo = new Color(1, 0.2f, 1);
-        boss.model = loadedModels["trent"];
+		boss.model = loadedModels["trent"];
         boss.texture = loadedTextures["trent"];
         boss.AddComponent(new SphereColliderComponent(8f));
         this.AddChild(boss);
+
+        //Overlord :)
+        GameObject overlord = new GameObject("Overlord");
+        overlord.AddComponent(new OverlordComponent());
+        this.AddChild(overlord);
+
 
 
         TPCamera.cameraComponent.SetMain();
@@ -386,12 +379,12 @@ class ProceduralTest : Scene
     {
         //kState = Keyboard.GetState();
 
-        /* if (SquaredDistanceBetweenEnemyAndPlayer() <
-             enemy.GetComponent<Follower>().SocialDistance * 3.0f)
-         {
-             _playerInsideEnemyFOV = true;
-             enemy.GetComponent<Follower>().Target = gab;
-         }*/
+       /* if (SquaredDistanceBetweenEnemyAndPlayer() <
+            enemy.GetComponent<Follower>().SocialDistance * 3.0f)
+        {
+            _playerInsideEnemyFOV = true;
+            enemy.GetComponent<Follower>().Target = gab;
+        }*/
 
 
         // Suspend the game if an Escape key was pressed
@@ -424,6 +417,7 @@ class ProceduralTest : Scene
                 bossRhythym.hasEnded = false;
                 bossRhythym.Start(content, spriteBatch);
                 turnedOn = true;
+                OverlordComponent.instance.SetFight(bossRhythym, 100, gab, Follower.enemyToFight);
             }
 
             if (turnedOn)
@@ -495,13 +489,13 @@ class ProceduralTest : Scene
 
         go.transform.position = pos;
         go.transform.scale = new Vector3(0.75f);
-
+        
         go.AddComponent(new SphereColliderComponent(0.75f, false));
         go.AddComponent(new Follower(go, 2f));
 
         GameObject visual = new GameObject("GebusVisual");
-        visual.model = loadedModels["sphere"];
-        visual.texture = loadedTextures["gabTex"];
+		visual.model = loadedModels["sphere"];
+		visual.texture = loadedTextures["gabTex"];
         visual.albedo = Color.Red;
         go.AddChild(visual);
 
