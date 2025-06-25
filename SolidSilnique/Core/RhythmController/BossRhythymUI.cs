@@ -33,6 +33,8 @@ public class BossRhythymUI
     private Texture2D goodHitTexture;
     private Texture2D badHitTexture;
 
+    private Vector2[] _notePositions;
+
     private class Feedback
     {
         public Texture2D Texture;
@@ -71,7 +73,27 @@ public class BossRhythymUI
         visuals = new GUIRhythymController(loadedNotes,content);
         songTime = 0f;
         audio.Play();
-        
+
+        var vp = spriteBatch.GraphicsDevice.Viewport;
+
+        float cx = vp.Width * 0.5f;
+        float cy = vp.Height * 0.5f;
+
+        float netX = vp.Width * offset;
+        float netY = vp.Height * offset;
+
+        _notePositions = new Vector2[4]
+        {
+            // NW
+            new Vector2(cx - netX, cy - netY),
+            // NE
+            new Vector2(cx + netX, cy - netY),
+            // SE
+            new Vector2(cx + netX, cy + netY),
+            // SW
+            new Vector2(cx - netX, cy + netY)
+        };
+
     }
 
     // Update is called once per frame
@@ -200,12 +222,12 @@ public class BossRhythymUI
                 _feedbacks.Add(new Feedback
                 {
                     Texture = goodHitTexture,
-                    Position = new Vector2(960, 100),
+                    Position = _notePositions[a],
                     Color = Color.White,
                     StartTime = songTime,
                     Duration = FeedbackDur
                 });
-                combo++;
+        combo++;
                 if (health < 96)
                 {
                     health += 5;
@@ -230,10 +252,11 @@ public class BossRhythymUI
         {
             if (loadedNotes[i].Time < songTime - 0.14f)
             {
+                int a = loadedNotes[i].Button;  // which arrow missed
                 _feedbacks.Add(new Feedback
                 {
                     Texture = badHitTexture,
-                    Position = new Vector2(960, 100),
+                    Position = _notePositions[a],
                     Color = Color.White,
                     StartTime = songTime,
                     Duration = FeedbackDur

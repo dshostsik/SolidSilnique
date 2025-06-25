@@ -200,12 +200,15 @@ namespace SolidSilnique.Core
             Add("ToggleCelShadingOn", new ActionBinding { Keys = { Keys.F2 } });
             Add("ToggleCelShadingOff", new ActionBinding { Keys = { Keys.F1 } });
             
+
             Add("ToggleMouseFree", new ActionBinding { Keys = { Keys.CapsLock } });
 
-            Add("NoteI", new ActionBinding { Keys = { Keys.I }, Buttons = { Buttons.Y } });
-            Add("NoteJ", new ActionBinding { Keys = { Keys.J }, Buttons = { Buttons.X } });
-            Add("NoteK", new ActionBinding { Keys = { Keys.K }, Buttons = { Buttons.A } });
-            Add("NoteL", new ActionBinding { Keys = { Keys.L }, Buttons = { Buttons.B } });
+
+            Add("NoteI", new ActionBinding { Keys = { Keys.I }, Buttons = { Buttons.Y , Buttons.DPadUp } });
+
+            Add("NoteJ", new ActionBinding { Keys = { Keys.J }, Buttons = { Buttons.X, Buttons.DPadLeft } });
+            Add("NoteK", new ActionBinding { Keys = { Keys.K }, Buttons = { Buttons.A, Buttons.DPadDown } });
+            Add("NoteL", new ActionBinding { Keys = { Keys.L }, Buttons = { Buttons.B, Buttons.DPadRight } });
 
         }
 
