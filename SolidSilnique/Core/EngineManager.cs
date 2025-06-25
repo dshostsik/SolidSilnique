@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using SolidSilnique.Core.Components;
 using GUIRESOURCES;
+using Microsoft.Xna.Framework.Content;
 
 namespace SolidSilnique.Core
 {
@@ -74,7 +75,11 @@ namespace SolidSilnique.Core
         // Initialize exit from a game
         public static bool CloseGame = false;
         public static bool mouseVisible = false;
-        
+
+        public static SpriteBatch UIbatch;
+        public static SpriteFont UIfont;
+        public static ContentManager Content;
+
         public static void Start()
         {
 			UiRenderer = new SpriteBatch(graphics);
@@ -425,9 +430,38 @@ namespace SolidSilnique.Core
 	            currentGui.Draw(UiRenderer);
             }
             UiRenderer.End();
-            
-           
-            
+            /*
+            var over = OverlordComponent.instance;
+            if (over != null && over.ShowResults)
+            {
+                UIbatch.Begin();
+
+                // total score
+                UIbatch.DrawString(
+                    UIfont,
+                    $"Total Score: {over.FinalScore}",
+                    new Vector2(100, 100),
+                    Color.White);
+
+                // average accuracy
+                UIbatch.DrawString(
+                    UIfont,
+                    $"Avg. Accuracy: {over.FinalAccuracyAvg:P1}",
+                    new Vector2(100, 140),
+                    Color.White);
+
+                // grade icon
+                string key = over.FinalGrade.ToString();  // "A", "B", etc.
+                var gradeTex = EngineManager.scene.loadedTextures[key];
+
+                var pos = new Vector2(
+                    vp.Width * 0.5f - gradeTex.Width * 0.5f,
+                    vp.Height * 0.3f);
+                UIbatch.Draw(gradeTex, pos, Color.White);
+
+                UIbatch.End();
+            }*/
+
         }
     
 		

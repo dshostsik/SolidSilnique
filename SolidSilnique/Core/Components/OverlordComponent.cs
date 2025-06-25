@@ -4,6 +4,7 @@ using SolidSilnique.Core.ArtificialIntelligence;
 using System;
 using System.Linq;
 using GUIRESOURCES;
+using System.Collections.Generic;
 
 namespace SolidSilnique.Core.Components
 {
@@ -52,7 +53,23 @@ namespace SolidSilnique.Core.Components
 		int ballPoolIndex = 0;
 		Model ballModel;
 
-		public override void Start()
+        private int _initialNotesCount;
+        private int _finalScore;
+        private float _finalAccuracySum;
+        private float _finalAccuracyAvg;
+        private FightGrade _finalGrade;
+        private bool _showResults = false;
+        private Dictionary<FightGrade, Texture2D> _gradeTextures;
+
+        public bool ShowResults => _showResults;
+        public int FinalScore => _finalScore;
+        public float FinalAccuracyAvg => _finalAccuracyAvg;
+        public FightGrade FinalGrade => _finalGrade;
+
+        public IReadOnlyDictionary<FightGrade, Texture2D> GradeTextures
+            => _gradeTextures;
+
+        public override void Start()
 		{
 
 			instance = this;
@@ -89,7 +106,14 @@ namespace SolidSilnique.Core.Components
 			EngineManager.lightsManager.Start();
 			currentGui.progressBars[1].visible = false;
 
-		}
+            _gradeTextures = Enum.GetValues(typeof(FightGrade))
+                        .Cast<FightGrade>()
+                        .ToDictionary(
+                            g => g,
+                            g => EngineManager.Content
+                                      .Load<Texture2D>($"Grades/{g}"));
+
+        }
 
 		float rotate = 0;
 		Vector3 cShake = Vector3.Zero;
@@ -144,18 +168,19 @@ namespace SolidSilnique.Core.Components
 			EngineManager.lightsManager.DirectionalLight.Enabled = 0;
 			EngineManager.lightsManager.Spotlights[0].Enabled = 1;
 			EngineManager.lightsManager.Start();
-			//Reposition Player
-			//Reposition Enemy
-			//Set Camera
+            //Reposition Player
+            //Reposition Enemy
+            //Set Camera
 
-			//Dim scene - create arena
+            //Dim scene - create arena
 
-			//Show UIs
+            //Show UIs
 
-			//Start Rhythm UI
+            //Start Rhythm UI
+            _initialNotesCount = (int)(targetPoints / 30f + 0.5f);
+            enemyProgress = 0;
 
-
-		}
+        }
 
 		private void Hit(object sender, BossRhythymUI.NoteHitEventArgs e)
 		{
@@ -223,16 +248,40 @@ namespace SolidSilnique.Core.Components
 			EngineManager.lightsManager.Spotlights[0].Enabled = 0;
 			EngineManager.lightsManager.Start();
 
+            _finalScore = (int)enemyProgress;
+           // _finalAccuracySum = rhythmUI.ReturnScoresAndAccuracy();
+
+            //_finalAccuracyAvg = _initialNotesCount > 0
+            //                  ? _finalAccuracySum / _initialNotesCount
+            //                  : 0f;
+
+            // performance ratio
+            float perf = enemyProgress / enemyProgressTarget;
+            _finalGrade = perf >= 0.95f ? FightGrade.S
+                        : perf >= 0.85f ? FightGrade.A
+                        : perf >= 0.70f ? FightGrade.B
+                        : perf >= 0.50f ? FightGrade.C
+                        : perf >= 0.30f ? FightGrade.D
+                        : FightGrade.F;
+
+            _showResults = true;      
+            //state = OverlordStates.RESULTS_WAIT; 
+
+            //SET Result
+            //CALC SCORE
+            //CALC GRADE
+            //SAVE GRADE
+            //SHOW Result
+
+        }
+
+        
+
+        public void SetGradeTextures(Dictionary<FightGrade, Texture2D> textures)
+        {
+            _gradeTextures = textures;
+        }
 
 
-			//SET Result
-			//CALC SCORE
-			//CALC GRADE
-			//SAVE GRADE
-			//SHOW Result
-
-		}
-
-		
-	}
+    }
 }

@@ -105,6 +105,8 @@ namespace SolidSilnique
         public static bool CloseGame = false;
         public static bool MouseVisible = false;
 
+        
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -284,6 +286,9 @@ namespace SolidSilnique
             _font = Content.Load<SpriteFont>("Megafont");
             _text = new SpriteBatch(GraphicsDevice);
 
+            EngineManager.UIbatch = _spriteBatch;
+            EngineManager.UIfont = _font;
+            EngineManager.Content = Content;
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 

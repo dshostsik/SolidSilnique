@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core.Animation;
 using SolidSilnique.MonoAL;
 using static BossRhythymUI;
+using System.Linq;
 
 
 namespace SolidSilnique.GameContent;
@@ -139,7 +140,17 @@ class ProceduralTest : Scene
         //treeTextures.Add(Content.Load<Texture2D>("Textures/gab_tex"));
         loadedModels.Add("tower", Content.Load<Model>("Models/tower"));
         loadedModels.Add("eMonster1", Content.Load<Model>("Models/monstr"));
+        loadedTextures.Add("F", Content.Load<Texture2D>("Grades/F"));
+        loadedTextures.Add("D", Content.Load<Texture2D>("Grades/D"));
+        loadedTextures.Add("C", Content.Load<Texture2D>("Grades/C"));
+        loadedTextures.Add("B", Content.Load<Texture2D>("Grades/B"));
+        loadedTextures.Add("A", Content.Load<Texture2D>("Grades/A"));
+        loadedTextures.Add("S", Content.Load<Texture2D>("Grades/S"));
+        
+
         content = Content;
+
+        
     }
 
     public override void Setup()
