@@ -14,10 +14,13 @@
     <ItemGroup>
         <None Remove="Icon.ico" />
         <None Remove="Icon.bmp" />
+        <None Update="Content\level.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
         <None Update="GUI\resources\UI.xml">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Content\level.xml">
+        <None Update="Content\level2.xml">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Content\RhythymGui.xml">

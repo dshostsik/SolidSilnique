@@ -211,7 +211,7 @@ class ProceduralTest : Scene
         gabFur.transform.scale = new Vector3(1f);
         gabFur.model = loadedModels["dodik"];
         gabFur.texture = loadedTextures["dodik_texture"];
-        gab.AddChild(gabFur);
+       gab.AddChild(gabFur);
         
         GameObject eye1 = new GameObject("eye1");
         eye1.transform.position = new Vector3(-0.25f * 2, 0.209f, -0.495f * 2);
