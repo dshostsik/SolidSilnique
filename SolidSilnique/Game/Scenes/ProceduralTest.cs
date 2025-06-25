@@ -387,7 +387,7 @@ class ProceduralTest : Scene
 
 
         // Suspend the game if an Escape key was pressed
-        if (Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+        if (Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Start == ButtonState.Pressed)
         {
             // Switch mode
             inMainMenu = true;
