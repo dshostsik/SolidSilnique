@@ -333,7 +333,7 @@ namespace SolidSilnique
         /// <param name="gameTime">Object containing time values</param>
         protected override void Update(GameTime gameTime)
         {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
+            if (//GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
                 CloseGame
                 //Keyboard.GetState().IsKeyDown(Keys.Escape)
                 )

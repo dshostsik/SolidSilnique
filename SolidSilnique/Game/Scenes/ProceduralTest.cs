@@ -393,7 +393,7 @@ class ProceduralTest : Scene
 
 
         // Suspend the game if an Escape key was pressed
-        if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+        if (Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Start == ButtonState.Pressed)
         {
             // Switch mode
             inMainMenu = true;
@@ -497,6 +497,25 @@ class ProceduralTest : Scene
                     }
                 }
             }
+        }
+
+        if (GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed && inMainMenu)
+        {
+	        inMainMenu = false;
+	        EngineManager.darkenTheScene = 0;
+	        EngineManager.currentGui = rhythymGui;
+	        EngineManager.mouseFree = inMainMenu;
+	        EngineManager.mouseVisible = false;
+	        if (_songWasPlaying && turnedOn)
+	        {
+		        bossRhythym.audio.Play();
+		        _songWasPlaying = false;
+	        }
+        }
+
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed && inMainMenu)
+        {
+	        EngineManager.CloseGame = true;
         }
     }
 
