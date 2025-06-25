@@ -23,7 +23,11 @@ public class ProgressBar : GuiElement
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        Vector2 newScale = new Vector2(scale,scale);
+		if (!visible)
+		{
+			return;
+		}
+		Vector2 newScale = new Vector2(scale,scale);
         var position = new Vector2(positionX, positionY);
         if (IsVertical)
             newScale = new Vector2(scale * progress / 100, scale);
