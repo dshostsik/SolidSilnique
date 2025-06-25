@@ -12,6 +12,7 @@ namespace SolidSilnique.Core
         public List<Keys> Keys = new();
         public List<Buttons> Buttons = new();
         public List<Func<KeyboardState, GamePadState, bool>> Conditions = new();
+        
 
         public bool IsPressed(KeyboardState kb, GamePadState gp)
         {
@@ -43,6 +44,7 @@ namespace SolidSilnique.Core
         public event Action<string> ActionHeld;
         public event Action<MouseButton> MouseClicked;
         public event Action<float, float> MouseMoved;
+        public event Action<Keys> KeyPressed;
         private static readonly Point _fixedCenter = new Point(1920 / 2, 1080 / 2);
         public bool gMode;
         public bool move = true;
@@ -76,6 +78,7 @@ namespace SolidSilnique.Core
             EvaluateMouseClicks();
             EvaluateMouseMovement();
             EvaluateGamePadLook(gameTime);
+
         }
 
         private void EvaluateActions()
@@ -198,7 +201,12 @@ namespace SolidSilnique.Core
             Add("ToggleCelShadingOff", new ActionBinding { Keys = { Keys.F1 } });
             
             Add("ToggleMouseFree", new ActionBinding { Keys = { Keys.CapsLock } });
-            
+
+            Add("NoteI", new ActionBinding { Keys = { Keys.I }, Buttons = { Buttons.Y } });
+            Add("NoteJ", new ActionBinding { Keys = { Keys.J }, Buttons = { Buttons.X } });
+            Add("NoteK", new ActionBinding { Keys = { Keys.K }, Buttons = { Buttons.A } });
+            Add("NoteL", new ActionBinding { Keys = { Keys.L }, Buttons = { Buttons.B } });
+
         }
 
         /// <summary>Returns whether an action is currently down (for polling if you prefer).</summary>

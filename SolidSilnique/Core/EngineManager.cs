@@ -77,8 +77,9 @@ namespace SolidSilnique.Core
         
         public static void Start()
         {
-            scene.Start();
-            UiRenderer = new SpriteBatch(graphics);
+			UiRenderer = new SpriteBatch(graphics);
+
+			scene.Start();
             GenerateInstanceData();
         }
 
@@ -91,10 +92,7 @@ namespace SolidSilnique.Core
             Game1.CloseGame = CloseGame;
             Game1.MouseVisible = mouseVisible;
             scene.Update();
-            if (null != EngineManager.scene.mainCamera)
-            {
-	            EngineManager.scene.mainCamera.UpdateCameraVectors();
-            }
+			EngineManager.scene.mainCamera.UpdateCameraVectors();
 		}
 
         public static void InitializeInput(Game1 game)
@@ -415,7 +413,7 @@ namespace SolidSilnique.Core
 			
             _postSpriteBatch.End();
             
-            //var UiRenderer = new SpriteBatch(graphics);
+            
             UiRenderer.Begin();
             while (renderQueueUI.Count > 0)
             {
@@ -481,6 +479,7 @@ namespace SolidSilnique.Core
 			shader.SetTexture("texture_roughness1", go.roughnessMap ?? defaultRoughnessMap);
 			shader.SetTexture("texture_ao1", go.aoMap ?? defaultAOMap);
 			shader.SetUniform("albedo", go.albedo.ToVector4());
+			shader.SetUniform("emissive", go.emissive.ToVector4());
 
 			shader.SetUniform("useLayering", 0);
 			shader.SetUniform("useNormalMap", (go.normalMap != null) ? 1 : 0);
@@ -616,7 +615,7 @@ namespace SolidSilnique.Core
 
 
 		}
-        private static void OnActionPressed(string action)
+        public static void OnActionPressed(string action)
         {
             var cam = scene.mainCamera;
             switch (action)

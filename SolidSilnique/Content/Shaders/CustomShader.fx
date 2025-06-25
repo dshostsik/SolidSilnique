@@ -149,6 +149,7 @@ sampler2D texture_roughness1;
 sampler2D texture_ao1;
 //----------------------------
 float4 albedo;
+float4 emissive;
 //bool useNormalMap;
 
 //-----------FLAGS------------
@@ -376,9 +377,9 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
     
     
     if (darken != 1) {
-	    return float4((directionalLight + totalPointLight + totalSpotlight), 1.0)  * textureVector * albedo;
+	    return float4((directionalLight + totalPointLight + totalSpotlight), 1.0) * textureVector * albedo + emissive;
     } else {
-        return float4((directionalLight + totalPointLight + totalSpotlight), 1.0)  * textureVector * albedo * float4(0.05f, 0.05f, 0.05f, 1.0f);
+        return float4((directionalLight + totalPointLight + totalSpotlight), 1.0) * textureVector * albedo * float4(0.05f, 0.05f, 0.05f, 1.0f) + emissive;
     }
 }
 

@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using SolidSilnique.Core.ArtificialIntelligence;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static SolidSilnique.Core.Camera;
 
 namespace SolidSilnique.Core.Components
 {
@@ -43,12 +39,16 @@ namespace SolidSilnique.Core.Components
 		public static OverlordComponent instance;
 
 		//FIGHT VARIABLES
-		Follower enemy;
+		GameObject enemy;
+		GameObject player;
 		BossRhythymUI rhythymUI;
 		float enemyProgress;
 		float enemyProgressTarget;
 		Vector3 arenaPos;
 		FightGrade maxGrade;
+		int ballPoolCount = 30;
+		int ballPoolIndex = 0;
+		Model ballModel;
 
 		public override void Start()
 		{
@@ -68,11 +68,25 @@ namespace SolidSilnique.Core.Components
 			GameObject camera = new GameObject("olCamera");
 			camera.AddComponent(new CameraComponent());
 			this.gameObject.AddChild(camera);
+			ballModel = EngineManager.scene.loadedModels["sphere"];
 
+			GameObject ballsPool = new GameObject("olBallsPool");
+			for (int i = 0; i < ballPoolCount; i++) {
+				GameObject ball = new GameObject("olBall"+i);
+				ball.AddComponent(new RhythmBall());
+				ball.texture = EngineManager.scene.loadedTextures["eye"];
+				ball.albedo = new Color(1, 1, 0.4f) ;
+				ball.emissive = new Color(1, 1, 0f) ;
+				ball.transform.scale = new Vector3(0.15f);
+				ballsPool.AddChild(ball);
+			}
+			this.gameObject.AddChild(ballsPool);
 			
 			state = OverlordStates.EXPLORE;
 			//EngineManager.lightsManager.DirectionalLight.Enabled = 0;
 			EngineManager.lightsManager.Start();
+			EngineManager.currentGui.progressBars[1].visible = false;
+
 		}
 
 		float rotate = 0;
@@ -102,8 +116,11 @@ namespace SolidSilnique.Core.Components
 			state = OverlordStates.FIGHT;
 			rhythmUi.hit += Hit;
 			rhythymUI = rhythmUi;
-			enemyProgressTarget = (rhythmUi.loadedNotes.Count()/2) * 30;
-
+			enemyProgressTarget = (rhythmUi.loadedNotes.Count()) * 30;
+			this.enemy = enemy;
+			this.player = player;
+			EngineManager.currentGui.progressBars[1].visible = true;
+			EngineManager.currentGui.progressBars[1].progress = (enemyProgress / enemyProgressTarget) * 100;
 
 			arenaPos = (player.transform.position + enemy.transform.position)/2.0f;
 			Vector3 displacementVector = (player.transform.position - arenaPos);
@@ -139,7 +156,7 @@ namespace SolidSilnique.Core.Components
 
 		private void Hit(object sender, BossRhythymUI.NoteHitEventArgs e)
 		{
-			float comboMod = 1+MathF.Min(2,MathF.Max(e.Combo - 1, 0) * 0.1f);
+			float comboMod = 1+MathF.Min(2,MathF.Max(e.Combo - 1, 0) * 0.05f);
 			if (e.Accuracy <= 0.14f && e.Accuracy > 0.8f)
 			{
 				enemyProgress += 10 * comboMod; //Great
@@ -147,44 +164,70 @@ namespace SolidSilnique.Core.Components
 			else if (e.Accuracy <= 0.8f) {
 				enemyProgress += 30 * comboMod; //Perfect
 			}
+			EngineManager.currentGui.progressBars[1].progress = MathF.Min(100,(enemyProgress/enemyProgressTarget) * 100);
 
 			cShake += -Vector3.Forward * comboMod;
-			/*switch (e.NoteType) {
+			GameObject usedBall = this.gameObject.children[2].children[ballPoolIndex++];
+			if (ballPoolIndex >= ballPoolCount) {
+				ballPoolIndex = 0;
+			}
+			usedBall.model = null;
+			usedBall.Update();
+			usedBall.model = ballModel;
+			usedBall.GetComponent<RhythmBall>().target = enemy;
+			usedBall.transform.position = player.transform.position;
+			
+			switch (e.NoteType) {
 				case 0: //UP
-					
+					usedBall.transform.LookAt(player.transform.getModelMatrix().Up + player.transform.position);
 					break;
 				case 1: //LEFT
-					cShake = Vector3.Forward;
+					usedBall.transform.LookAt(player.transform.getModelMatrix().Left + player.transform.position);
 					break;
 
+
 				case 2: //DOWN
-					cShake = -Vector3.Up;
+					usedBall.transform.LookAt(player.transform.getModelMatrix().Forward + player.transform.position);
 					break;
 				case 3: //RIGHT
-					cShake = -Vector3.Forward;
+					usedBall.transform.LookAt(player.transform.getModelMatrix().Right + player.transform.position);
 					break;
 				
 
-			}*/
+			}
 			
 		}
 
-		public void Hit()
-		{
-			//Dodaj Progrss
-			//Shoot Star
-			//Camera Shake
-			//Updateuj UI
-		}
+		
 
-		public void FinishFight()
+		public void FinishFight(CameraComponent camToSet)
 		{
+			state = OverlordStates.EXPLORE;
+			EngineManager.currentGui.progressBars[1].visible = false;
+
+
+
+
+
+
+
+
+
+
+			camToSet.SetMain();
+
+			EngineManager.lightsManager.DirectionalLight.Enabled = 1;
+			EngineManager.lightsManager.Spotlights[0].Enabled = 0;
+			EngineManager.lightsManager.Start();
+
+
+
 			//SET Result
 			//CALC SCORE
 			//CALC GRADE
 			//SAVE GRADE
 			//SHOW Result
-			
+
 		}
 
 		

@@ -9,10 +9,14 @@ public class GuiElement
     public float positionY;
     public string name;
     public float scale;
+    public bool visible = true;
 
     public virtual void Draw(SpriteBatch spriteBatch)
     {
-        Console.WriteLine("Kocham piwko");
+        if(!visible)
+        {
+            return;
+        }
     }
     public virtual void Load(Texture2D texture)
     {

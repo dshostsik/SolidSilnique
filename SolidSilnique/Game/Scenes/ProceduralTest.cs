@@ -121,9 +121,9 @@ class ProceduralTest : Scene
 		//models.Add(Content.Load<Model>("pModels/Log")); textures.Add(loadedTextures["deimos"]);
 		models.Add(Content.Load<Model>("pModels/Stump")); textures.Add(loadedTextures["deimos"]);
 
-        //models.Add(Content.Load<Model>("brzewno1/brzewno"));
-        //models.Add(Content.Load<Model>("brzewno3/brzewno3"));
-        //textures.Add(loadedTextures["leafTex"]);
+		//models.Add(Content.Load<Model>("brzewno1/brzewno"));
+		//models.Add(Content.Load<Model>("brzewno3/brzewno3"));
+		//textures.Add(loadedTextures["leafTex"]);
         //textures.Add(loadedTextures["deimos"]);
 
         treeModels.Add(Content.Load<Model>("pModels/tree1"));
@@ -138,14 +138,14 @@ class ProceduralTest : Scene
 
     public override void Setup()
     {
-        /*
-        string[] sounds = new string[4];
-        sounds[0] = "Content/Sounds/drum-hitclap.wav";
-        sounds[1] = "Content/Sounds/drum-hitfinish.wav";
-        sounds[2] = "Content/Sounds/drum-hitnormal.wav";
-        sounds[3] = "Content/Sounds/drum-hitnormalh.wav";
-        hitSounds = new AudioPlayer(sounds, PositionalHelper.GetInstance(), 1f, 1f);
-        */
+	    /*
+	    string[] sounds = new string[4];
+	    sounds[0] = "Content/Sounds/drum-hitclap.wav";
+	    sounds[1] = "Content/Sounds/drum-hitfinish.wav";
+	    sounds[2] = "Content/Sounds/drum-hitnormal.wav";
+	    sounds[3] = "Content/Sounds/drum-hitnormalh.wav";
+	    hitSounds = new AudioPlayer(sounds, PositionalHelper.GetInstance(), 1f, 1f);
+	    */
         environmentObject = new EnvironmentObject();
         environmentObject.Generate("Map1", content, 3, 60, 3, 8);
 
@@ -163,7 +163,7 @@ class ProceduralTest : Scene
         go.AddComponent(new TPPCameraComponent());
         this.AddChild(go);
 
-
+        
         Task.WhenAll(task1).Wait(); //:O
 
         newProc.GenerateObjects();
@@ -336,10 +336,11 @@ class ProceduralTest : Scene
 
         mainMenuGui = new GUI("Content/MainMenuUI/menu.xml", content);
         rhythymGui = new GUI("Content/RhythymGui.xml", content);
+        EngineManager.currentGui = rhythymGui;
 
         // Check if we're playing or nah
         EngineManager.darkenTheScene = inMainMenu ? 1 : 0;
-        EngineManager.currentGui = inMainMenu ? mainMenuGui : rhythymGui;
+        //EngineManager.currentGui = inMainMenu ? mainMenuGui : rhythymGui;
         EngineManager.mouseFree = inMainMenu;
         EngineManager.mouseVisible = inMainMenu;
 
@@ -421,31 +422,34 @@ class ProceduralTest : Scene
         }
         else
         {
-            if ((Follower.enemyToFight != null && !turnedOn))
-            {
-                bossRhythym.hasEnded = false;
-                bossRhythym.Start(content, spriteBatch);
-                turnedOn = true;
-                OverlordComponent.instance.SetFight(bossRhythym, 100, gab, Follower.enemyToFight);
-            }
+	        if ((Follower.enemyToFight != null && !turnedOn))
+	        {
+		        bossRhythym.hasEnded = false;
+		        bossRhythym.Start(content, spriteBatch);
+		        turnedOn = true;
+		        OverlordComponent.instance.SetFight(bossRhythym, 100, gab, Follower.enemyToFight);
+	        }
 
-            if (turnedOn)
-            {
-                bossRhythym.Update();
-            }
+	        if (turnedOn)
+	        {
+		        bossRhythym.Update();
+	        }
 
-            if (bossRhythym.hasEnded && turnedOn)
-            {
-                turnedOn = false;
-                Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
-                Follower.enemyToFight = null;
-            }
+	        if (bossRhythym.hasEnded && turnedOn)
+	        {
+		        turnedOn = false;
+		        Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
+		        Follower.enemyToFight = null;
+		        OverlordComponent.instance.FinishFight(TPCamera.cameraComponent);
 
-            rhythymGui.progressBars[0].progress = bossRhythym.health;
-            rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
-            rhythymGui.texts[1].text = bossRhythym.combo.ToString();
+	        }
 
-            base.Update();
+	        rhythymGui.progressBars[0].progress = bossRhythym.health;
+	        rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
+	        rhythymGui.texts[1].text = bossRhythym.combo.ToString();
+
+
+	        base.Update();
         }
     }
 
