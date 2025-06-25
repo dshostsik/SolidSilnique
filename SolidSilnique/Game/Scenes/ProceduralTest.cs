@@ -314,21 +314,31 @@ class ProceduralTest : Scene
 
 
         GameObject prevGeb = gab;
-			for (int i = 0; i < 3; i++)
+			/*for (int i = 0; i < 3; i++)
 			{
 				GameObject gogus = CreateGebus(new Vector3(250 + i*20, 80, 250 + i*20));
 				gogus.GetComponent<Follower>().Target = gab;
 				if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
 				this.AddChild(gogus);
 				//prevGeb = gogus;
-			}
+			}*/
 
-        GameObject gigus = CreateGebus(new Vector3(165, 15, 600));
-
-
+        GameObject gigus = CreateGebus(new Vector3(165, 15, 600),1,"Easy","wav");
 		gigus.GetComponent<Follower>().Target = gab;
-        gigus.albedo = Color.Red;
 		this.AddChild(gigus);
+
+		gigus = CreateGebus(new Vector3(150, 15, 550),2,"Easy","wav");
+		gigus.GetComponent<Follower>().Target = gab;
+		this.AddChild(gigus);
+
+		gigus = CreateGebus(new Vector3(150, 15, 500),3,"Easy","mp3");
+		gigus.GetComponent<Follower>().Target = gab;
+		this.AddChild(gigus);
+
+
+		
+		//gigus.albedo = Color.Red;
+		
 
 
         GameObject ziutek = CreateMovableObject("ziutek", 200, 200);
@@ -429,7 +439,7 @@ class ProceduralTest : Scene
 	        if ((Follower.enemyToFight != null && !turnedOn))
 	        {
 		        bossRhythym.hasEnded = false;
-		        bossRhythym.Start(content, spriteBatch);
+		        bossRhythym.Start(content, spriteBatch, Follower.enemyToFight.GetComponent<Follower>().enemyIndex, Follower.enemyToFight.GetComponent<Follower>().difficulty, Follower.enemyToFight.GetComponent<Follower>().audioExtension);
 		        turnedOn = true;
 		        OverlordComponent.instance.SetFight(bossRhythym, 100, gab, Follower.enemyToFight);
 	        }
@@ -523,7 +533,7 @@ class ProceduralTest : Scene
         }
     }
 
-    GameObject CreateGebus(Vector3 pos)
+    GameObject CreateGebus(Vector3 pos, int enemyIndex, string difficulty, string audioExtension)
     {
         GameObject go = new GameObject("Gebus");
 
@@ -531,7 +541,10 @@ class ProceduralTest : Scene
         go.transform.scale = new Vector3(0.75f);
         
         go.AddComponent(new SphereColliderComponent(0.75f, false));
-        go.AddComponent(new Follower(go, 2f));
+        go.AddComponent(new Follower(go, 2f) { 
+            difficulty = difficulty, audioExtension = audioExtension, enemyIndex = enemyIndex
+        });
+
 
         GameObject visual = new GameObject("GebusVisual");
 		visual.model = loadedModels["sphere"];

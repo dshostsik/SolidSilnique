@@ -35,6 +35,15 @@
         <None Update="Content\RLevels\enemy2\song.wav">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <None Update="Content\RLevels\enemy3\chartEasy.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Content\RLevels\enemy3\chartHard.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Content\RLevels\enemy3\song.mp3">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
         <None Update="GUI\resources\UI.xml">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>

@@ -61,10 +61,17 @@ namespace SolidSilnique.Core.ArtificialIntelligence
 
         private float tolerance = 0.01f;
 
-        /// <summary>
-        /// The distance between Self and <see cref="Target"/> . The default value is calculated based on <see cref="_socialDistanceMultiplier"/>
-        /// </summary>
-        private float _socialDistance;
+
+
+        //Battle variables
+        public int enemyIndex;
+        public string difficulty;
+        public string audioExtension;
+
+		/// <summary>
+		/// The distance between Self and <see cref="Target"/> . The default value is calculated based on <see cref="_socialDistanceMultiplier"/>
+		/// </summary>
+		private float _socialDistance;
 
         /// <summary>
         /// Reference to a target <see cref="GameObject"/> that will be followed by Self. <p>Default value is <c>null</c>. Make sure that you set it before calling <see cref="GetFollowDirectionVector"/> method.</p>

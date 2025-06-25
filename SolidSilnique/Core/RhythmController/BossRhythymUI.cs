@@ -51,7 +51,7 @@ public class BossRhythymUI
 
     public event EventHandler<NoteHitEventArgs> hit;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    public void Start(ContentManager content,SpriteBatch spriteBatch)
+    public void Start(ContentManager content,SpriteBatch spriteBatch, int enemyIndex, string difficulty, string audioExtension)
     {
         this.spriteBatch = spriteBatch;
         this.content = content;
@@ -68,8 +68,8 @@ public class BossRhythymUI
         EngineManager.InputManager.ActionPressed += OnActionPressed;
 
         audio = new NAudioPlayer();
-        audio.LoadAudio("Content/Rlevels/enemy2/song.wav");
-        loadedNotes = NotesLoader.LoadNotesFromXml("Content/Rlevels/enemy2/chartEasy.xml");
+        audio.LoadAudio("Content/Rlevels/enemy"+enemyIndex+"/song." + audioExtension);
+        loadedNotes = NotesLoader.LoadNotesFromXml("Content/Rlevels/enemy"+enemyIndex+"/chart"+difficulty+".xml");
         visuals = new GUIRhythymController(loadedNotes,content);
         songTime = 0f;
 		turnedOff = false;
