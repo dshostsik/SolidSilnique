@@ -467,6 +467,7 @@ namespace SolidSilnique.Core
 			shader.SetTexture("texture_roughness1", go.roughnessMap ?? defaultRoughnessMap);
 			shader.SetTexture("texture_ao1", go.aoMap ?? defaultAOMap);
 			shader.SetUniform("albedo", go.albedo.ToVector4());
+			shader.SetUniform("emissive", go.emissive.ToVector4());
 
 			shader.SetUniform("useLayering", 0);
 			shader.SetUniform("useNormalMap", (go.normalMap != null) ? 1 : 0);

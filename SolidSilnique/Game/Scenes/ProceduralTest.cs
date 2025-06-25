@@ -370,8 +370,9 @@ class ProceduralTest : Scene
             turnedOn = false;
             Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
             Follower.enemyToFight = null;
+			OverlordComponent.instance.FinishFight(TPCamera.cameraComponent);
 
-        }
+		}
 
         rhythymGui.progressBars[0].progress = bossRhythym.health;
         rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();

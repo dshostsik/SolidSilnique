@@ -147,6 +147,7 @@ sampler2D texture_normal1;
 sampler2D texture_roughness1;
 sampler2D texture_ao1;
 float4 albedo;
+float4 emissive;
 //bool useNormalMap;
 
 int useRoughnessMap;
@@ -364,7 +365,7 @@ float4 MainPS(VertexShaderOutput input) : SV_TARGET
     
     
     
-	return float4((directionalLight + totalPointLight + totalSpotlight), 1.0)  * textureVector * albedo;
+    return float4((directionalLight + totalPointLight + totalSpotlight), 1.0) * textureVector * albedo + emissive;
 }
 
 

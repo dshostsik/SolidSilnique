@@ -38,6 +38,7 @@ namespace SolidSilnique.Core
         public Texture2D roughnessMap = null;
         public Texture2D aoMap = null;
         public Color albedo = Color.White;
+        public Color emissive = Color.Black;
 
         // Level of Detail (LOD)
         /// <summary>

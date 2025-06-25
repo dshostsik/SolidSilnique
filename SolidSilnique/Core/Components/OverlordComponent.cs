@@ -75,8 +75,9 @@ namespace SolidSilnique.Core.Components
 				GameObject ball = new GameObject("olBall"+i);
 				ball.AddComponent(new RhythmBall());
 				ball.texture = EngineManager.scene.loadedTextures["eye"];
-				ball.albedo = new Color(1, 1, 0.8f) ;
-				ball.transform.scale = new Vector3(0.3f);
+				ball.albedo = new Color(1, 1, 0.4f) ;
+				ball.emissive = new Color(1, 1, 0f) ;
+				ball.transform.scale = new Vector3(0.15f);
 				ballsPool.AddChild(ball);
 			}
 			this.gameObject.AddChild(ballsPool);
@@ -199,14 +200,34 @@ namespace SolidSilnique.Core.Components
 
 		
 
-		public void FinishFight()
+		public void FinishFight(CameraComponent camToSet)
 		{
+			state = OverlordStates.EXPLORE;
+			EngineManager.currentGui.progressBars[1].visible = false;
+
+
+
+
+
+
+
+
+
+
+			camToSet.SetMain();
+
+			EngineManager.lightsManager.DirectionalLight.Enabled = 1;
+			EngineManager.lightsManager.Spotlights[0].Enabled = 0;
+			EngineManager.lightsManager.Start();
+
+
+
 			//SET Result
 			//CALC SCORE
 			//CALC GRADE
 			//SAVE GRADE
 			//SHOW Result
-			
+
 		}
 
 		
