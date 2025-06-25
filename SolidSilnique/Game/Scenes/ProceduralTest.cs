@@ -182,17 +182,21 @@ class ProceduralTest : Scene
 
 
         gab = new GameObject("gab");
-        gab.transform.position = new Vector3(180, 15, 730);
+		GameObject gabV = new GameObject("gabVisual");
+        gab.AddChild(gabV);
+
+
+		gab.transform.position = new Vector3(180, 15, 730);
 
         gab.transform.scale = new Vector3(1f);
-        gab.model = loadedModels["cube"];
-        gab.texture = loadedTextures["gabTex"];
+        gabV.model = loadedModels["cube"];
+        gabV.texture = loadedTextures["gabTex"];
         //gab.normalMap = loadedTextures["gabNo"];
         //gab.roughnessMap = loadedTextures["gabRo"];
         //gab.aoMap = loadedTextures["gabAo"];
         gab.AddComponent(new DebugMoveComponent());
         gab.AddComponent(new SphereColliderComponent(1));
-        gab.AddComponent(new NoteResponseComponent());
+        gabV.AddComponent(new NoteResponseComponent());
         this.AddChild(gab);
 
 
@@ -216,14 +220,14 @@ class ProceduralTest : Scene
         gabFur.transform.scale = new Vector3(1f);
         gabFur.model = loadedModels["dodik"];
         gabFur.texture = loadedTextures["dodik_texture"];
-       gab.AddChild(gabFur);
+       gabV.AddChild(gabFur);
         
         GameObject eye1 = new GameObject("eye1");
         eye1.transform.position = new Vector3(-0.25f * 2, 0.209f, -0.495f * 2);
         eye1.transform.scale = new Vector3(0.4f);
         eye1.model = loadedModels["sphere"];
         eye1.texture = loadedTextures["eye"];
-        gab.AddChild(eye1);
+        gabV.AddChild(eye1);
 
 			GameObject pupil1 = new GameObject("pupil1");
 				pupil1.transform.position = new Vector3(0, 0, -0.495f * 2);
@@ -238,14 +242,14 @@ class ProceduralTest : Scene
 		brow1.transform.rotation = new Vector3(0f,0,-20f);
 		brow1.model = loadedModels["cube"];
 		brow1.texture = loadedTextures["simpleBlack"];
-		gab.AddChild(brow1);
+		gabV.AddChild(brow1);
 
 		GameObject eye2 = new GameObject("eye2");
 			eye2.transform.position = new Vector3(0.25f*2, 0.209f, -0.495f * 2);
 			eye2.transform.scale = new Vector3(0.4f);
 			eye2.model = loadedModels["sphere"];
 			eye2.texture = loadedTextures["eye"];
-			gab.AddChild(eye2);
+			gabV.AddChild(eye2);
 
 		GameObject pupil2 = new GameObject("pupil1");
 		pupil2.transform.position = new Vector3(0, 0, -0.495f * 2);
@@ -260,7 +264,7 @@ class ProceduralTest : Scene
 		brow2.transform.rotation = new Vector3(0f, 0, 20f);
 		brow2.model = loadedModels["cube"];
 		brow2.texture = loadedTextures["simpleBlack"];
-		gab.AddChild(brow2);
+		gabV.AddChild(brow2);
 
 
         GameObject Tower = new GameObject("tower");
@@ -639,7 +643,7 @@ class ProceduralTest : Scene
     private void OnBossNoteHit(object sender, NoteHitEventArgs e)
     {
         // ensure gab has the component
-        var responder = gab.GetComponent<NoteResponseComponent>();
+        var responder = gab.children[0].GetComponent<NoteResponseComponent>();
         if (responder == null) return;
 
         // map button index → nod direction
