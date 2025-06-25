@@ -68,8 +68,8 @@ public class BossRhythymUI
         EngineManager.InputManager.ActionPressed += OnActionPressed;
 
         audio = new NAudioPlayer();
-        audio.LoadAudio("Content/master house.mp3");
-        loadedNotes = NotesLoader.LoadNotesFromXml("Content/level.xml");
+        audio.LoadAudio("Content/Rlevels/enemy2/song.wav");
+        loadedNotes = NotesLoader.LoadNotesFromXml("Content/Rlevels/enemy2/chartEasy.xml");
         visuals = new GUIRhythymController(loadedNotes,content);
         songTime = 0f;
 		turnedOff = false;
