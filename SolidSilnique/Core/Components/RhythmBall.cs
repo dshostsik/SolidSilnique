@@ -27,7 +27,7 @@ namespace SolidSilnique.Core.Components
 		public override void Update()
 		{
 			if (gameObject.model == null) {
-				speed = 20;
+				speed = 50;
 				turnRate = 2f;
 				return;
 			}
