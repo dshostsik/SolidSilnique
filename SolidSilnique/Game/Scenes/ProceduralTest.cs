@@ -189,15 +189,6 @@ class ProceduralTest : Scene
         gab.AddComponent(new DebugMoveComponent());
         gab.AddComponent(new SphereColliderComponent(1));
 
-        gab.transform.scale = new Vector3(1f);
-        //gab.model = loadedModels["dodik"];
-        //gab.texture = loadedTextures["dodik_texture"];
-        //gab.normalMap = loadedTextures["gabNo"];
-        //gab.roughnessMap = loadedTextures["gabRo"];
-        //gab.aoMap = loadedTextures["gabAo"];
-        gab.AddComponent(new DebugMoveComponent());
-        gab.AddComponent(new SphereColliderComponent(1));
-
 
         this.AddChild(gab);
         GameObject TPcam = new GameObject("cam");
