@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 
@@ -32,7 +33,7 @@ public static class XMLLoader
         float PositionX = float.Parse(node.Attributes["positionX"].Value);
         float PositionY = float.Parse(node.Attributes["positionY"].Value);
         string name = node.FirstChild.Attributes["name"].Value;
-        float scale = float.Parse(node.Attributes["scale"].Value);
+        float scale = float.Parse(node.Attributes["scale"].Value, new CultureInfo("de-DE"));
         switch (amog)
         {
             case "Bar":
