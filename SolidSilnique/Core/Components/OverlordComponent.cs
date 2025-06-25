@@ -115,6 +115,7 @@ namespace SolidSilnique.Core.Components
 
 		public void SetFight(BossRhythymUI rhythmUi, float targetPoints, GameObject player, GameObject enemy)
 		{
+			enemyProgress = 0;
 			state = OverlordStates.FIGHT;
 			rhythmUi.hit += Hit;
 			rhythymUI = rhythmUi;

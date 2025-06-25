@@ -44,7 +44,7 @@ public class BossRhythymUI
         public float     Duration;
     }
 
-    private readonly List<Feedback> _feedbacks = new();
+    private List<Feedback> _feedbacks = new();
 
     private const float FeedbackDur = 0.2f;
     
@@ -72,7 +72,9 @@ public class BossRhythymUI
         loadedNotes = NotesLoader.LoadNotesFromXml("Content/level.xml");
         visuals = new GUIRhythymController(loadedNotes,content);
         songTime = 0f;
-        audio.Play();
+		turnedOff = false;
+		_feedbacks = new();
+		audio.Play();
 
         var vp = spriteBatch.GraphicsDevice.Viewport;
 

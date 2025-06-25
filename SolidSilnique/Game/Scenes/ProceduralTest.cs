@@ -29,6 +29,7 @@ class ProceduralTest : Scene
     public EnvironmentObject enviro = new EnvironmentObject();
     KeyboardState kState = new KeyboardState();
     BossRhythymUI bossRhythym = new BossRhythymUI();
+    BossRhythymUI bossRhythym2 = new BossRhythymUI();
 
 
     private AudioPlayer hitSounds;
@@ -369,7 +370,7 @@ class ProceduralTest : Scene
 
         TPCamera.cameraComponent.SetMain();
         EngineManager.InputManager.gMode = true;
-        bossRhythym.hit += powiedzDupa;
+        //bossRhythym.hit += powiedzDupa;
         bossRhythym.hit += OnBossNoteHit;
 
         GameObject visual = new GameObject("GebusVisual");
