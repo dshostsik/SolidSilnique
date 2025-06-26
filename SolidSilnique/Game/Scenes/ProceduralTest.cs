@@ -165,7 +165,7 @@ class ProceduralTest : Scene
 	    hitSounds = new AudioPlayer(sounds, PositionalHelper.GetInstance(), 1f, 1f);
 	    */
         environmentObject = new EnvironmentObject();
-        environmentObject.Generate("Map1", content, 3, 60, 2, 8);
+        environmentObject.Generate("Map1", content, 3, 60, 2, 16);
 
         _lastAudioStopTime = 0f;
         
@@ -297,8 +297,8 @@ class ProceduralTest : Scene
         var animator1 = new AnimatorComponent(clip1, loop: true);
 
         Tower.AddComponent(animator1);
-        animator1.Play();
-        this.AddChild(Tower);
+        //animator1.Play();
+        //this.AddChild(Tower);
 
 
         /*var cube = new GameObject("AnimatedCube");
@@ -336,7 +336,7 @@ class ProceduralTest : Scene
 				//prevGeb = gogus;
 			}*/
 
-        GameObject gigus = CreateGebus(new Vector3(190, 15, 435),1,"Easy","wav");
+        GameObject gigus = CreateGebus(new Vector3(190, 15, 435),3,"Easy", "mp3");
 		gigus.GetComponent<Follower>().Target = gab;
 		this.AddChild(gigus);
 
@@ -344,19 +344,21 @@ class ProceduralTest : Scene
 		gigus.GetComponent<Follower>().Target = gab;
 		this.AddChild(gigus);
 
-		gigus = CreateGebus(new Vector3(220, 15, 195),3,"Easy","mp3");
+		gigus = CreateGebus(new Vector3(220, 15, 195),1,"Easy", "wav");
 		gigus.GetComponent<Follower>().Target = gab;
 		this.AddChild(gigus);
 
-		gigus = CreateGebus(new Vector3(250, 15, 650), 1, "Hard", "wav");
+
+
+		gigus = CreateGebus(new Vector3(400, 15, 650), 1, "Hard", "wav");
 		gigus.GetComponent<Follower>().Target = gab;
 		this.AddChild(gigus);
 
-		gigus = CreateGebus(new Vector3(300, 15, 650), 2, "Hard", "wav");
+		gigus = CreateGebus(new Vector3(540, 15, 560), 2, "Hard", "wav");
 		gigus.GetComponent<Follower>().Target = gab;
 		this.AddChild(gigus);
 
-		gigus = CreateGebus(new Vector3(400, 15, 650), 3, "Hard", "mp3");
+		gigus = CreateGebus(new Vector3(600, 15, 235), 3, "Hard", "mp3");
 		gigus.GetComponent<Follower>().Target = gab;
 		this.AddChild(gigus);
 
@@ -365,10 +367,7 @@ class ProceduralTest : Scene
 
 
 
-		GameObject ziutek = CreateMovableObject("ziutek", 200, 200);
-        ziutek.GetComponent<SphereColliderComponent>().boundingSphere.Radius = 2.0f;
-        //ziutek.GetComponent<Follower>().Target = gab;
-        this.AddChild(ziutek);
+		
 
         mainMenuGui = new GUI("Content/MainMenuUI/menu.xml", content);
         rhythymGui = new GUI("Content/RhythymGui.xml", content);
@@ -391,7 +390,8 @@ class ProceduralTest : Scene
 
 
         GameObject boss = new GameObject("boss");
-		boss.transform.position = new Vector3(512, 0, 50);
+		boss.transform.position = new Vector3(400, 0, 80);
+		boss.transform.scale = new Vector3(2);
         boss.albedo = new Color(1, 0.2f, 1);
 		boss.model = loadedModels["trent"];
         boss.texture = loadedTextures["trent"];
