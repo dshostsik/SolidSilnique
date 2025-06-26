@@ -53,9 +53,6 @@
         <None Update="Content\RhythymGui.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="Content\master house.mp3">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
         <None Update="Content\Sounds\drum-hitclap.wav">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
@@ -69,6 +66,9 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="Content\MainMenuUI\menu.xml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Content\RLevels\enemy4\song.mp3">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
