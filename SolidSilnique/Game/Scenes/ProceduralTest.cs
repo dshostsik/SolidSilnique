@@ -151,7 +151,7 @@ class ProceduralTest : Scene
         content = Content;
         bgmPlayer = new NAudioPlayer();
         bgmPlayer.LoadAudio("Content/Sounds/bgm1.mp3");
-
+		bgmPlayer.Repeat();
     }
 
     public override void Setup()

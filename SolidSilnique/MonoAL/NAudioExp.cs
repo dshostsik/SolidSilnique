@@ -8,7 +8,7 @@ namespace SolidSilnique.MonoAL
         private AudioFileReader audioFile;
         private WasapiOut outputDevice;
         private bool isDisposed;
-
+        
         public NAudioPlayer()
         {
             outputDevice = new WasapiOut();
@@ -87,6 +87,14 @@ namespace SolidSilnique.MonoAL
 
                 isDisposed = true;
             }
+        }
+
+        public void Repeat()
+        {
+            outputDevice.PlaybackStopped += (s, e) => {
+                audioFile.Position = 0;
+                outputDevice.Play();
+            };
         }
     }
 }
