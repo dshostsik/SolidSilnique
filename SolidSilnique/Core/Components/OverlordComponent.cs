@@ -84,7 +84,7 @@ namespace SolidSilnique.Core.Components
 		{
 
 			instance = this;
-
+			currentGui.texts[1].visible = false;
 			GameObject spotlight = new GameObject("olSpotlight");
 			spotlight.AddComponent(new Spotlight(0.05f, 0.01f, 1, Vector3.Down, 0.7f, 0.8f));
 			
@@ -116,6 +116,7 @@ namespace SolidSilnique.Core.Components
 			//EngineManager.lightsManager.DirectionalLight.Enabled = 0;
 			EngineManager.lightsManager.Start();
 			currentGui.progressBars[1].visible = false;
+			currentGui.images[2].visible = false;
 
             _gradeTextures = Enum.GetValues(typeof(FightGrade))
                         .Cast<FightGrade>()
@@ -144,6 +145,7 @@ namespace SolidSilnique.Core.Components
 				gameObject.children[1].transform.position = cPos;
 				gameObject.children[1].transform.LookAt(arenaPos);
 				currentGui.texts[3].text = enemyProgress.ToString() +" / "+ enemyProgressTarget.ToString() ;
+
 			}
 		}
 
@@ -152,12 +154,15 @@ namespace SolidSilnique.Core.Components
 			enemyProgress = 0;
 			state = OverlordStates.FIGHT;
 			rhythmUi.hit += Hit;
+			rhythmUi.combo = 0;
 			rhythymUI = rhythmUi;
 			enemyProgressTarget = (rhythmUi.loadedNotes.Count()) * 30 * 0.6f;
 			this.enemy = enemy;
 			this.player = player;
 			currentGui.progressBars[1].visible = true;
+			currentGui.images[2].visible = true;
 			currentGui.progressBars[1].progress = (enemyProgress / enemyProgressTarget) * 100;
+			currentGui.texts[1].visible = true;
 
 			arenaPos = (player.transform.position + enemy.transform.position)/2.0f;
 			Vector3 displacementVector = (player.transform.position - arenaPos);
@@ -166,7 +171,11 @@ namespace SolidSilnique.Core.Components
 			enemy.transform.position = arenaPos - displacementVector*5 * bossMult;
 
 			player.transform.LookAt(enemy.transform.position);
+
 			player.transform.rotation *= Vector3.Up;
+
+			enemy.children[0].transform.LookAt(player.transform.position);
+			enemy.children[0].transform.rotation *= Vector3.Up;
 
 			gameObject.children[0].transform.position = arenaPos + Vector3.Up * 10;
 			//gameObject.children[1].transform.position = arenaPos + Vector3.Up * 8;
@@ -242,6 +251,8 @@ namespace SolidSilnique.Core.Components
 		{
 			state = OverlordStates.EXPLORE;
 			currentGui.progressBars[1].visible = false;
+			currentGui.images[2].visible = false;
+			currentGui.texts[1].visible = false;
 
 			rhythymUI.hit -= Hit;
 

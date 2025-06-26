@@ -409,11 +409,13 @@ class ProceduralTest : Scene
 
 
         boss = new GameObject("boss");
+        GameObject bossV = new GameObject("bossV");
+		boss.AddChild(bossV);
 		boss.transform.position = new Vector3(400, 0, 80);
 		boss.transform.scale = new Vector3(1.5f);
-        boss.albedo = new Color(1, 0.2f, 1);
-		boss.model = loadedModels["trent"];
-        boss.texture = loadedTextures["trent"];
+		bossV.albedo = new Color(1, 0.2f, 1);
+		bossV.model = loadedModels["trent"];
+		bossV.texture = loadedTextures["trent"];
         boss.AddComponent(new SphereColliderComponent(8f));
         Follower helpMe = new Follower(boss) {
             aggroRange = 40, enemyIndex = 4, audioExtension = "mp3", difficulty = "Easy", Target = gab, patrolRadius = 0, SocialDistance = 1000
@@ -421,6 +423,7 @@ class ProceduralTest : Scene
         };
         boss.AddComponent(helpMe);
         this.AddChild(boss);
+		
 
         //Overlord :)
         GameObject overlord = new GameObject("Overlord");

@@ -15,7 +15,11 @@ public class Image : GuiElement
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        Vector2 position = new Vector2(positionX, positionY);
+		if (!visible)
+		{
+			return;
+		}
+		Vector2 position = new Vector2(positionX, positionY);
         spriteBatch.Draw(texture, position,null, Color.White,0,Vector2.Zero,scale,SpriteEffects.None,0);
     }
     

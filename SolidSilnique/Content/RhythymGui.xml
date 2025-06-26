@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Hud name="test">
-	<GuiElement positionX="50" positionY="20" scale="1,5">
+	<GuiElement positionX="2050" positionY="20" scale="1,5">
 		<Bar name="HP_BAR" orientation="vertical" inverse="false" width="50"/>
 	</GuiElement>
-	<GuiElement positionX="50" positionY="20" scale="1,5">
+	<GuiElement positionX="2050" positionY="20" scale="1,5">
 		<Image name="HP_FRAME"/>
 	</GuiElement>
     <GuiElement positionX="2050" positionY="50" scale="1">
         <Text name="text" fontSize="6" fontStyle="Arial">combo</Text>
     </GuiElement>
-    <GuiElement positionX="1280" positionY="720" scale="2">
-        <Text name="text" fontSize="3" fontStyle="Arial">wynik</Text>
+    <GuiElement positionX="1280" positionY="720" scale="3">
+        <Text name="text" fontSize="1" fontStyle="Arial">wynik</Text>
     </GuiElement>
-	<GuiElement positionX="5" positionY="1045" scale="2">
-		<Text name="text" fontSize="1" fontStyle="Arial">Test Build 12052025</Text>
+	<GuiElement positionX="5" positionY="2045" scale="1">
+		<Text name="text" fontSize="0,5" fontStyle="Arial">Test Build 12052025</Text>
 	</GuiElement>
-	<GuiElement positionX="10" positionY="830" scale="0,25">
+	<GuiElement positionX="2010" positionY="830" scale="0,25">
 		<Image name="thrab_logo"/>
 	</GuiElement>
-	<GuiElement positionX="400" positionY="1045" scale="2">
-		<Text name="text" fontSize="1" fontStyle="Arial">TARGET</Text>
+	<GuiElement positionX="400" positionY="2045" scale="1">
+		<Text name="text" fontSize="0,5" fontStyle="Arial">TARGET</Text>
 	</GuiElement>
 	<GuiElement positionX="510" positionY="900" scale="1,5">
 		<Bar name="progressbar_fill" orientation="vertical" inverse="false" width="0"/>
+	</GuiElement>
+	<GuiElement positionX="510" positionY="900" scale="1,5">
+		<Image name="progressbar_frame"/>
 	</GuiElement>
 </Hud>
