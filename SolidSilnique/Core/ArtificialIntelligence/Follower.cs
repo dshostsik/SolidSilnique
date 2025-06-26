@@ -225,6 +225,9 @@ namespace SolidSilnique.Core.ArtificialIntelligence
                 moveVec = -(gameObject.transform.position - (spawnPoint + patrolTargetOffset));
                 moveVec.Normalize();
 
+                gameObject.children[0].transform.LookAt(moveVec + gameObject.transform.position);
+                //gameObject.children[0].transform.rotation *= Vector3.Up;
+
                 gameObject.transform.position += moveVec * Time.deltaTime * 2;
             }
 
@@ -241,10 +244,12 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         public void ChaseUpdate()
         {
             gameObject.transform.position += GetFollowDirectionVector() * Time.deltaTime * 5;
+			gameObject.children[0].transform.LookAt(GetFollowDirectionVector() + gameObject.transform.position);
+			gameObject.children[0].transform.rotation *= Vector3.Up;
 
-            //State Transition
-            // -> Return state
-            if (Vector3.DistanceSquared(this.gameObject.transform.position, Target.transform.position) >= (aggroRange * 1.5) * (aggroRange * 1.5) || Vector3.DistanceSquared(this.gameObject.transform.position, spawnPoint) >= homeRange * homeRange)
+			//State Transition
+			// -> Return state
+			if (Vector3.DistanceSquared(this.gameObject.transform.position, Target.transform.position) >= (aggroRange * 1.5) * (aggroRange * 1.5) || Vector3.DistanceSquared(this.gameObject.transform.position, spawnPoint) >= homeRange * homeRange)
             {
                 state = AIState.HOSTILE_RETURN;
             }
@@ -280,7 +285,11 @@ namespace SolidSilnique.Core.ArtificialIntelligence
 
                 gameObject.transform.position += moveVec * Time.deltaTime * 4;
 
-            }
+				gameObject.children[0].transform.LookAt(moveVec + gameObject.transform.position);
+				gameObject.children[0].transform.rotation *= Vector3.Up;
+
+
+			}
             else
             {
                 //State Transition
@@ -293,6 +302,8 @@ namespace SolidSilnique.Core.ArtificialIntelligence
         public void FollowUpdate()
         {
 			gameObject.transform.position += GetFollowDirectionVector() * Time.deltaTime * 8;
+			gameObject.children[0].transform.LookAt(GetFollowDirectionVector() + gameObject.transform.position);
+			gameObject.children[0].transform.rotation *= Vector3.Up;
 			if ((Vector3.DistanceSquared(this.gameObject.transform.position, Target.transform.position) >= teleportRange * teleportRange))
 			{
 				//State Transition

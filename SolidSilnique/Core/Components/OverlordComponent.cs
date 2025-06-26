@@ -171,7 +171,11 @@ namespace SolidSilnique.Core.Components
 			enemy.transform.position = arenaPos - displacementVector*5 * bossMult;
 
 			player.transform.LookAt(enemy.transform.position);
+
 			player.transform.rotation *= Vector3.Up;
+
+			enemy.children[0].transform.LookAt(player.transform.position);
+			enemy.children[0].transform.rotation *= Vector3.Up;
 
 			gameObject.children[0].transform.position = arenaPos + Vector3.Up * 10;
 			//gameObject.children[1].transform.position = arenaPos + Vector3.Up * 8;
