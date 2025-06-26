@@ -204,7 +204,7 @@ public class BossRhythymUI
         {
             
             
-            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time-0.014) < 0.14f)
+            if (a == loadedNotes[i].Button && Math.Abs(pressTime-(float)loadedNotes[i].Time-0.014) < 0.18f)
             {
                 hit?.Invoke(this,new NoteHitEventArgs(Math.Abs(pressTime-(float)loadedNotes[i].Time - 0.014f),a,combo+1));
                 NoteHit?.Invoke(this, new NoteEventArgs
