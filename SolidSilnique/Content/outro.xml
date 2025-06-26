@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Hud name="Outro">
+    <GuiElement positionX="550" positionY="400" scale="2">
+        <Text name="text" fontSize="2" fontStyle="Arial">Thanks for playing! See you later!</Text>
+    </GuiElement>
+    <GuiElement positionX="850" positionY="790" scale="1">
+        <Button name="MainMenuUI/QuitToDesktop" width="300" height = "90"/>
+    </GuiElement>
+    <GuiElement positionX="5" positionY="1045" scale="2">
+        <Text name="text" fontSize="1" fontStyle="Arial">Test Build 25062025</Text>
+    </GuiElement>
+    <GuiElement positionX="850" positionY="10" scale="0,25">
+        <Image name="thrab_logo"/>
+    </GuiElement>
+</Hud>

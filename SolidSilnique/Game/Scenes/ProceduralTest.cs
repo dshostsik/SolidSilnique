@@ -43,6 +43,10 @@ class ProceduralTest : Scene
     public GUI mainMenuGui;
 
     //---------------------------
+    
+    public GUI outroGui;
+    
+    
     ContentManager content;
 
     // let's assume it as a player object so far
@@ -64,6 +68,10 @@ class ProceduralTest : Scene
     private Vector3 secondEye = new Vector3(0.1f, 0.16f, 1f);
 
     private Vector3 pupil = new Vector3(0.5f, 0.0f, 0.5f);
+
+    private bool bossDefeated = false;
+
+    private GameObject boss;
     
     public ProceduralTest()
     {
@@ -381,6 +389,7 @@ class ProceduralTest : Scene
 
         mainMenuGui = new GUI("Content/MainMenuUI/menu.xml", content);
         rhythymGui = new GUI("Content/RhythymGui.xml", content);
+        outroGui = new GUI("Content/outro.xml", content);
         //EngineManager.currentGui = rhythymGui;
 
         // Check if we're playing or nah
@@ -399,7 +408,7 @@ class ProceduralTest : Scene
         this.AddChild(go);
 
 
-        GameObject boss = new GameObject("boss");
+        boss = new GameObject("boss");
 		boss.transform.position = new Vector3(400, 0, 80);
 		boss.transform.scale = new Vector3(1.5f);
         boss.albedo = new Color(1, 0.2f, 1);
@@ -462,6 +471,17 @@ class ProceduralTest : Scene
             }
         }
 
+        if (bossDefeated)
+        {
+	        EngineManager.mouseVisible = true;
+	        // Make the entire scene dark
+	        EngineManager.darkenTheScene = 1;
+	        // Switch interface
+	        EngineManager.currentGui = outroGui;
+	        // Unlock the mouse
+	        EngineManager.mouseFree = bossDefeated;
+        }
+		
         // Process only menu if inMainMenu is true. All updates will be suspended. Otherwise, update all entities
         if (inMainMenu)
         {
@@ -470,6 +490,10 @@ class ProceduralTest : Scene
             Console.WriteLine("Mouse pos in menu: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
 #endif
             CheckHovers();
+        }
+        else if (bossDefeated)
+        {
+	        CheckHoversOutro();
         }
         else
         {
@@ -490,35 +514,43 @@ class ProceduralTest : Scene
 	        if (bossRhythym.hasEnded && turnedOn)
 	        {
 		        turnedOn = false;
-		        Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
-		        Follower.enemyToFight = null;
-		        OverlordComponent.instance.FinishFight(TPCamera.cameraComponent);
-				bgmPlayer.Play();
-		        grade = OverlordComponent.instance.FinalGrade;
-
-		        switch (grade)
+		        if (boss.Equals(Follower.enemyToFight))
 		        {
-			        case FightGrade.A:
-				        EngineManager.gradeTexture = loadedTextures["A"];
-				        break;
-			        case FightGrade.B:
-				        EngineManager.gradeTexture = loadedTextures["B"];
-				        break;
-			        case FightGrade.C:
-				        EngineManager.gradeTexture = loadedTextures["C"];
-				        break;
-			        case FightGrade.D:
-				        EngineManager.gradeTexture = loadedTextures["D"];
-				        break;
-			        case FightGrade.F:
-				        EngineManager.gradeTexture = loadedTextures["F"];
-				        break;
-			        case FightGrade.S:
-				        EngineManager.gradeTexture = loadedTextures["S"];
-				        break;
+			        bossDefeated = true;
+			        
 		        }
+		        else
+		        {
+			        Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
+			        Follower.enemyToFight = null;
+			        OverlordComponent.instance.FinishFight(TPCamera.cameraComponent);
+			        bgmPlayer.Play();
+			        grade = OverlordComponent.instance.FinalGrade;
 
-		        EngineManager.timePoint = 0;
+			        switch (grade)
+			        {
+				        case FightGrade.A:
+					        EngineManager.gradeTexture = loadedTextures["A"];
+					        break;
+				        case FightGrade.B:
+					        EngineManager.gradeTexture = loadedTextures["B"];
+					        break;
+				        case FightGrade.C:
+					        EngineManager.gradeTexture = loadedTextures["C"];
+					        break;
+				        case FightGrade.D:
+					        EngineManager.gradeTexture = loadedTextures["D"];
+					        break;
+				        case FightGrade.F:
+					        EngineManager.gradeTexture = loadedTextures["F"];
+					        break;
+				        case FightGrade.S:
+					        EngineManager.gradeTexture = loadedTextures["S"];
+					        break;
+			        }
+
+			        EngineManager.timePoint = 0;
+		        }
 	        }
 
 	        rhythymGui.progressBars[0].progress = bossRhythym.health;
@@ -528,6 +560,32 @@ class ProceduralTest : Scene
 
         }
 	    base.Update();
+    }
+
+    private void CheckHoversOutro()
+    {
+	    int mouseX = Mouse.GetState().X;
+	    int mouseY = Mouse.GetState().Y;
+
+	    // Check ONLY if mouse was pressed somewhere in menu
+	    if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+	    {
+			    Button button = outroGui.buttons[0];
+
+			    int x = (int)Math.Clamp(mouseX, button.positionX, button.positionX + button.width);
+			    int y = (int)Math.Clamp(mouseY, button.positionY, button.positionY + button.height);
+                
+		    
+			    if (mouseX == x && mouseY == y)
+			    {
+				    EngineManager.CloseGame = true;
+			    }
+	    } 
+	    
+	    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed && bossDefeated)
+	    {
+		    EngineManager.CloseGame = true;
+	    }
     }
 
     /// <summary>
