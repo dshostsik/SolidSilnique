@@ -55,6 +55,8 @@ class ProceduralTest : Scene
 
     private bool firstFrame = true;
 
+    private FightGrade grade;
+    
     public ProceduralTest()
     {
     }
@@ -414,6 +416,8 @@ class ProceduralTest : Scene
         visual.texture = loadedTextures["gabTex"];
         visual.albedo = Color.Red;
         go.AddChild(visual);
+        
+        EngineManager.spritePos = new Rectangle((int)(EngineManager.windowWidth * 0.8f), (int)(EngineManager.windowHeight * 0.1f), (int)(EngineManager.windowWidth * 0.15f), (int)(EngineManager.windowWidth * 0.15f));
     }
 
     public override void Update()
@@ -477,7 +481,31 @@ class ProceduralTest : Scene
 		        Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
 		        Follower.enemyToFight = null;
 		        OverlordComponent.instance.FinishFight(TPCamera.cameraComponent);
+		        grade = OverlordComponent.instance.FinalGrade;
 
+		        switch (grade)
+		        {
+			        case FightGrade.A:
+				        EngineManager.gradeTexture = loadedTextures["A"];
+				        break;
+			        case FightGrade.B:
+				        EngineManager.gradeTexture = loadedTextures["B"];
+				        break;
+			        case FightGrade.C:
+				        EngineManager.gradeTexture = loadedTextures["C"];
+				        break;
+			        case FightGrade.D:
+				        EngineManager.gradeTexture = loadedTextures["D"];
+				        break;
+			        case FightGrade.F:
+				        EngineManager.gradeTexture = loadedTextures["F"];
+				        break;
+			        case FightGrade.S:
+				        EngineManager.gradeTexture = loadedTextures["S"];
+				        break;
+		        }
+
+		        EngineManager.timePoint = 0;
 	        }
 
 	        rhythymGui.progressBars[0].progress = bossRhythym.health;

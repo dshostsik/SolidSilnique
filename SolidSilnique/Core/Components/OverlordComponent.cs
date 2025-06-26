@@ -24,16 +24,17 @@ namespace SolidSilnique.Core.Components
 		S
 
 	}
+
 	public class OverlordComponent : Component
 	{
 		/* CZYM jest OVERLORD?
 		 * Overlord to wszechwładca Gampeplay loopa
-		 * 
+		 *
 		 * Tankuj z tym
-		 * 
+		 *
 		 * Ma se kamere i spotlighta, on wie co z nimi zrobić :)
-		 * 
-		 * 
+		 *
+		 *
 		 */
 
 
@@ -53,22 +54,31 @@ namespace SolidSilnique.Core.Components
 		int ballPoolIndex = 0;
 		Model ballModel;
 
-        private int _initialNotesCount;
-        private int _finalScore;
-        private float _finalAccuracySum;
-        private float _finalAccuracyAvg;
-        private FightGrade _finalGrade;
-        private bool _showResults = false;
-        private Dictionary<FightGrade, Texture2D> _gradeTextures;
+		private int _initialNotesCount;
+		private int _finalScore;
+		private float _finalAccuracySum;
+		private float _finalAccuracyAvg;
+		private FightGrade _finalGrade;
+		private bool _showResults = false;
+		private Dictionary<FightGrade, Texture2D> _gradeTextures;
 
-        public bool ShowResults => _showResults;
-        public int FinalScore => _finalScore;
-        public float FinalAccuracyAvg => _finalAccuracyAvg;
-        public FightGrade FinalGrade => _finalGrade;
+		public bool ShowResults => _showResults;
+		public int FinalScore => _finalScore;
+		public float FinalAccuracyAvg => _finalAccuracyAvg;
+		public FightGrade FinalGrade => _finalGrade;
 
-        public IReadOnlyDictionary<FightGrade, Texture2D> GradeTextures
-            => _gradeTextures;
+		public IReadOnlyDictionary<FightGrade, Texture2D> GradeTextures
+			=> _gradeTextures;
 
+
+		private float perf;
+
+		public float Perf
+		{
+			get => perf;
+			private set { perf = value; }
+		}
+        
         public override void Start()
 		{
 
@@ -112,7 +122,6 @@ namespace SolidSilnique.Core.Components
                             g => g,
                             g => EngineManager.Content
                                       .Load<Texture2D>($"Grades/{g}"));
-
         }
 
 		float rotate = 0;
@@ -256,7 +265,7 @@ namespace SolidSilnique.Core.Components
             //                  : 0f;
 
             // performance ratio
-            float perf = enemyProgress / enemyProgressTarget;
+            perf = enemyProgress / enemyProgressTarget;
             _finalGrade = perf >= 0.95f ? FightGrade.S
                         : perf >= 0.85f ? FightGrade.A
                         : perf >= 0.70f ? FightGrade.B
