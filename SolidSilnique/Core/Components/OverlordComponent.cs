@@ -143,7 +143,7 @@ namespace SolidSilnique.Core.Components
 			state = OverlordStates.FIGHT;
 			rhythmUi.hit += Hit;
 			rhythymUI = rhythmUi;
-			enemyProgressTarget = (rhythmUi.loadedNotes.Count()) * 30;
+			enemyProgressTarget = (rhythmUi.loadedNotes.Count()) * 30 * 0.6f;
 			this.enemy = enemy;
 			this.player = player;
 			currentGui.progressBars[1].visible = true;
@@ -193,7 +193,7 @@ namespace SolidSilnique.Core.Components
 				enemyProgress += 30;// * comboMod; //Perfect
 			}
 			currentGui.progressBars[1].progress = MathF.Min(100,(enemyProgress/enemyProgressTarget) * 100);
-
+			enemy.children[0].emissive = new Color(1, 1, 0) * MathF.Min(1,(enemyProgress / enemyProgressTarget));
 			cShake += -Vector3.Forward * comboMod;
 			GameObject usedBall = this.gameObject.children[2].children[ballPoolIndex++];
 			if (ballPoolIndex >= ballPoolCount) {
@@ -233,7 +233,7 @@ namespace SolidSilnique.Core.Components
 			state = OverlordStates.EXPLORE;
 			currentGui.progressBars[1].visible = false;
 
-
+			rhythymUI.hit -= Hit;
 
 
 

@@ -165,7 +165,7 @@ class ProceduralTest : Scene
 	    hitSounds = new AudioPlayer(sounds, PositionalHelper.GetInstance(), 1f, 1f);
 	    */
         environmentObject = new EnvironmentObject();
-        environmentObject.Generate("Map1", content, 3, 60, 3, 8);
+        environmentObject.Generate("Map1", content, 3, 60, 2, 8);
 
         _lastAudioStopTime = 0f;
         
@@ -198,7 +198,8 @@ class ProceduralTest : Scene
         gab.AddChild(gabV);
 
 
-		gab.transform.position = new Vector3(180, 15, 730);
+		gab.transform.position = new Vector3(270, 13, 565);
+		gab.transform.rotation = new Vector3(0, 45, 0);
 
         gab.transform.scale = new Vector3(1f);
         gabV.model = loadedModels["cube"];
@@ -335,15 +336,15 @@ class ProceduralTest : Scene
 				//prevGeb = gogus;
 			}*/
 
-        GameObject gigus = CreateGebus(new Vector3(165, 15, 600),1,"Easy","wav");
+        GameObject gigus = CreateGebus(new Vector3(190, 15, 435),1,"Easy","wav");
 		gigus.GetComponent<Follower>().Target = gab;
 		this.AddChild(gigus);
 
-		gigus = CreateGebus(new Vector3(150, 15, 550),2,"Easy","wav");
+		gigus = CreateGebus(new Vector3(270, 15, 300),2,"Easy","wav");
 		gigus.GetComponent<Follower>().Target = gab;
 		this.AddChild(gigus);
 
-		gigus = CreateGebus(new Vector3(150, 15, 500),3,"Easy","mp3");
+		gigus = CreateGebus(new Vector3(220, 15, 195),3,"Easy","mp3");
 		gigus.GetComponent<Follower>().Target = gab;
 		this.AddChild(gigus);
 
@@ -420,18 +421,19 @@ class ProceduralTest : Scene
 
     public override void Update()
     {
-        //kState = Keyboard.GetState();
+		rhythymGui.texts[3].text = gab.transform.position.ToString();
+		//kState = Keyboard.GetState();
 
-       /* if (SquaredDistanceBetweenEnemyAndPlayer() <
-            enemy.GetComponent<Follower>().SocialDistance * 3.0f)
-        {
-            _playerInsideEnemyFOV = true;
-            enemy.GetComponent<Follower>().Target = gab;
-        }*/
+		/* if (SquaredDistanceBetweenEnemyAndPlayer() <
+			 enemy.GetComponent<Follower>().SocialDistance * 3.0f)
+		 {
+			 _playerInsideEnemyFOV = true;
+			 enemy.GetComponent<Follower>().Target = gab;
+		 }*/
 
 
-        // Suspend the game if an Escape key was pressed
-        if (Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Start == ButtonState.Pressed)
+		// Suspend the game if an Escape key was pressed
+		if (Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Start == ButtonState.Pressed)
         {
             // Switch mode
             inMainMenu = true;
