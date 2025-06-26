@@ -51,6 +51,7 @@ namespace SolidSilnique.Core.Components
 		FightGrade maxGrade;
 		int ballPoolCount = 30;
 		int ballPoolIndex = 0;
+		public float bossMult = 1;
 		Model ballModel;
 
         private int _initialNotesCount;
@@ -127,8 +128,8 @@ namespace SolidSilnique.Core.Components
 				cShakeActual = Vector3.Lerp(cShakeActual, cShake, Time.deltaTime * 10);
 				Vector3 cPos = arenaPos
 					+ Vector3.Up * (6f + cShakeActual.Y)
-					+ Vector3.Right * (MathF.Sin(rotate) * (12f + cShakeActual.Z))
-					+ Vector3.Forward * (MathF.Cos(rotate) * (12f + cShakeActual.Z));
+					+ Vector3.Right * (MathF.Sin(rotate) * (12f + cShakeActual.Z) * bossMult)
+					+ Vector3.Forward * (MathF.Cos(rotate) * (12f + cShakeActual.Z) * bossMult);
 
 				cShake = Vector3.Lerp(cShake, Vector3.Zero, Time.deltaTime * 10);
 				gameObject.children[1].transform.position = cPos;
@@ -152,8 +153,8 @@ namespace SolidSilnique.Core.Components
 			arenaPos = (player.transform.position + enemy.transform.position)/2.0f;
 			Vector3 displacementVector = (player.transform.position - arenaPos);
 			displacementVector.Normalize();
-			player.transform.position = arenaPos + displacementVector*5;
-			enemy.transform.position = arenaPos - displacementVector*5;
+			player.transform.position = arenaPos + displacementVector*5*bossMult;
+			enemy.transform.position = arenaPos - displacementVector*5 * bossMult;
 
 			player.transform.LookAt(enemy.transform.position);
 			player.transform.rotation *= Vector3.Up;
@@ -193,7 +194,7 @@ namespace SolidSilnique.Core.Components
 				enemyProgress += 30;// * comboMod; //Perfect
 			}
 			currentGui.progressBars[1].progress = MathF.Min(100,(enemyProgress/enemyProgressTarget) * 100);
-			enemy.children[0].emissive = new Color(1, 1, 0) * MathF.Min(1,(enemyProgress / enemyProgressTarget));
+			//enemy.children[0].emissive = new Color(1, 1, 0) * MathF.Min(1,(enemyProgress / enemyProgressTarget));
 			cShake += -Vector3.Forward * comboMod;
 			GameObject usedBall = this.gameObject.children[2].children[ballPoolIndex++];
 			if (ballPoolIndex >= ballPoolCount) {

@@ -76,6 +76,15 @@ public class BossRhythymUI
 		_feedbacks = new();
 		audio.Play();
 
+
+        if (enemyIndex == 4)
+        {
+            OverlordComponent.instance.bossMult = 2;
+        }
+        else {
+			OverlordComponent.instance.bossMult = 1;
+		}
+
         var vp = spriteBatch.GraphicsDevice.Viewport;
 
         float cx = vp.Width * 0.5f;

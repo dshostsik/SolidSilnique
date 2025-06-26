@@ -390,12 +390,17 @@ class ProceduralTest : Scene
 
 
         GameObject boss = new GameObject("boss");
-		boss.transform.position = new Vector3(400, 0, 80);
+		boss.transform.position = new Vector3(200/*400*/, 0, 580);
 		boss.transform.scale = new Vector3(2);
         boss.albedo = new Color(1, 0.2f, 1);
 		boss.model = loadedModels["trent"];
         boss.texture = loadedTextures["trent"];
         boss.AddComponent(new SphereColliderComponent(8f));
+        Follower helpMe = new Follower(boss) {
+            aggroRange = 40, enemyIndex = 4, audioExtension = "mp3", difficulty = "Easy", Target = gab, patrolRadius = 0, SocialDistance = 1000
+            
+        };
+        boss.AddComponent(helpMe);
         this.AddChild(boss);
 
         //Overlord :)
@@ -663,7 +668,7 @@ class ProceduralTest : Scene
         return go;
     }
 
-    private bool turnedOn = false;
+    public bool turnedOn = false;
 
     private float SquaredDistanceBetweenEnemyAndPlayer()
     {
