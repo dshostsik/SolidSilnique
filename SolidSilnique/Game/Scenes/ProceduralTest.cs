@@ -54,7 +54,7 @@ class ProceduralTest : Scene
     private double _lastAudioStopTime;
 
     private bool firstFrame = true;
-
+    public NAudioPlayer bgmPlayer;
     public ProceduralTest()
     {
     }
@@ -149,8 +149,9 @@ class ProceduralTest : Scene
         
 
         content = Content;
+        bgmPlayer = new NAudioPlayer();
+        bgmPlayer.LoadAudio("Content/Sounds/bgm1.mp3");
 
-        
     }
 
     public override void Setup()
@@ -414,6 +415,7 @@ class ProceduralTest : Scene
         visual.texture = loadedTextures["gabTex"];
         visual.albedo = Color.Red;
         go.AddChild(visual);
+        bgmPlayer.Play();
     }
 
     public override void Update()
@@ -468,6 +470,7 @@ class ProceduralTest : Scene
 
 	        if (turnedOn)
 	        {
+		        bgmPlayer.Pause();
 		        bossRhythym.Update();
 	        }
 
@@ -477,7 +480,7 @@ class ProceduralTest : Scene
 		        Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
 		        Follower.enemyToFight = null;
 		        OverlordComponent.instance.FinishFight(TPCamera.cameraComponent);
-
+				bgmPlayer.Play();
 	        }
 
 	        rhythymGui.progressBars[0].progress = bossRhythym.health;
