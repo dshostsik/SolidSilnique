@@ -17,10 +17,10 @@
         <None Update="Content\level.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="Content\RLevels\enemy1\chartEasy.xml">
+        <None Update="Content\RLevels\enemy1\chartHard.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="Content\RLevels\enemy1\chartHard.xml">
+        <None Update="Content\RLevels\enemy1\chartEasy.xml">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="Content\RLevels\enemy1\song.wav">
