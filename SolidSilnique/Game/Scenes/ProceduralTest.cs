@@ -390,8 +390,8 @@ class ProceduralTest : Scene
 
 
         GameObject boss = new GameObject("boss");
-		boss.transform.position = new Vector3(200/*400*/, 0, 580);
-		boss.transform.scale = new Vector3(2);
+		boss.transform.position = new Vector3(400, 0, 80);
+		boss.transform.scale = new Vector3(1.5f);
         boss.albedo = new Color(1, 0.2f, 1);
 		boss.model = loadedModels["trent"];
         boss.texture = loadedTextures["trent"];
