@@ -18,6 +18,9 @@ namespace SolidSilnique.Core
 
     static class EngineManager
     {
+	    public static int windowHeight;
+	    public static int windowWidth;
+	    
         public static Scene scene = null;
 
         public static Queue<GameObject> renderQueue = [];
@@ -79,13 +82,21 @@ namespace SolidSilnique.Core
         public static SpriteBatch UIbatch;
         public static SpriteFont UIfont;
         public static ContentManager Content;
+        
+        public static int timePoint = 0;
+        // Your grade for the play
+        private static SpriteBatch _grade;
+        public static Rectangle spritePos;
+        public static Texture2D gradeTexture;
+        
 
         public static bool disableMove;
 
         public static void Start()
         {
 			UiRenderer = new SpriteBatch(graphics);
-
+			_grade = new SpriteBatch(graphics);
+			gradeTexture = new Texture2D(graphics, (int)(windowWidth * 0.5f), (int)(windowHeight * 0.5f));
 			scene.Start();
             GenerateInstanceData();
         }
@@ -98,6 +109,7 @@ namespace SolidSilnique.Core
             Skybox.skyboxEffect.Parameters["darken"].SetValue(darkenTheScene);
             Game1.CloseGame = CloseGame;
             Game1.MouseVisible = mouseVisible;
+            timePoint += gameTime.ElapsedGameTime.Seconds;
             scene.Update();
 			EngineManager.scene.mainCamera.UpdateCameraVectors();
 		}
@@ -233,9 +245,7 @@ namespace SolidSilnique.Core
 
                 graphics.DepthStencilState = prevDepth;
             }
-            
 
-            
 
             graphics.DepthStencilState = DepthStencilState.Default;
             graphics.RasterizerState = RasterizerState.CullCounterClockwise;
@@ -464,6 +474,12 @@ namespace SolidSilnique.Core
                 UIbatch.End();
             }*/
 
+            if (timePoint <= 5 && !mouseVisible)
+            {
+	            _grade.Begin();
+	            _grade.Draw(gradeTexture, spritePos, Color.White);
+	            _grade.End();
+            }
         }
     
 		

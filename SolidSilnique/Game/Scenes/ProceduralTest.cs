@@ -54,7 +54,17 @@ class ProceduralTest : Scene
     private double _lastAudioStopTime;
 
     private bool firstFrame = true;
+
+    private FightGrade grade;
+    
     public NAudioPlayer bgmPlayer;
+    
+    
+    private Vector3 firstEye = new Vector3(1f, 0.45f, 0.1f);
+    private Vector3 secondEye = new Vector3(0.1f, 0.16f, 1f);
+
+    private Vector3 pupil = new Vector3(0.5f, 0.0f, 0.5f);
+    
     public ProceduralTest()
     {
     }
@@ -415,12 +425,8 @@ class ProceduralTest : Scene
         EngineManager.InputManager.gMode = true;
         //bossRhythym.hit += powiedzDupa;
         bossRhythym.hit += OnBossNoteHit;
-
-        GameObject visual = new GameObject("GebusVisual");
-        visual.model = loadedModels["sphere"];
-        visual.texture = loadedTextures["gabTex"];
-        visual.albedo = Color.Red;
-        go.AddChild(visual);
+        
+        EngineManager.spritePos = new Rectangle((int)(EngineManager.windowWidth * 0.8f), (int)(EngineManager.windowHeight * 0.1f), (int)(EngineManager.windowWidth * 0.15f), (int)(EngineManager.windowWidth * 0.15f));
         bgmPlayer.Play();
     }
 
@@ -488,6 +494,31 @@ class ProceduralTest : Scene
 		        Follower.enemyToFight = null;
 		        OverlordComponent.instance.FinishFight(TPCamera.cameraComponent);
 				bgmPlayer.Play();
+		        grade = OverlordComponent.instance.FinalGrade;
+
+		        switch (grade)
+		        {
+			        case FightGrade.A:
+				        EngineManager.gradeTexture = loadedTextures["A"];
+				        break;
+			        case FightGrade.B:
+				        EngineManager.gradeTexture = loadedTextures["B"];
+				        break;
+			        case FightGrade.C:
+				        EngineManager.gradeTexture = loadedTextures["C"];
+				        break;
+			        case FightGrade.D:
+				        EngineManager.gradeTexture = loadedTextures["D"];
+				        break;
+			        case FightGrade.F:
+				        EngineManager.gradeTexture = loadedTextures["F"];
+				        break;
+			        case FightGrade.S:
+				        EngineManager.gradeTexture = loadedTextures["S"];
+				        break;
+		        }
+
+		        EngineManager.timePoint = 0;
 	        }
 
 	        rhythymGui.progressBars[0].progress = bossRhythym.health;
@@ -597,6 +628,34 @@ class ProceduralTest : Scene
         visual.AddComponent(animator2);
         animator2.Play();
 
+        GameObject gigusEye1 = new GameObject("gigusEye1");
+        gigusEye1.transform.position = firstEye;
+        gigusEye1.transform.scale = new Vector3(0.3f, 0.3f, 0.3f);
+        gigusEye1.model = loadedModels["sphere"];
+        gigusEye1.texture = loadedTextures["eye"];
+        visual.AddChild(gigusEye1);
+		
+        GameObject gigusPupil1 = new GameObject("gigusPupil1");
+        gigusPupil1.transform.position = pupil;
+        gigusPupil1.transform.scale = new Vector3(0.5f, 0.5f, 0.5f);
+        gigusPupil1.model = loadedModels["sphere"];
+        gigusPupil1.texture = loadedTextures["simpleBlack"];
+        gigusEye1.AddChild(gigusPupil1);
+		
+        GameObject gigusEye2 = new GameObject("gigusPupil2");
+        gigusEye2.transform.position = secondEye;
+        gigusEye2.transform.scale = new Vector3(0.3f, 0.3f, 0.3f);
+        gigusEye2.model = loadedModels["sphere"];
+        gigusEye2.texture = loadedTextures["eye"];
+        visual.AddChild(gigusEye2);
+		
+        GameObject gigusPupil2 = new GameObject("gigusPupil2");
+        gigusPupil2.transform.position = pupil;
+        gigusPupil2.transform.scale = new Vector3(0.5f, 0.5f, 0.5f);
+        gigusPupil2.model = loadedModels["sphere"];
+        gigusPupil2.texture = loadedTextures["simpleBlack"];
+        gigusEye2.AddChild(gigusPupil2);
+        
         return go;
     }
 

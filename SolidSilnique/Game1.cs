@@ -205,6 +205,9 @@ namespace SolidSilnique
 
             manager = new LightsManagerComponent(shader);
 
+            EngineManager.windowHeight = GraphicsDevice.Viewport.Height;
+            EngineManager.windowWidth = GraphicsDevice.Viewport.Width;
+            
             dirlight_ambient = new Vector4(0.6f, 0.6f, 0.6f, 1.0f);
             dirlight_diffuse = new Vector4(0.8f, 0.8f, 0f, 1.0f);
             dirlight_specular = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
