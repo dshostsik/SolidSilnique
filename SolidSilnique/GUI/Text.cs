@@ -22,7 +22,11 @@ public class Text : GuiElement
     
     public override void Draw(SpriteBatch spriteBatch)
     {
-        var position = new Vector2(positionX, positionY);
+		if (!visible)
+		{
+			return;
+		}
+		var position = new Vector2(positionX, positionY);
         Vector2 FontOrigin = new Vector2(fontSize *text.Length  / 2,fontSize *text.Length / 2);
         // Draw the string
         spriteBatch.DrawString(fontCache,text,position,Color.White,0.0f,Vector2.Zero,fontSize * scale,SpriteEffects.None, 0);

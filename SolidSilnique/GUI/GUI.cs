@@ -28,6 +28,7 @@ public class GUI
             {
                 texts.Add(elements[i] as Text);
                 SpriteFont font = Content.Load<SpriteFont>(texts[texts.Count-1].font);
+                
                 texts[texts.Count-1].Load(font);
             }
             else if (elements[i] is TextInput)
