@@ -80,6 +80,8 @@ namespace SolidSilnique.Core
         public static SpriteFont UIfont;
         public static ContentManager Content;
 
+        public static bool disableMove;
+
         public static void Start()
         {
 			UiRenderer = new SpriteBatch(graphics);
@@ -688,6 +690,7 @@ namespace SolidSilnique.Core
         {
             var cam = scene.mainCamera;
             float dt = Time.deltaTime;
+            /*
             if(InputManager.gMode == false)
             {
                 switch (action)
@@ -698,7 +701,7 @@ namespace SolidSilnique.Core
                     case "Right": cam.move(Camera.directions.RIGHT, dt); break;
                     case "Up": cam.move(Camera.directions.UP, dt); break;
                 }
-            }
+            }*/
             
         }
 
