@@ -67,12 +67,12 @@ namespace SolidSilnique.Core
             for (int i = 0; i < _particleCount; i++)
             {
                 float angle = MathHelper.TwoPi * (float)rnd.NextDouble();
-                float radius = 1 + (float)rnd.NextDouble() * 100f;
+                float radius = 1 + (float)rnd.NextDouble() * 1000f;
 
                 Vector3 pos = new Vector3(
-                    250 + radius * (float)Math.Cos(angle),
+                    320 + radius * (float)Math.Cos(angle),
                     10 + (float)rnd.NextDouble() * 100f,
-                    220 + radius * (float)Math.Sin(angle)
+                    350 + radius * (float)Math.Sin(angle)
                 );
 
                 Vector3 vel = new Vector3(

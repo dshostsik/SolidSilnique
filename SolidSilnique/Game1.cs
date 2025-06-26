@@ -310,14 +310,14 @@ namespace SolidSilnique
             EngineManager.Start();
 
             // Initialize GPU leaf particles
-            _leafSystem = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 1e6f, gravity: new Vector3(0, 0, 0))
+            _leafSystem = new LeafParticle(maxParticles: (int)2e+5,lifeTime: 1e5f, gravity: new Vector3(0, 0, 0))
             {
                 _game = this
             };
             Texture2D dusttex = Content.Load<Texture2D>("Textures/Dust");
             _leafSystem.LoadContent(GraphicsDevice, Content, dusttex);
 
-            _leafSystem2 = new LeafParticle(maxParticles: (int)2e+3,lifeTime: 4000f, gravity: new Vector3(0, -0.2f, 0))
+            _leafSystem2 = new LeafParticle(maxParticles: (int)2e+5,lifeTime: 1e5f, gravity: new Vector3(0, -0.05f, 0))
             {    
                 _game = this
             };
