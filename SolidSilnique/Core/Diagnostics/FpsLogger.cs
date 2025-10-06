@@ -21,6 +21,8 @@ namespace SolidSilnique.Core.Diagnostics
         /// </summary>
         private Task InputOutputTask;
 
+        private CancellationTokenSource _cts = new();
+
         /// <summary>
         /// Values sent by main thread to be written
         /// </summary>
@@ -56,19 +58,26 @@ namespace SolidSilnique.Core.Diagnostics
 
         private async Task WriteRecord()
         {
-            using StreamWriter writer = new StreamWriter(Path);
-            using CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-
-            foreach (float fps in AveragedValues.GetConsumingEnumerable())
+            try
             {
-                csv.WriteField(fps);
-                await csv.FlushAsync();
+                using StreamWriter writer = new StreamWriter(Path);
+                using CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+
+                foreach (float fps in AveragedValues.GetConsumingEnumerable(_cts.Token))
+                {
+                    csv.WriteField(fps);
+                    await csv.FlushAsync();
+                }
+            } catch (OperationCanceledException)
+            {
+
             }
         }
 
         public void Dispose()
         {
             _averagedValues.CompleteAdding();
+            _cts.Cancel();
 
             try
             {
@@ -76,6 +85,7 @@ namespace SolidSilnique.Core.Diagnostics
             }
             catch (AggregateException) { }
 
+            _cts.Dispose();
             _averagedValues.Dispose();
         }
     }
