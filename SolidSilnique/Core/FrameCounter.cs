@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using SolidSilnique.Core.Diagnostics;
+using SolidSilnique.Core.Interfaces;
 
 namespace SolidSilnique.Core
 {
@@ -18,6 +20,8 @@ namespace SolidSilnique.Core
         public const int MaximumSamples = 100;
 
         private Queue<float> samples = new();
+
+        private IFileManager<float> logger = FpsLoggerFactory.Logger;
 
         public void Update(GameTime gameTime)
         {
@@ -38,6 +42,11 @@ namespace SolidSilnique.Core
 
             TotalFrames++;
             TotalSeconds += deltaTime;
+
+            if (TotalFrames % 5 == 0)
+            {
+                logger.Write(avgFPS);
+            }
         }
     }
 }
