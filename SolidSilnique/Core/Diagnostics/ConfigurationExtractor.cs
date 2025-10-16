@@ -11,7 +11,7 @@ using System.IO;
 
 namespace SolidSilnique.Core.Diagnostics
 {
-    public static class UserConfigurationInfo
+    public static class ConfigurationExtractor
     {
         private static string path = "configuration.txt";
         public async static Task writeUserConfiguration(string graphicsDeviceDescription) {
@@ -20,7 +20,7 @@ namespace SolidSilnique.Core.Diagnostics
                 ManagementObject cpuInfo = new ManagementObjectSearcher("select * from win32_Processor")
                     .Get()
                     .Cast<ManagementObject>()
-                    .First();
+                    .FirstOrDefault();
                 string cpu = (string)cpuInfo["Name"];
                 /// Check if it is laptop or pc. if laptop then check of it is plugged in
                 PowerLineStatus status = SystemInformation.PowerStatus.PowerLineStatus;
@@ -42,8 +42,16 @@ namespace SolidSilnique.Core.Diagnostics
                 }
 
                 double totalMemoryGB = totalMemory / 1024.0 / 1024.0 / 1024.0;
+
+                ManagementObject osInfo = new ManagementObjectSearcher("select caption from Win32_OperatingSystem")
+                .Get()
+                .Cast<ManagementObject>()
+                .FirstOrDefault();
+
+                string os = (string)osInfo["Caption"];
+
                 using StreamWriter writer = new StreamWriter(path);
-                writer.Write($"CPU: {cpu};\nRAM: {totalMemoryGB}GB;\nGPU: {graphicsDeviceDescription};\n{powerConfiguration}");
+                writer.Write($"CPU: {cpu};\nRAM: {totalMemoryGB}GB;\nGPU: {graphicsDeviceDescription};\nOperating system: {os};\n{powerConfiguration}");
                 writer.FlushAsync();
             });
         }

@@ -276,7 +276,7 @@ namespace SolidSilnique
             EngineManager.GraphicsManager = _graphics;
             EngineManager.Skybox = _skybox;
 
-            UserConfigurationInfo.writeUserConfiguration(GraphicsDevice.Adapter.Description);
+            ConfigurationExtractor.writeUserConfiguration(GraphicsDevice.Adapter.Description);
             base.Initialize();
         }
 
