@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SolidSilnique.Core.Interfaces
+﻿namespace SolidSilnique.Core.Interfaces
 {
     /// <summary>
     /// Interface for FILE reader classes

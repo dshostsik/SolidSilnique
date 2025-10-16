@@ -1,12 +1,7 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics;
+﻿using System.Linq;
 using System.Management;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Runtime.Versioning;
 using System.IO;
 
 namespace SolidSilnique.Core.Diagnostics
@@ -15,6 +10,9 @@ namespace SolidSilnique.Core.Diagnostics
     {
         private static string path = "configuration.txt";
         public async static Task writeUserConfiguration(string graphicsDeviceDescription) {
+        #if !WINDOWS
+            throw new PlatformNotSupportedException("This platform is not supported! Sorry");
+        #endif
             await Task.Run(() => {
                 // MaGiC of LINQ
                 ManagementObject cpuInfo = new ManagementObjectSearcher("select * from win32_Processor")
