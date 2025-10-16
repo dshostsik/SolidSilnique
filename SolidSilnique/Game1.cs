@@ -10,6 +10,8 @@ using SolidSilnique.GameContent;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
 // Use this to prevent conflicts with Microsoft.Xna.Framework.Graphics.DirectionalLight
 using DirectionalLight = SolidSilnique.Core.DirectionalLight;
+using SolidSilnique.Core.Diagnostics;
+using System.Diagnostics;
 
 namespace SolidSilnique
 {
@@ -172,7 +174,7 @@ namespace SolidSilnique
             _graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             _graphics.ApplyChanges();
 
-
+            
             // Create camera
             //TODO delete
             //TODO delete
@@ -274,7 +276,7 @@ namespace SolidSilnique
             EngineManager.GraphicsManager = _graphics;
             EngineManager.Skybox = _skybox;
 
-
+            UserConfigurationInfo.writeUserConfiguration(GraphicsDevice.Adapter.Description);
             base.Initialize();
         }
 
