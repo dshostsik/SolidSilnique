@@ -1,19 +1,21 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Management;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
 
 namespace SolidSilnique.Core.Diagnostics
 {
     public static class ConfigurationExtractor
     {
         private static string path = "configuration.txt";
-        public async static Task writeUserConfiguration(string graphicsDeviceDescription) {
-        #if !WINDOWS
+        public async static Task writeUserConfiguration(string graphicsDeviceDescription)
+        {
+#if !WINDOWS
             throw new PlatformNotSupportedException("This platform is not supported! Sorry");
-        #endif
-            await Task.Run(() => {
+#endif
+            await Task.Run(() =>
+            {
                 // MaGiC of LINQ
                 ManagementObject cpuInfo = new ManagementObjectSearcher("select * from win32_Processor")
                     .Get()
@@ -50,7 +52,9 @@ namespace SolidSilnique.Core.Diagnostics
 
                 using StreamWriter writer = new StreamWriter(path);
                 writer.Write($"CPU: {cpu};\nRAM: {totalMemoryGB}GB;\nGPU: {graphicsDeviceDescription};\nOperating system: {os};\n{powerConfiguration}");
-                writer.FlushAsync();
+                writer.Flush();
+
+                writer.Dispose();
             });
         }
     }

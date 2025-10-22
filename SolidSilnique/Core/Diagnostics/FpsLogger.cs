@@ -62,7 +62,7 @@ namespace SolidSilnique.Core.Diagnostics
             {
                 using StreamWriter writer = new StreamWriter(Path);
                 using CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-
+                
                 foreach (float fps in AveragedValues.GetConsumingEnumerable(_cts.Token))
                 {
                     csv.WriteField(fps);
@@ -84,6 +84,8 @@ namespace SolidSilnique.Core.Diagnostics
                 InputOutputTask.Wait();
             }
             catch (AggregateException) { }
+
+            InputOutputTask?.Dispose();
 
             _cts.Dispose();
             _averagedValues.Dispose();
