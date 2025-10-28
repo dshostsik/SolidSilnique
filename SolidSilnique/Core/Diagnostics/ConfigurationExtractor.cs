@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Management;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -42,16 +44,17 @@ namespace SolidSilnique.Core.Diagnostics
                 }
 
                 double totalMemoryGB = totalMemory / 1024.0 / 1024.0 / 1024.0;
-
+                
                 ManagementObject osInfo = new ManagementObjectSearcher("select caption from Win32_OperatingSystem")
                 .Get()
                 .Cast<ManagementObject>()
                 .FirstOrDefault();
 
                 string os = (string)osInfo["Caption"];
+                var bits = System.Runtime.InteropServices.RuntimeInformation.OSArchitecture;
 
                 using StreamWriter writer = new StreamWriter(path);
-                writer.Write($"CPU: {cpu};\nRAM: {totalMemoryGB}GB;\nGPU: {graphicsDeviceDescription};\nOperating system: {os};\n{powerConfiguration}");
+                writer.Write($"CPU: {cpu};\nRAM: {totalMemoryGB}GB;\nGPU: {graphicsDeviceDescription};\nOperating system: {os} {bits};\n{powerConfiguration}");
                 writer.Flush();
 
                 writer.Dispose();
