@@ -22,6 +22,7 @@ namespace SolidSilnique.Core
         private Queue<float> samples = new();
 
         private IFileManager<float> logger = AdvancedFpsLoggerFactory.Logger;
+        private IFileManager<float> simpleLogger = FpsLoggerFactory.Logger;
 
         public void Update(GameTime gameTime)
         {
@@ -46,6 +47,7 @@ namespace SolidSilnique.Core
             if (TotalFrames % 5 == 0)
             {
                 logger.Write(avgFPS);
+                simpleLogger.Write(avgFPS);
             }
         }
     }
