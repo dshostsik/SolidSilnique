@@ -7,21 +7,27 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace SolidSilnique.Core.Diagnostics
 {
-    internal class AdvancedFpsLogger : IFileManager<(string scene, float fps)>, IDisposable
+    internal class AdvancedFpsLogger : IFileManager<float>, IDisposable, ISceneSwapable<string>
     {
 
         private string _path;
         private readonly Task task;
-        private BlockingCollection<(string scene, float fps)> values;
+        private BlockingCollection<string> values;
         private CancellationTokenSource _cts;
+        public string CurrentScene
+        {
+            get; set;
+        } = "";
 
         internal AdvancedFpsLogger(string path)
         {
             _path = path;
             _cts = new CancellationTokenSource();
-            values = new BlockingCollection<(string scene, float fps)>();
+            values = new BlockingCollection<string>();
             task = Task.Run(Execute);
         }
 
@@ -32,25 +38,27 @@ namespace SolidSilnique.Core.Diagnostics
                 using StreamWriter writer = new StreamWriter(_path);
                 using CsvWriter csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
-                foreach (var tuple in values.GetConsumingEnumerable(_cts.Token))
+                foreach (var value in values.GetConsumingEnumerable(_cts.Token))
                 {
-                    csv.WriteField($"{tuple.scene} {tuple.fps}");
+                    csv.WriteField(value);
+                    csv.NextRecord();
                     await writer.FlushAsync();
                 }
-            } catch (OperationCanceledException)
+            }
+            catch (OperationCanceledException)
             {
 
             }
         }
 
-        public (string scene, float fps) Read()
+        public float Read()
         {
             throw new NotImplementedException();
         }
 
-        public void Write((string scene, float fps) input)
+        public void Write(float input)
         {
-            values.Add(input);
+            values.Add($"{CurrentScene}:{input}");
         }
 
         public void Dispose()
@@ -66,12 +74,13 @@ namespace SolidSilnique.Core.Diagnostics
             {
             }
 
-            
+
             try
             {
                 task?.Dispose();
             }
-            catch (InvalidOperationException) {
+            catch (InvalidOperationException)
+            {
             }
 
 

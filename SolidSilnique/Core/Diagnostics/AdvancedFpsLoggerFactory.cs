@@ -6,9 +6,9 @@ namespace SolidSilnique.Core.Diagnostics
 {
     public static class AdvancedFpsLoggerFactory
     {
-        private static IFileManager<(string scene, float fps)>? logger;
+        private static AdvancedFpsLogger? logger;
 
-        public static IFileManager<(string scene, float fps)> Logger
+        public static IFileManager<float> Logger
         {
             get
             {
@@ -18,5 +18,11 @@ namespace SolidSilnique.Core.Diagnostics
             }
         }
 
+        public static ISceneSwapable<string> GetSceneSwapableLogger()
+        {
+            logger ??= new AdvancedFpsLogger("advanced_report.csv");
+
+            return logger;
+        }
     }
 }

@@ -1,19 +1,20 @@
-﻿using System;
+﻿using GUIRESOURCES;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using SolidSilnique.Core;
+using SolidSilnique.Core.Animation;
 using SolidSilnique.Core.ArtificialIntelligence;
 using SolidSilnique.Core.Components;
+using SolidSilnique.Core.Diagnostics;
+using SolidSilnique.Core.Interfaces;
+using SolidSilnique.MonoAL;
 using SolidSilnique.ProcderuralFoliage;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GUIRESOURCES;
-using Microsoft.Xna.Framework.Input;
-using SolidSilnique.Core.Animation;
-using SolidSilnique.MonoAL;
 using static BossRhythymUI;
-using System.Linq;
 
 
 namespace SolidSilnique.GameContent;
@@ -43,10 +44,10 @@ class ProceduralTest : Scene
     public GUI mainMenuGui;
 
     //---------------------------
-    
+
     public GUI outroGui;
-    
-    
+
+
     ContentManager content;
 
     // let's assume it as a player object so far
@@ -60,10 +61,10 @@ class ProceduralTest : Scene
     private bool firstFrame = true;
 
     private FightGrade grade;
-    
+
     public NAudioPlayer bgmPlayer;
-    
-    
+
+
     private Vector3 firstEye = new Vector3(1f, 0.45f, 0.1f);
     private Vector3 secondEye = new Vector3(0.1f, 0.16f, 1f);
 
@@ -72,7 +73,11 @@ class ProceduralTest : Scene
     private bool bossDefeated = false;
 
     private GameObject boss;
-    
+
+#if DEBUG
+    private ISceneSwapable<string> _sceneLogger = AdvancedFpsLoggerFactory.GetSceneSwapableLogger();
+#endif
+
     public ProceduralTest()
     {
     }
@@ -131,24 +136,24 @@ class ProceduralTest : Scene
         //loadedTextures.Add("trent/roughness", Content.Load<Texture2D>("trent_fire/PM3D_Cylinder3D_10_Coat_roughness"));
 
         models.Add(Content.Load<Model>("pModels/Rock1")); textures.Add(loadedTextures["deimos"]);
-		//models.Add(Content.Load<Model>("pModels/Branch")); textures.Add(loadedTextures["deimos"]);
-		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
-		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
-		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
-		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
-		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
-		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
-		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
-		models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
-		models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
-		models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
-		models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
-		//models.Add(Content.Load<Model>("pModels/Log")); textures.Add(loadedTextures["deimos"]);
-		models.Add(Content.Load<Model>("pModels/Stump")); textures.Add(loadedTextures["deimos"]);
+        //models.Add(Content.Load<Model>("pModels/Branch")); textures.Add(loadedTextures["deimos"]);
+        models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+        models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+        models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+        models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+        models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+        models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+        models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+        models.Add(Content.Load<Model>("pModels/BushBig")); textures.Add(loadedTextures["leafTex"]);
+        models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
+        models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
+        models.Add(Content.Load<Model>("pModels/BushSmall")); textures.Add(loadedTextures["deimos"]);
+        //models.Add(Content.Load<Model>("pModels/Log")); textures.Add(loadedTextures["deimos"]);
+        models.Add(Content.Load<Model>("pModels/Stump")); textures.Add(loadedTextures["deimos"]);
 
-		//models.Add(Content.Load<Model>("brzewno1/brzewno"));
-		//models.Add(Content.Load<Model>("brzewno3/brzewno3"));
-		//textures.Add(loadedTextures["leafTex"]);
+        //models.Add(Content.Load<Model>("brzewno1/brzewno"));
+        //models.Add(Content.Load<Model>("brzewno3/brzewno3"));
+        //textures.Add(loadedTextures["leafTex"]);
         //textures.Add(loadedTextures["deimos"]);
 
         treeModels.Add(Content.Load<Model>("pModels/tree1"));
@@ -164,17 +169,17 @@ class ProceduralTest : Scene
         loadedTextures.Add("B", Content.Load<Texture2D>("Grades/B"));
         loadedTextures.Add("A", Content.Load<Texture2D>("Grades/A"));
         loadedTextures.Add("S", Content.Load<Texture2D>("Grades/S"));
-        
+
 
         content = Content;
         bgmPlayer = new NAudioPlayer();
         bgmPlayer.LoadAudio("Content/Sounds/bgm1.mp3");
-		bgmPlayer.Repeat();
+        bgmPlayer.Repeat();
     }
 
     public override void Setup()
     {
-	    /*
+        /*
 	    string[] sounds = new string[4];
 	    sounds[0] = "Content/Sounds/drum-hitclap.wav";
 	    sounds[1] = "Content/Sounds/drum-hitfinish.wav";
@@ -186,7 +191,7 @@ class ProceduralTest : Scene
         environmentObject.Generate("Map1", content, 3, 60, 2, 16);
 
         _lastAudioStopTime = 0f;
-        
+
         ProceduralGrass newProc =
             new ProceduralGrass(models, textures, treeModels, treeTextures, content, environmentObject);
         Task task1 = Task.Run(() => newProc.precomputeNoise());
@@ -199,7 +204,7 @@ class ProceduralTest : Scene
         go.AddComponent(new TPPCameraComponent());
         this.AddChild(go);
 
-        
+
         Task.WhenAll(task1).Wait(); //:O
 
         newProc.GenerateObjects();
@@ -212,12 +217,12 @@ class ProceduralTest : Scene
 
 
         gab = new GameObject("gab");
-		GameObject gabV = new GameObject("gabVisual");
+        GameObject gabV = new GameObject("gabVisual");
         gab.AddChild(gabV);
 
 
-		gab.transform.position = new Vector3(270, 13, 565);
-		gab.transform.rotation = new Vector3(0, 45, 0);
+        gab.transform.position = new Vector3(270, 13, 565);
+        gab.transform.rotation = new Vector3(0, 45, 0);
 
         gab.transform.scale = new Vector3(1f);
         gabV.model = loadedModels["cube"];
@@ -251,8 +256,8 @@ class ProceduralTest : Scene
         gabFur.transform.scale = new Vector3(1f);
         gabFur.model = loadedModels["dodik"];
         gabFur.texture = loadedTextures["dodik_texture"];
-       gabV.AddChild(gabFur);
-        
+        gabV.AddChild(gabFur);
+
         GameObject eye1 = new GameObject("eye1");
         eye1.transform.position = new Vector3(-0.25f * 2, 0.209f, -0.495f * 2);
         eye1.transform.scale = new Vector3(0.4f);
@@ -260,42 +265,42 @@ class ProceduralTest : Scene
         eye1.texture = loadedTextures["eye"];
         gabV.AddChild(eye1);
 
-			GameObject pupil1 = new GameObject("pupil1");
-				pupil1.transform.position = new Vector3(0, 0, -0.495f * 2);
-				pupil1.transform.scale = new Vector3(0.4f,0.4f,0.2f);
-				pupil1.model = loadedModels["sphere"];
-				pupil1.texture = loadedTextures["simpleBlack"];
-				eye1.AddChild(pupil1);
+        GameObject pupil1 = new GameObject("pupil1");
+        pupil1.transform.position = new Vector3(0, 0, -0.495f * 2);
+        pupil1.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
+        pupil1.model = loadedModels["sphere"];
+        pupil1.texture = loadedTextures["simpleBlack"];
+        eye1.AddChild(pupil1);
 
-		GameObject brow1 = new GameObject("brow1");
-		brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, -0.495f * 2);
-		brow1.transform.scale = new Vector3(0.45f, 0.2f,0.4f);
-		brow1.transform.rotation = new Vector3(0f,0,-20f);
-		brow1.model = loadedModels["cube"];
-		brow1.texture = loadedTextures["simpleBlack"];
-		gabV.AddChild(brow1);
+        GameObject brow1 = new GameObject("brow1");
+        brow1.transform.position = new Vector3(-0.25f * 2, 0.5f, -0.495f * 2);
+        brow1.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
+        brow1.transform.rotation = new Vector3(0f, 0, -20f);
+        brow1.model = loadedModels["cube"];
+        brow1.texture = loadedTextures["simpleBlack"];
+        gabV.AddChild(brow1);
 
-		GameObject eye2 = new GameObject("eye2");
-			eye2.transform.position = new Vector3(0.25f*2, 0.209f, -0.495f * 2);
-			eye2.transform.scale = new Vector3(0.4f);
-			eye2.model = loadedModels["sphere"];
-			eye2.texture = loadedTextures["eye"];
-			gabV.AddChild(eye2);
+        GameObject eye2 = new GameObject("eye2");
+        eye2.transform.position = new Vector3(0.25f * 2, 0.209f, -0.495f * 2);
+        eye2.transform.scale = new Vector3(0.4f);
+        eye2.model = loadedModels["sphere"];
+        eye2.texture = loadedTextures["eye"];
+        gabV.AddChild(eye2);
 
-		GameObject pupil2 = new GameObject("pupil1");
-		pupil2.transform.position = new Vector3(0, 0, -0.495f * 2);
-		pupil2.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
-		pupil2.model = loadedModels["sphere"];
-		pupil2.texture = loadedTextures["simpleBlack"];
-		eye2.AddChild(pupil2);
+        GameObject pupil2 = new GameObject("pupil1");
+        pupil2.transform.position = new Vector3(0, 0, -0.495f * 2);
+        pupil2.transform.scale = new Vector3(0.4f, 0.4f, 0.2f);
+        pupil2.model = loadedModels["sphere"];
+        pupil2.texture = loadedTextures["simpleBlack"];
+        eye2.AddChild(pupil2);
 
-		GameObject brow2 = new GameObject("brow1");
-		brow2.transform.position = new Vector3(0.25f * 2, 0.5f, -0.495f * 2);
-		brow2.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
-		brow2.transform.rotation = new Vector3(0f, 0, 20f);
-		brow2.model = loadedModels["cube"];
-		brow2.texture = loadedTextures["simpleBlack"];
-		gabV.AddChild(brow2);
+        GameObject brow2 = new GameObject("brow1");
+        brow2.transform.position = new Vector3(0.25f * 2, 0.5f, -0.495f * 2);
+        brow2.transform.scale = new Vector3(0.45f, 0.2f, 0.4f);
+        brow2.transform.rotation = new Vector3(0f, 0, 20f);
+        brow2.model = loadedModels["cube"];
+        brow2.texture = loadedTextures["simpleBlack"];
+        gabV.AddChild(brow2);
 
 
         GameObject Tower = new GameObject("tower");
@@ -345,47 +350,47 @@ class ProceduralTest : Scene
 
 
         GameObject prevGeb = gab;
-			/*for (int i = 0; i < 3; i++)
-			{
-				GameObject gogus = CreateGebus(new Vector3(250 + i*20, 80, 250 + i*20));
-				gogus.GetComponent<Follower>().Target = gab;
-				if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
-				this.AddChild(gogus);
-				//prevGeb = gogus;
-			}*/
+        /*for (int i = 0; i < 3; i++)
+        {
+            GameObject gogus = CreateGebus(new Vector3(250 + i*20, 80, 250 + i*20));
+            gogus.GetComponent<Follower>().Target = gab;
+            if (i == 0) gogus.GetComponent<Follower>().SocialDistanceMultiplier = 4.0f;
+            this.AddChild(gogus);
+            //prevGeb = gogus;
+        }*/
 
-        GameObject gigus = CreateGebus(new Vector3(190, 15, 435),3,"Easy", "mp3");
-		gigus.GetComponent<Follower>().Target = gab;
-		this.AddChild(gigus);
+        GameObject gigus = CreateGebus(new Vector3(190, 15, 435), 3, "Easy", "mp3");
+        gigus.GetComponent<Follower>().Target = gab;
+        this.AddChild(gigus);
 
-		gigus = CreateGebus(new Vector3(270, 15, 300),2,"Easy","wav");
-		gigus.GetComponent<Follower>().Target = gab;
-		this.AddChild(gigus);
+        gigus = CreateGebus(new Vector3(270, 15, 300), 2, "Easy", "wav");
+        gigus.GetComponent<Follower>().Target = gab;
+        this.AddChild(gigus);
 
-		gigus = CreateGebus(new Vector3(220, 15, 195),1,"Easy", "wav");
-		gigus.GetComponent<Follower>().Target = gab;
-		this.AddChild(gigus);
-
-
-
-		gigus = CreateGebus(new Vector3(400, 15, 650), 1, "Hard", "wav");
-		gigus.GetComponent<Follower>().Target = gab;
-		this.AddChild(gigus);
-
-		gigus = CreateGebus(new Vector3(540, 15, 560), 2, "Hard", "wav");
-		gigus.GetComponent<Follower>().Target = gab;
-		this.AddChild(gigus);
-
-		gigus = CreateGebus(new Vector3(600, 15, 235), 3, "Hard", "mp3");
-		gigus.GetComponent<Follower>().Target = gab;
-		this.AddChild(gigus);
-
-
-		//gigus.albedo = Color.Red;
+        gigus = CreateGebus(new Vector3(220, 15, 195), 1, "Easy", "wav");
+        gigus.GetComponent<Follower>().Target = gab;
+        this.AddChild(gigus);
 
 
 
-		
+        gigus = CreateGebus(new Vector3(400, 15, 650), 1, "Hard", "wav");
+        gigus.GetComponent<Follower>().Target = gab;
+        this.AddChild(gigus);
+
+        gigus = CreateGebus(new Vector3(540, 15, 560), 2, "Hard", "wav");
+        gigus.GetComponent<Follower>().Target = gab;
+        this.AddChild(gigus);
+
+        gigus = CreateGebus(new Vector3(600, 15, 235), 3, "Hard", "mp3");
+        gigus.GetComponent<Follower>().Target = gab;
+        this.AddChild(gigus);
+
+
+        //gigus.albedo = Color.Red;
+
+
+
+
 
         mainMenuGui = new GUI("Content/MainMenuUI/menu.xml", content);
         rhythymGui = new GUI("Content/RhythymGui.xml", content);
@@ -410,20 +415,27 @@ class ProceduralTest : Scene
 
         boss = new GameObject("boss");
         GameObject bossV = new GameObject("bossV");
-		boss.AddChild(bossV);
-		boss.transform.position = new Vector3(400, 0, 80);
-		boss.transform.scale = new Vector3(1.5f);
-		bossV.albedo = new Color(1, 0.2f, 1);
-		bossV.model = loadedModels["trent"];
-		bossV.texture = loadedTextures["trent"];
+        boss.AddChild(bossV);
+        boss.transform.position = new Vector3(400, 0, 80);
+        boss.transform.scale = new Vector3(1.5f);
+        bossV.albedo = new Color(1, 0.2f, 1);
+        bossV.model = loadedModels["trent"];
+        bossV.texture = loadedTextures["trent"];
         boss.AddComponent(new SphereColliderComponent(8f));
-        Follower helpMe = new Follower(boss) {
-            aggroRange = 40, enemyIndex = 4, audioExtension = "mp3", difficulty = "Easy", Target = gab, patrolRadius = 0, SocialDistance = 1000
-            
+        Follower helpMe = new Follower(boss)
+        {
+            aggroRange = 40,
+            enemyIndex = 4,
+            audioExtension = "mp3",
+            difficulty = "Easy",
+            Target = gab,
+            patrolRadius = 0,
+            SocialDistance = 1000
+
         };
         boss.AddComponent(helpMe);
         this.AddChild(boss);
-		
+
 
         //Overlord :)
         GameObject overlord = new GameObject("Overlord");
@@ -437,17 +449,17 @@ class ProceduralTest : Scene
         EngineManager.InputManager.gMode = true;
         //bossRhythym.hit += powiedzDupa;
         bossRhythym.hit += OnBossNoteHit;
-        
+
         EngineManager.spritePos = new Rectangle((int)(EngineManager.windowWidth * 0.8f), (int)(EngineManager.windowHeight * 0.1f), (int)(EngineManager.windowWidth * 0.15f), (int)(EngineManager.windowWidth * 0.15f));
         bgmPlayer.Play();
     }
 
     public override void Update()
     {
-		rhythymGui.texts[3].text = gab.transform.position.ToString();
-		//kState = Keyboard.GetState();
+        rhythymGui.texts[3].text = gab.transform.position.ToString();
+        //kState = Keyboard.GetState();
 
-		/* if (SquaredDistanceBetweenEnemyAndPlayer() <
+        /* if (SquaredDistanceBetweenEnemyAndPlayer() <
 			 enemy.GetComponent<Follower>().SocialDistance * 3.0f)
 		 {
 			 _playerInsideEnemyFOV = true;
@@ -455,8 +467,8 @@ class ProceduralTest : Scene
 		 }*/
 
 
-		// Suspend the game if an Escape key was pressed
-		if (Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Start == ButtonState.Pressed)
+        // Suspend the game if an Escape key was pressed
+        if (Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Start == ButtonState.Pressed)
         {
             // Switch mode
             inMainMenu = true;
@@ -465,130 +477,143 @@ class ProceduralTest : Scene
             EngineManager.darkenTheScene = 1;
             // Switch interface
             EngineManager.currentGui = mainMenuGui;
+#if DEBUG
+            _sceneLogger.CurrentScene = "Main Menu";
+#endif
             // Unlock the mouse
             EngineManager.mouseFree = inMainMenu;
             if (turnedOn && !_songWasPlaying)
             {
-	            bossRhythym.audio.Pause();
-	            _songWasPlaying = true;
+                bossRhythym.audio.Pause();
+                _songWasPlaying = true;
             }
         }
 
         if (bossDefeated)
         {
-	        EngineManager.mouseVisible = true;
-	        // Make the entire scene dark
-	        EngineManager.darkenTheScene = 1;
-	        // Switch interface
-	        EngineManager.currentGui = outroGui;
-	        // Unlock the mouse
-	        EngineManager.mouseFree = bossDefeated;
+            EngineManager.mouseVisible = true;
+            // Make the entire scene dark
+            EngineManager.darkenTheScene = 1;
+            // Switch interface
+            EngineManager.currentGui = outroGui;
+#if DEBUG
+            _sceneLogger.CurrentScene = "Outro";
+#endif
+            // Unlock the mouse
+            EngineManager.mouseFree = bossDefeated;
         }
-		
+
         // Process only menu if inMainMenu is true. All updates will be suspended. Otherwise, update all entities
         if (inMainMenu)
         {
-// For a debug version
+            // For a debug version
 #if DEBUG
             Console.WriteLine("Mouse pos in menu: " + Mouse.GetState().X + " " + Mouse.GetState().Y);
+            _sceneLogger.CurrentScene = "Main Menu";
 #endif
             CheckHovers();
         }
         else if (bossDefeated)
         {
-	        CheckHoversOutro();
+            CheckHoversOutro();
         }
         else
         {
-	        if ((Follower.enemyToFight != null && !turnedOn))
-	        {
-		        bossRhythym.hasEnded = false;
-		        bossRhythym.Start(content, spriteBatch, Follower.enemyToFight.GetComponent<Follower>().enemyIndex, Follower.enemyToFight.GetComponent<Follower>().difficulty, Follower.enemyToFight.GetComponent<Follower>().audioExtension);
-		        turnedOn = true;
-		        OverlordComponent.instance.SetFight(bossRhythym, 100, gab, Follower.enemyToFight);
-	        }
+            if ((Follower.enemyToFight != null && !turnedOn))
+            {
+                bossRhythym.hasEnded = false;
+                bossRhythym.Start(content, spriteBatch, Follower.enemyToFight.GetComponent<Follower>().enemyIndex, Follower.enemyToFight.GetComponent<Follower>().difficulty, Follower.enemyToFight.GetComponent<Follower>().audioExtension);
+                turnedOn = true;
+                OverlordComponent.instance.SetFight(bossRhythym, 100, gab, Follower.enemyToFight);
+#if DEBUG
+                _sceneLogger.CurrentScene = "Fight";
+#endif
+            }
 
-	        if (turnedOn)
-	        {
-		        bgmPlayer.Pause();
-		        bossRhythym.Update();
-	        }
+            if (turnedOn)
+            {
+                bgmPlayer.Pause();
+                bossRhythym.Update();
+            }
 
-	        if (bossRhythym.hasEnded && turnedOn)
-	        {
-		        turnedOn = false;
-		        if (boss.Equals(Follower.enemyToFight))
-		        {
-			        bossDefeated = true;
-			        
-		        }
-		        else
-		        {
-			        Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
-			        Follower.enemyToFight = null;
-			        OverlordComponent.instance.FinishFight(TPCamera.cameraComponent);
-			        bgmPlayer.Play();
-			        grade = OverlordComponent.instance.FinalGrade;
+            if (bossRhythym.hasEnded && turnedOn)
+            {
+                turnedOn = false;
+                if (boss.Equals(Follower.enemyToFight))
+                {
+                    bossDefeated = true;
 
-			        switch (grade)
-			        {
-				        case FightGrade.A:
-					        EngineManager.gradeTexture = loadedTextures["A"];
-					        break;
-				        case FightGrade.B:
-					        EngineManager.gradeTexture = loadedTextures["B"];
-					        break;
-				        case FightGrade.C:
-					        EngineManager.gradeTexture = loadedTextures["C"];
-					        break;
-				        case FightGrade.D:
-					        EngineManager.gradeTexture = loadedTextures["D"];
-					        break;
-				        case FightGrade.F:
-					        EngineManager.gradeTexture = loadedTextures["F"];
-					        break;
-				        case FightGrade.S:
-					        EngineManager.gradeTexture = loadedTextures["S"];
-					        break;
-			        }
+                }
+                else
+                {
+                    Follower.enemyToFight.GetComponent<Follower>().SetFriendly();
+                    Follower.enemyToFight = null;
+                    OverlordComponent.instance.FinishFight(TPCamera.cameraComponent);
+#if DEBUG
+                    _sceneLogger.CurrentScene = "Open World";
+#endif
+                    bgmPlayer.Play();
+                    grade = OverlordComponent.instance.FinalGrade;
 
-			        EngineManager.timePoint = 0;
-		        }
-	        }
+                    switch (grade)
+                    {
+                        case FightGrade.A:
+                            EngineManager.gradeTexture = loadedTextures["A"];
+                            break;
+                        case FightGrade.B:
+                            EngineManager.gradeTexture = loadedTextures["B"];
+                            break;
+                        case FightGrade.C:
+                            EngineManager.gradeTexture = loadedTextures["C"];
+                            break;
+                        case FightGrade.D:
+                            EngineManager.gradeTexture = loadedTextures["D"];
+                            break;
+                        case FightGrade.F:
+                            EngineManager.gradeTexture = loadedTextures["F"];
+                            break;
+                        case FightGrade.S:
+                            EngineManager.gradeTexture = loadedTextures["S"];
+                            break;
+                    }
 
-	        rhythymGui.progressBars[0].progress = bossRhythym.health;
-	        rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
-	        rhythymGui.texts[1].text = bossRhythym.combo.ToString();
+                    EngineManager.timePoint = 0;
+                }
+            }
+
+            rhythymGui.progressBars[0].progress = bossRhythym.health;
+            rhythymGui.texts[0].text = bossRhythym.ReturnScoresAndAccuracy().ToString();
+            rhythymGui.texts[1].text = bossRhythym.combo.ToString();
 
 
         }
-	    base.Update();
+        base.Update();
     }
 
     private void CheckHoversOutro()
     {
-	    int mouseX = Mouse.GetState().X;
-	    int mouseY = Mouse.GetState().Y;
+        int mouseX = Mouse.GetState().X;
+        int mouseY = Mouse.GetState().Y;
 
-	    // Check ONLY if mouse was pressed somewhere in menu
-	    if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-	    {
-			    Button button = outroGui.buttons[0];
+        // Check ONLY if mouse was pressed somewhere in menu
+        if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+        {
+            Button button = outroGui.buttons[0];
 
-			    int x = (int)Math.Clamp(mouseX, button.positionX, button.positionX + button.width);
-			    int y = (int)Math.Clamp(mouseY, button.positionY, button.positionY + button.height);
-                
-		    
-			    if (mouseX == x && mouseY == y)
-			    {
-				    EngineManager.CloseGame = true;
-			    }
-	    } 
-	    
-	    if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed && bossDefeated)
-	    {
-		    EngineManager.CloseGame = true;
-	    }
+            int x = (int)Math.Clamp(mouseX, button.positionX, button.positionX + button.width);
+            int y = (int)Math.Clamp(mouseY, button.positionY, button.positionY + button.height);
+
+
+            if (mouseX == x && mouseY == y)
+            {
+                EngineManager.CloseGame = true;
+            }
+        }
+
+        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed && bossDefeated)
+        {
+            EngineManager.CloseGame = true;
+        }
     }
 
     /// <summary>
@@ -608,7 +633,7 @@ class ProceduralTest : Scene
 
                 int x = (int)Math.Clamp(mouseX, button.positionX, button.positionX + button.width);
                 int y = (int)Math.Clamp(mouseY, button.positionY, button.positionY + button.height);
-                
+
                 // if mouse actually intercepts any button, then check it's number. predefined in Content/MainMenuGUI/menu.xml
                 if (mouseX == x && mouseY == y)
                 {
@@ -619,19 +644,22 @@ class ProceduralTest : Scene
                             inMainMenu = false;
                             EngineManager.darkenTheScene = 0;
                             EngineManager.currentGui = rhythymGui;
+#if DEBUG
+                            _sceneLogger.CurrentScene = "Open World";
+#endif
                             EngineManager.mouseFree = inMainMenu;
                             EngineManager.mouseVisible = false;
                             if (_songWasPlaying && turnedOn)
                             {
-	                            bossRhythym.audio.Play();
-	                            _songWasPlaying = false;
+                                bossRhythym.audio.Play();
+                                _songWasPlaying = false;
                             }
                             break;
                         // Escape button
                         case 1:
                             EngineManager.CloseGame = true;
                             break;
-                        // The Settings button is not implemented. idk if we really need it
+                            // The Settings button is not implemented. idk if we really need it
                     }
                 }
             }
@@ -639,21 +667,24 @@ class ProceduralTest : Scene
 
         if (GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed && inMainMenu)
         {
-	        inMainMenu = false;
-	        EngineManager.darkenTheScene = 0;
-	        EngineManager.currentGui = rhythymGui;
-	        EngineManager.mouseFree = inMainMenu;
-	        EngineManager.mouseVisible = false;
-	        if (_songWasPlaying && turnedOn)
-	        {
-		        bossRhythym.audio.Play();
-		        _songWasPlaying = false;
-	        }
+            inMainMenu = false;
+            EngineManager.darkenTheScene = 0;
+            EngineManager.currentGui = rhythymGui;
+#if DEBUG
+            _sceneLogger.CurrentScene = "Open World";
+#endif
+            EngineManager.mouseFree = inMainMenu;
+            EngineManager.mouseVisible = false;
+            if (_songWasPlaying && turnedOn)
+            {
+                bossRhythym.audio.Play();
+                _songWasPlaying = false;
+            }
         }
 
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed && inMainMenu)
         {
-	        EngineManager.CloseGame = true;
+            EngineManager.CloseGame = true;
         }
     }
 
@@ -663,16 +694,19 @@ class ProceduralTest : Scene
 
         go.transform.position = pos;
         go.transform.scale = new Vector3(0.75f);
-        
+
         go.AddComponent(new SphereColliderComponent(0.75f, false));
-        go.AddComponent(new Follower(go, 2f) { 
-            difficulty = difficulty, audioExtension = audioExtension, enemyIndex = enemyIndex
+        go.AddComponent(new Follower(go, 2f)
+        {
+            difficulty = difficulty,
+            audioExtension = audioExtension,
+            enemyIndex = enemyIndex
         });
 
 
         GameObject visual = new GameObject("GebusVisual");
-		visual.model = loadedModels["sphere"];
-		visual.texture = loadedTextures["gabTex"];
+        visual.model = loadedModels["sphere"];
+        visual.texture = loadedTextures["gabTex"];
         visual.albedo = Color.Red;
         go.AddChild(visual);
 
@@ -695,28 +729,28 @@ class ProceduralTest : Scene
         gigusEye1.model = loadedModels["sphere"];
         gigusEye1.texture = loadedTextures["eye"];
         visual.AddChild(gigusEye1);
-		
+
         GameObject gigusPupil1 = new GameObject("gigusPupil1");
         gigusPupil1.transform.position = pupil;
         gigusPupil1.transform.scale = new Vector3(0.5f, 0.5f, 0.5f);
         gigusPupil1.model = loadedModels["sphere"];
         gigusPupil1.texture = loadedTextures["simpleBlack"];
         gigusEye1.AddChild(gigusPupil1);
-		
+
         GameObject gigusEye2 = new GameObject("gigusPupil2");
         gigusEye2.transform.position = secondEye;
         gigusEye2.transform.scale = new Vector3(0.3f, 0.3f, 0.3f);
         gigusEye2.model = loadedModels["sphere"];
         gigusEye2.texture = loadedTextures["eye"];
         visual.AddChild(gigusEye2);
-		
+
         GameObject gigusPupil2 = new GameObject("gigusPupil2");
         gigusPupil2.transform.position = pupil;
         gigusPupil2.transform.scale = new Vector3(0.5f, 0.5f, 0.5f);
         gigusPupil2.model = loadedModels["sphere"];
         gigusPupil2.texture = loadedTextures["simpleBlack"];
         gigusEye2.AddChild(gigusPupil2);
-        
+
         return go;
     }
 

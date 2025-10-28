@@ -21,7 +21,7 @@ namespace SolidSilnique.Core
 
         private Queue<float> samples = new();
 
-        private IFileManager<float> logger = FpsLoggerFactory.Logger;
+        private IFileManager<float> logger = AdvancedFpsLoggerFactory.Logger;
 
         public void Update(GameTime gameTime)
         {

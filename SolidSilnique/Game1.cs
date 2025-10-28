@@ -169,8 +169,7 @@ namespace SolidSilnique
             // _graphics.HardwareModeSwitch = true;
             //_graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
             //_graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
-            _graphics.SynchronizeWithVerticalRetrace = true; //VSync
-            //_graphics.SynchronizeWithVerticalRetrace = false; // disabled VSync for uncapped FPS
+            _graphics.SynchronizeWithVerticalRetrace = false; //VSync
             _graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             _graphics.ApplyChanges();
 
