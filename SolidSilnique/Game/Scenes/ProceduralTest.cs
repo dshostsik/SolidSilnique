@@ -225,25 +225,25 @@ class ProceduralTest : Scene
         //gab.normalMap = loadedTextures["gabNo"];
         //gab.roughnessMap = loadedTextures["gabRo"];
         //gab.aoMap = loadedTextures["gabAo"];
-        gab.AddComponent(new DebugMoveComponent());
+        //gab.AddComponent(new DebugMoveComponent());
         gab.AddComponent(new SphereColliderComponent(1));
         gabV.AddComponent(new NoteResponseComponent());
         this.AddChild(gab);
 
 
-        GameObject TPcam = new GameObject("cam");
-        TPcam.AddComponent(new TPPCameraComponent());
-        TPcam.transform.position = new Vector3(0, 1.5f, 0);
-        gab.AddChild(TPcam);
-
-        GameObject TPcamCam = new GameObject("camcam");
-        var tpcCamComp = new CameraComponent();
-        TPcamCam.AddComponent(tpcCamComp);
-
-
-        TPcamCam.transform.position = new Vector3(0, 0, 10);
-        this.TPCamera = new Camera(tpcCamComp);
-        TPcam.AddChild(TPcamCam);
+        // GameObject TPcam = new GameObject("cam");
+        // TPcam.AddComponent(new TPPCameraComponent());
+        // TPcam.transform.position = new Vector3(0, 1.5f, 0);
+        // gab.AddChild(TPcam);
+        //
+        // GameObject TPcamCam = new GameObject("camcam");
+        // var tpcCamComp = new CameraComponent();
+        // TPcamCam.AddComponent(tpcCamComp);
+        //
+        //
+        // TPcamCam.transform.position = new Vector3(0, 0, 10);
+        // this.TPCamera = new Camera(tpcCamComp);
+        // TPcam.AddChild(TPcamCam);
 
 
         GameObject gabFur = new GameObject("gabFur");
@@ -433,8 +433,8 @@ class ProceduralTest : Scene
 
 
 
-        TPCamera.cameraComponent.SetMain();
-        EngineManager.InputManager.gMode = true;
+        //TPCamera.cameraComponent.SetMain();
+        EngineManager.InputManager.gMode = false;
         //bossRhythym.hit += powiedzDupa;
         bossRhythym.hit += OnBossNoteHit;
         

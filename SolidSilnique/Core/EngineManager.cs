@@ -702,11 +702,11 @@ namespace SolidSilnique.Core
             }
         }
 
-        private static void OnActionHeld(string action)
+        public static void OnActionHeld(string action)
         {
             var cam = scene.mainCamera;
             float dt = Time.deltaTime;
-            /*
+            
             if(InputManager.gMode == false)
             {
                 switch (action)
@@ -717,7 +717,7 @@ namespace SolidSilnique.Core
                     case "Right": cam.move(Camera.directions.RIGHT, dt); break;
                     case "Up": cam.move(Camera.directions.UP, dt); break;
                 }
-            }*/
+            }
             
         }
 

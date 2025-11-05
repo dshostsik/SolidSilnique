@@ -23,7 +23,7 @@ namespace SolidSilnique
 
 
         //FPS Counter
-        private readonly FrameCounter counter;
+        //private readonly FrameCounter counter;
         private Vector2 frameraterCounterPosition;
 
         // Model-View-Projection
@@ -118,7 +118,7 @@ namespace SolidSilnique
             IsMouseVisible = false;
             IsFixedTimeStep = false;
             Mouse.SetCursor(MouseCursor.Arrow);
-            counter = new FrameCounter();
+            //counter = new FrameCounter();
             scrollWheelValue = 0;
         }
 
@@ -389,7 +389,7 @@ namespace SolidSilnique
 
             IsMouseVisible = MouseVisible;
 
-            counter.Update(gameTime);
+            //counter.Update(gameTime);
             EngineManager.ProcessInput(gameTime);
             EngineManager.Update(gameTime);
 
@@ -425,9 +425,9 @@ namespace SolidSilnique
             //float t = (float)gameTime.TotalGameTime.TotalSeconds;
 
 
-            _text.Begin();
-            _text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Aqua);
-            _text.End();
+            //_text.Begin();
+            //_text.DrawString(_font, MathF.Ceiling(counter.avgFPS).ToString(), frameraterCounterPosition, Color.Aqua);
+            //_text.End();
 
 
             base.Draw(gameTime);
